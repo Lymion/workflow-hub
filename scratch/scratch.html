@@ -7,7 +7,7 @@
 <script>window.SCRATCH_STATES=['empty','loading','error','full']</script>
 <script>
   (function(){var t;try{t=localStorage.getItem('wh-theme')}catch(e){}
-  if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  if(!t)t=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
   document.documentElement.dataset.theme=t;})();
 </script>
 <style>
@@ -74,7 +74,7 @@ body{
     radial-gradient(800px 500px at 50% 115%, var(--wash-3), transparent 60%),
     var(--bg);
   background-attachment:fixed;
-  display:grid; grid-template-columns:240px minmax(0,1fr);
+  display:grid; grid-template-columns:240px minmax(0,1fr); height:100%;
 }
 svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 h1,h2,h3,p{margin:0}
@@ -134,7 +134,7 @@ kbd{font:600 11px var(--font);color:var(--label-2);background:var(--fill);border
 
 /* ---------- sidebar ---------- */
 .sidebar{
-  position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:14px;padding:16px 12px 14px;
+  position:sticky;top:0;height:100%;display:flex;flex-direction:column;gap:14px;padding:16px 12px 14px;
   background:var(--sidebar);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border-right:1px solid var(--sep);box-shadow:inset -1px 0 0 rgba(255,255,255,.35);
 }
@@ -166,9 +166,9 @@ body[data-state="error"]:has(.route.on[data-route="#home"]) .engine .off{display
 .engine .btn{margin-left:auto}
 
 /* ---------- main ---------- */
-main{min-width:0;height:100vh;overflow:auto}
+main{min-width:0;height:100%;overflow:auto}
 .page{max-width:1120px;margin:0 auto;padding:28px 36px 96px}
-.toolbar{display:flex;align-items:flex-end;gap:16px;margin-bottom:24px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;margin-bottom:24px}
 .toolbar .titles{flex:1;min-width:0}
 .toolbar .eyebrow{font-size:13px;color:var(--label-2);font-weight:500;margin-bottom:4px}
 .route{display:none}
@@ -255,7 +255,7 @@ main{min-width:0;height:100vh;overflow:auto}
 .type.add{background:transparent;backdrop-filter:none;box-shadow:inset 0 0 0 1.5px var(--sep);border-radius:var(--r-l);cursor:default}
 .type.add .tile{background:var(--fill-strong);color:var(--label-2);box-shadow:none}
 .type.bad{cursor:default;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 45%,transparent)}
-.name-row{display:flex;gap:16px;align-items:flex-end;margin-top:22px}
+.name-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-top:22px}
 .field{display:flex;flex-direction:column;gap:6px;flex:1;max-width:380px}
 .field label{font-size:12.5px;font-weight:600;color:var(--label-2)}
 .input{height:38px;padding:0 12px;border-radius:10px;border:0;background:var(--surface-solid);color:var(--label);font:14px var(--font);box-shadow:inset 0 0 0 1px var(--sep),var(--shadow-1)}
@@ -318,7 +318,7 @@ tr:last-child td{box-shadow:none}
 .cart-foot .hint{display:block;font-size:12px;font-weight:500;color:var(--red-text)}
 
 /* ---------- project ---------- */
-.p-head{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.p-head{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:20px}
 .p-head .titles{flex:1;min-width:0}
 .p-head .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .seg{position:relative;display:inline-flex;padding:3px;border-radius:10px;background:var(--fill);margin-bottom:18px}
@@ -389,10 +389,13 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
   body{grid-template-columns:72px minmax(0,1fr)}
   .sidebar .brand b,.sidebar .search span,.sidebar .search kbd,.nav a span,.nav a .meta,.nav-label,.mini-spend,.engine span{display:none}
   .nav a,.search{justify-content:center;padding:0}
-  .home-grid,.wiring,.hb{grid-template-columns:1fr}
-  .board{grid-template-columns:1fr}
+  .home-grid,.wiring,.hb{grid-template-columns:minmax(0,1fr)}
+  .board{grid-template-columns:minmax(0,1fr)}
   .cart{position:static;max-height:none}
   .page{padding:24px 20px 96px}
+  .toasts{left:calc(50% + 36px)}
+  .chapter{padding:22px 18px}
+  table{display:block;overflow-x:auto}
 }
 @media (prefers-reduced-motion:reduce){
   /* gentler, not zero: keep fades and colour, drop movement */

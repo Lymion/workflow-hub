@@ -1,0 +1,1145 @@
+<title>Workflow Hub</title>
+<script>(function(){var s;try{s=sessionStorage.getItem('rv-state')}catch(e){}document.body.dataset.state=s||'full'})();</script>
+<script>window.SCRATCH_STATES=['empty','loading','error','full']</script>
+<script>
+  (function(){var t;try{t=localStorage.getItem('wh-theme')}catch(e){}
+  if(!t)t=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.dataset.theme=t;})();
+</script>
+<style>
+:root{
+  color-scheme: light;
+  --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+
+  --bg:#F2F2F7;
+  --wash-1:rgba(255,149,0,.13); --wash-2:rgba(94,92,230,.12); --wash-3:rgba(52,199,89,.09);
+  --sidebar:rgba(248,248,251,.62);
+  --surface:rgba(255,255,255,.74);
+  --surface-solid:#FFFFFF;
+  --fill:rgba(118,118,128,.10);
+  --fill-strong:rgba(118,118,128,.18);
+  --label:#1D1D1F; --label-2:#5E5E66; --label-3:#8E8E95;
+  --sep:rgba(60,60,67,.12);
+
+  --accent:#0071E3; --accent-hover:#0062C4; --accent-text:#0066CC; --on-accent:#FFFFFF; --accent-tint:rgba(0,113,227,.10);
+  --robotics:#F56300; --robotics-text:#C2410C; --robotics-tint:rgba(245,99,0,.12);
+  --appdev:#5E5CE6; --appdev-text:#4F46E5; --appdev-tint:rgba(94,92,230,.12);
+  --green:#34C759; --green-text:#1E7B34; --green-tint:rgba(52,199,89,.14);
+  --amber:#FF9F0A; --amber-text:#9A5B00; --amber-tint:rgba(255,159,10,.16);
+  --red:#FF3B30; --red-text:#C8001A; --red-tint:rgba(255,59,48,.12);
+
+  --r-s:8px; --r:12px; --r-l:16px;
+  --hl: inset 0 1px 0 rgba(255,255,255,.85);
+  --shadow-1: 0 0 0 .5px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.06), 0 8px 24px -12px rgba(0,0,0,.16);
+  --shadow-2: 0 0 0 .5px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.06), 0 24px 48px -16px rgba(0,0,0,.22);
+  --blur: blur(24px) saturate(180%);
+
+  --ease-out: cubic-bezier(.23,1,.32,1);
+  --ease-drawer: cubic-bezier(.32,.72,0,1);
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#141416;
+  --wash-1:rgba(255,149,0,.10); --wash-2:rgba(94,92,230,.14); --wash-3:rgba(48,209,88,.06);
+  --sidebar:rgba(30,30,33,.62);
+  --surface:rgba(44,44,48,.66);
+  --surface-solid:#2C2C2E;
+  --fill:rgba(118,118,128,.20);
+  --fill-strong:rgba(118,118,128,.32);
+  --label:#F5F5F7; --label-2:#AEAEB5; --label-3:#7C7C83;
+  --sep:rgba(255,255,255,.10);
+  --accent:#0A84FF; --accent-hover:#3395FF; --accent-text:#5AA9FF; --on-accent:#FFFFFF; --accent-tint:rgba(10,132,255,.18);
+  --robotics:#FF8A3D; --robotics-text:#FFA366; --robotics-tint:rgba(255,138,61,.16);
+  --appdev:#7D7AFF; --appdev-text:#A9A7FF; --appdev-tint:rgba(125,122,255,.18);
+  --green:#30D158; --green-text:#4ADE80; --green-tint:rgba(48,209,88,.16);
+  --amber:#FF9F0A; --amber-text:#FFC266; --amber-tint:rgba(255,159,10,.18);
+  --red:#FF453A; --red-text:#FF7B73; --red-tint:rgba(255,69,58,.18);
+  --hl: inset 0 1px 0 rgba(255,255,255,.07);
+  --shadow-1: 0 0 0 .5px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -12px rgba(0,0,0,.6);
+  --shadow-2: 0 0 0 .5px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4), 0 28px 56px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font:14px/1.45 var(--font); color:var(--label); -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(900px 520px at 8% -10%, var(--wash-1), transparent 60%),
+    radial-gradient(900px 600px at 105% 0%, var(--wash-2), transparent 60%),
+    radial-gradient(800px 500px at 50% 115%, var(--wash-3), transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+  display:grid; grid-template-columns:240px minmax(0,1fr); height:100%;
+}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+h1{font-size:26px;line-height:1.15;font-weight:700;letter-spacing:-.022em}
+h2{font-size:15px;font-weight:600;letter-spacing:-.01em}
+h3{font-size:14px;font-weight:600}
+.muted{color:var(--label-2)}
+.small{font-size:12px}
+.mono{font-family:var(--mono);font-size:12.5px}
+.num{font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;
+  border-radius:10px;border:0;font:600 13.5px var(--font);cursor:pointer;white-space:nowrap;
+  background:var(--surface-solid);color:var(--label);box-shadow:var(--hl),var(--shadow-1);
+  transition:transform 160ms var(--ease-out), background-color 160ms ease, opacity 160ms ease;
+}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 1px 2px rgba(0,0,0,.12),0 6px 16px -6px color-mix(in srgb,var(--accent) 70%,transparent)}
+.btn.tinted{background:var(--accent-tint);color:var(--accent-text);box-shadow:none}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--label-2)}
+.btn.sm{height:30px;padding:0 10px;font-size:12.5px;border-radius:8px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+@media (hover:hover) and (pointer:fine){
+  .btn.primary:not([disabled]):hover{background:var(--accent-hover)}
+  .btn.ghost:hover,.btn.tinted:hover{background:var(--fill)}
+  .btn:not(.primary):not(.ghost):not(.tinted):not([disabled]):hover{background:color-mix(in srgb,var(--surface-solid) 92%,var(--label))}
+}
+kbd{font:600 11px var(--font);color:var(--label-2);background:var(--fill);border-radius:5px;padding:1px 6px}
+
+/* ---------- surfaces ---------- */
+.card{
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-radius:var(--r-l);box-shadow:var(--hl),var(--shadow-1);
+}
+.pad{padding:18px 20px}
+.chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--fill);color:var(--label-2);white-space:nowrap}
+.chip.rob{background:var(--robotics-tint);color:var(--robotics-text)}
+.chip.app{background:var(--appdev-tint);color:var(--appdev-text)}
+.chip.ok{background:var(--green-tint);color:var(--green-text)}
+.chip.warn{background:var(--amber-tint);color:var(--amber-text)}
+.chip.bad{background:var(--red-tint);color:var(--red-text)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--label-3)}
+.dot.rob{background:var(--robotics)}.dot.app{background:var(--appdev)}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
+
+.tile{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px -2px rgba(0,0,0,.25)}
+.tile svg.i{width:19px;height:19px}
+.tile.rob{background:linear-gradient(160deg,#FFA94D,#F56300)}
+.tile.app{background:linear-gradient(160deg,#9A98FF,#5E5CE6)}
+.tile.lg{width:48px;height:48px;border-radius:13px}
+.tile.lg svg.i{width:24px;height:24px}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;height:100%;display:flex;flex-direction:column;gap:14px;padding:16px 12px 14px;
+  background:var(--sidebar);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-right:1px solid var(--sep);box-shadow:inset -1px 0 0 rgba(255,255,255,.35);
+}
+:root[data-theme="dark"] .sidebar{box-shadow:inset -1px 0 0 rgba(255,255,255,.04)}
+/* engine is only "offline" when Home reports it */
+.engine .off{display:none}
+body[data-state="error"]:has(.route.on[data-route="#home"]) .engine .on-ok{display:none}
+body[data-state="error"]:has(.route.on[data-route="#home"]) .engine .off{display:inline-block}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 6px}
+.brand-mark{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 200deg,#FF9F0A,#FF375F,#5E5CE6,#0A84FF,#30D158,#FF9F0A);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 2px 6px -2px rgba(0,0,0,.3)}
+.brand b{font-size:14.5px;letter-spacing:-.01em}
+.search{display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:9px;border:0;width:100%;background:var(--fill);color:var(--label-2);font:13px var(--font);cursor:pointer;text-align:left}
+.search span{flex:1}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:11.5px;font-weight:600;color:var(--label-2);padding:6px 10px 4px}
+.nav a{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border-radius:9px;color:var(--label);font-weight:500;transition:background-color 150ms ease}
+.nav a svg.i{color:var(--label-2)}
+.nav a[aria-current="page"]{background:var(--surface-solid);box-shadow:var(--hl),var(--shadow-1)}
+.nav a[aria-current="page"] svg.i{color:var(--accent)}
+@media (hover:hover) and (pointer:fine){.nav a:not([aria-current="page"]):hover{background:var(--fill)}}
+.nav a .meta{margin-left:auto;font-size:12px;color:var(--label-2)}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.mini-spend{padding:12px;border-radius:12px;background:var(--surface);box-shadow:var(--hl),var(--shadow-1)}
+.mini-spend .row{display:flex;justify-content:space-between;font-size:12px}
+.meter{height:6px;border-radius:999px;background:var(--fill-strong);overflow:hidden;margin-top:8px}
+.meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#30D158,#0A84FF);transform-origin:left;animation:grow 700ms var(--ease-out) both}
+@keyframes grow{from{transform:scaleX(0)}}
+.engine{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--label-2);padding:0 6px}
+.engine .btn{margin-left:auto}
+
+/* ---------- main ---------- */
+main{min-width:0;height:100%;overflow:auto}
+.page{max-width:1120px;margin:0 auto;padding:28px 36px 96px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;margin-bottom:24px}
+.toolbar .titles{flex:1;min-width:0}
+.toolbar .eyebrow{font-size:13px;color:var(--label-2);font-weight:500;margin-bottom:4px}
+.route{display:none}
+.route.on{display:block}
+.route.on .rise{animation:rise 200ms var(--ease-out) both;animation-delay:var(--d,0ms)}
+.route.seen .meter i{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(4px)}}
+
+.banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r);margin-bottom:18px;font-weight:500}
+.banner.bad{background:var(--red-tint);color:var(--red-text)}
+.banner.warn{background:var(--amber-tint);color:var(--amber-text)}
+.banner .btn{margin-left:auto}
+.banner code{font-family:var(--mono);font-size:12.5px;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:40px 24px}
+.empty .art{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--accent-tint);color:var(--accent-text)}
+.empty .art svg.i{width:26px;height:26px}
+.empty p{max-width:340px}
+
+.sk{background:linear-gradient(90deg,var(--fill) 0%,var(--fill-strong) 50%,var(--fill) 100%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:8px}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+
+/* ---------- home ---------- */
+.home-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:20px;align-items:start}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-head h2{flex:1}
+.tasks{list-style:none;margin:0;padding:6px}
+.task{display:flex;align-items:center;gap:12px;min-height:48px;padding:6px 12px;border-radius:10px}
+.task + .task{box-shadow:inset 0 1px 0 var(--sep)}
+.task .t{flex:1;min-width:0}
+.task .t b{display:block;font-weight:500;transition:color 200ms ease}
+.task .t span{font-size:12px;color:var(--label-2);display:flex;align-items:center;gap:6px}
+.task.done .t b{color:var(--label-2);text-decoration:line-through;text-decoration-color:var(--label-3)}
+.check{width:22px;height:22px;border-radius:50%;border:1.75px solid var(--label-3);background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;flex:none;color:#fff;transition:background-color 180ms var(--ease-out),border-color 180ms var(--ease-out),transform 160ms var(--ease-out)}
+.check:active{transform:scale(.9)}
+.check svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset 220ms var(--ease-out)}
+.task.done .check{background:var(--green);border-color:var(--green)}
+.task.done .check svg{stroke-dashoffset:0}
+.due{font-size:12px;font-weight:600;color:var(--label-2)}
+.due.today{color:var(--accent-text)}
+.due.late{color:var(--red-text)}
+
+.filters{display:flex;gap:6px}
+.fchip{height:28px;padding:0 12px;border-radius:999px;border:0;background:var(--fill);color:var(--label-2);font:600 12.5px var(--font);cursor:pointer;transition:background-color 150ms ease,color 150ms ease}
+.fchip[aria-pressed="true"]{background:var(--label);color:var(--bg)}
+.projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.proj{display:flex;flex-direction:column;gap:12px;padding:16px;cursor:pointer;transition:transform 200ms var(--ease-out),box-shadow 200ms var(--ease-out)}
+.proj:active{transform:scale(.98)}
+@media (hover:hover) and (pointer:fine){.proj:hover{transform:translateY(-1px);box-shadow:var(--hl),var(--shadow-2)}}
+.proj .top{display:flex;align-items:center;gap:10px}
+.proj .top b{display:block;font-weight:600}
+.proj .top span{font-size:12px;color:var(--label-2)}
+.proj .bar{height:4px;border-radius:999px;background:var(--fill-strong);overflow:hidden}
+.proj .bar i{display:block;height:100%;border-radius:inherit}
+.proj.rob .bar i{background:var(--robotics)}.proj.app .bar i{background:var(--appdev)}
+.proj .foot{display:flex;justify-content:space-between;font-size:12px;color:var(--label-2)}
+
+.spend .big{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.spend .big small{font-size:15px;font-weight:600;color:var(--label-2);letter-spacing:0}
+.spend .meter{height:8px;margin:14px 0 6px}
+.spend dl{margin:16px 0 0;display:grid;grid-template-columns:1fr auto auto;gap:9px 14px;font-size:13px}
+.spend dt{display:flex;align-items:center;gap:8px;color:var(--label)}
+.spend dd{margin:0;color:var(--label-2);text-align:right}
+.spend dd.rm{color:var(--label);font-weight:600}
+.spend .note{margin-top:14px;padding-top:12px;box-shadow:inset 0 1px 0 var(--sep);font-size:12px;color:var(--label-2);display:flex;gap:8px;align-items:center}
+
+/* ---------- new ---------- */
+.steps{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--label-2);margin-bottom:22px}
+.steps .s{display:flex;align-items:center;gap:6px}
+.steps .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--fill-strong);font-size:11px}
+.steps .s.on{color:var(--label)}
+.steps .s.on .n{background:var(--accent);color:#fff}
+.steps .line{width:28px;height:1.5px;background:var(--sep)}
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.type{position:relative;display:flex;flex-direction:column;gap:12px;padding:20px;text-align:left;border:0;font:inherit;color:inherit;cursor:pointer;transition:transform 200ms var(--ease-out),box-shadow 200ms var(--ease-out)}
+.type:active{transform:scale(.98)}
+@media (hover:hover) and (pointer:fine){.type:hover{box-shadow:var(--hl),var(--shadow-2)}}
+.type[aria-checked="true"]{box-shadow:var(--hl),0 0 0 2px var(--accent),var(--shadow-2)}
+.type .tick{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;opacity:0;transform:scale(.9);transition:opacity 180ms var(--ease-out),transform 180ms var(--ease-out)}
+.type .tick svg.i{width:13px;height:13px;stroke-width:3}
+.type[aria-checked="true"] .tick{opacity:1;transform:scale(1)}
+.type h3{font-size:16px}
+.type .meta{display:flex;flex-wrap:wrap;gap:6px}
+.type.add{background:transparent;backdrop-filter:none;box-shadow:inset 0 0 0 1.5px var(--sep);border-radius:var(--r-l);cursor:default}
+.type.add .tile{background:var(--fill-strong);color:var(--label-2);box-shadow:none}
+.type.bad{cursor:default;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 45%,transparent)}
+.name-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-top:22px}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;max-width:380px}
+.field label{font-size:12.5px;font-weight:600;color:var(--label-2)}
+.input{height:38px;padding:0 12px;border-radius:10px;border:0;background:var(--surface-solid);color:var(--label);font:14px var(--font);box-shadow:inset 0 0 0 1px var(--sep),var(--shadow-1)}
+.input:focus{outline:none;box-shadow:inset 0 0 0 1px var(--accent),0 0 0 3px var(--accent-tint)}
+.path{font-family:var(--mono);font-size:12.5px;color:var(--label-2);padding-bottom:10px}
+
+/* ---------- handbook ---------- */
+.hb{display:grid;grid-template-columns:210px minmax(0,1fr) 330px;gap:20px;align-items:start}
+.toc{position:sticky;top:0;padding:10px}
+.toc .input{height:32px;width:100%;font-size:13px;margin-bottom:8px}
+.toc h4{margin:12px 8px 4px;font-size:11.5px;font-weight:600;color:var(--label-2)}
+.toc a{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:6px;font-size:13px}
+.toc a.on{background:var(--accent-tint);color:var(--accent-text);font-weight:600}
+@media (hover:hover) and (pointer:fine){.toc a:not(.on):hover{background:var(--fill)}}
+.chapter{padding:28px 32px}
+.crumb{font-size:12.5px;color:var(--label-2);display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.crumb svg.i{width:12px;height:12px}
+.chapter .lead{font-size:16px;color:var(--label-2);margin:10px 0 16px;max-width:560px}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.callout{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--amber-tint);color:var(--amber-text);font-weight:500;margin-bottom:22px}
+.callout svg.i{margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--label-2);padding:8px 10px;box-shadow:inset 0 -1px 0 var(--sep)}
+td{padding:10px;box-shadow:inset 0 -1px 0 var(--sep);vertical-align:middle}
+tr:last-child td{box-shadow:none}
+.chapter h2{margin:24px 0 8px}
+.chapter p.body{max-width:600px;color:var(--label);line-height:1.6}
+.chapter .acts{display:flex;gap:8px;margin-top:24px}
+
+.cart{position:sticky;top:0;display:flex;flex-direction:column;max-height:calc(100vh - 140px);background:var(--surface);box-shadow:var(--hl),var(--shadow-2)}
+.cart-head{padding:16px 18px 12px;box-shadow:inset 0 -1px 0 var(--sep)}
+.cart-head .row{display:flex;align-items:center;gap:8px}
+.cart-head .row h2{flex:1}
+.select{display:flex;align-items:center;gap:8px;margin-top:10px;height:32px;padding:0 10px;border-radius:9px;background:var(--fill);font-size:13px;font-weight:500;cursor:pointer;border:0;color:var(--label);width:100%;font-family:var(--font)}
+.select span{flex:1;text-align:left}
+.cart-body{overflow:auto;padding:6px 18px 12px;flex:1}
+.slot-label{font-size:11.5px;font-weight:600;color:var(--label-2);margin:14px 0 6px}
+.item{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 8px;margin:0 -8px;border-radius:10px}
+.item + .item{box-shadow:inset 0 1px 0 var(--sep)}
+.item .nm{flex:1;min-width:0}
+.item .nm b{display:block;font-weight:500;font-size:13.5px}
+.item .nm span{font-size:12px;color:var(--label-2)}
+.qty{display:inline-flex;align-items:center;border-radius:8px;background:var(--fill)}
+.qty button{width:26px;height:26px;border:0;background:none;color:var(--label);font:600 14px var(--font);cursor:pointer;border-radius:8px}
+.qty button:active{background:var(--fill-strong)}
+.qty output{min-width:16px;text-align:center;font-size:13px;font-weight:600}
+.item.flash{animation:flash 900ms var(--ease-out)}
+@keyframes flash{from{background:var(--accent-tint)}to{background:transparent}}
+.checks{display:flex;flex-direction:column;gap:6px}
+.chk{display:flex;gap:8px;align-items:flex-start;padding:9px 10px;border-radius:10px;font-size:12.5px;line-height:1.4;transition:background-color 240ms ease,color 240ms ease}
+.chk svg.i{margin-top:1px;width:15px;height:15px}
+.chk.bad{background:var(--red-tint);color:var(--red-text)}
+.chk.warn{background:var(--amber-tint);color:var(--amber-text)}
+.chk.ok{background:var(--green-tint);color:var(--green-text)}
+.chk .btn{margin-left:auto;flex:none}
+.chk b{font-weight:600}
+.cart-foot{padding:14px 18px;box-shadow:inset 0 1px 0 var(--sep);display:flex;align-items:center;gap:12px}
+.cart-foot .tot{flex:1}
+.cart-foot .tot b{display:block;font-size:17px;letter-spacing:-.01em}
+.cart-foot .hint{display:block;font-size:12px;font-weight:500;color:var(--red-text)}
+
+/* ---------- project ---------- */
+.p-head{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:20px}
+.p-head .titles{flex:1;min-width:0}
+.p-head .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.seg{position:relative;display:inline-flex;padding:3px;border-radius:10px;background:var(--fill);margin-bottom:18px}
+.seg button{position:relative;z-index:1;height:30px;width:92px;padding:0;border:0;background:none;font:600 13px var(--font);color:var(--label-2);cursor:pointer;border-radius:8px;transition:color 200ms ease}
+.seg button[aria-selected="true"]{color:var(--label)}
+.seg .pill{position:absolute;top:3px;left:0;width:92px;height:30px;border-radius:7px;background:var(--surface-solid);box-shadow:var(--hl),0 1px 3px rgba(0,0,0,.12);transition:transform 260ms var(--ease-drawer)}
+.seg.kb .pill{transition:none}
+.tab{display:none}.tab.on{display:block}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.col{padding:8px}
+.col-head{display:flex;align-items:center;gap:8px;padding:8px 8px 10px}
+.col-head h3{flex:1}
+.col-head .count{font-size:12px;font-weight:600;color:var(--label-2);background:var(--fill);border-radius:999px;padding:1px 8px}
+.kcard{background:var(--surface-solid);border-radius:8px;padding:10px 12px;box-shadow:var(--hl),0 0 0 .5px var(--sep),0 1px 2px rgba(0,0,0,.05);margin-bottom:8px;display:flex;flex-direction:column;gap:6px;cursor:grab;transition:transform 160ms var(--ease-out)}
+.kcard:active{transform:scale(.98)}
+.kcard b{font-weight:500;font-size:13.5px}
+.kcard .r{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--label-2)}
+.kcard.done b{color:var(--label-2)}
+.wiring{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
+.diagram{padding:12px}
+.diagram svg{width:100%;height:auto;display:block}
+.diagram text{font-family:var(--font);font-size:10px;fill:var(--label-2)}
+.diagram .lbl{font-size:11px;font-weight:600;fill:var(--label)}
+.wire{fill:none;stroke-width:2.4;stroke-linecap:round;transition:opacity 200ms ease}
+.diagram.focus .wire{opacity:.18}
+.diagram.focus .wire.hot{opacity:1;stroke-width:3.4}
+.pin-row{cursor:pointer;transition:background-color 150ms ease}
+.pin-row.hot{background:var(--accent-tint)}
+@media (hover:hover) and (pointer:fine){.pin-row:hover{background:var(--fill)}}
+.code{margin-top:16px}
+.code-head{display:flex;align-items:center;gap:8px;padding:10px 14px;box-shadow:inset 0 -1px 0 var(--sep)}
+.code-head b{flex:1;font-family:var(--mono);font-size:12.5px}
+pre{margin:0;padding:14px;font:12.5px/1.6 var(--mono);color:var(--label);overflow:auto}
+pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--robotics-text)}
+
+/* ---------- menus / overlays ---------- */
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 6px);min-width:230px;padding:6px;z-index:30;background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:12px;box-shadow:var(--hl),var(--shadow-2);transform-origin:top right;opacity:0;transform:scale(.95);pointer-events:none;transition:opacity 100ms var(--ease-out),transform 100ms var(--ease-out)}
+.menu.open{opacity:1;transform:scale(1);pointer-events:auto;transition-duration:160ms}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;height:34px;padding:0 10px;border:0;border-radius:6px;background:none;color:var(--label);font:500 13.5px var(--font);cursor:pointer;text-align:left}
+.menu button span{margin-left:auto}
+@media (hover:hover) and (pointer:fine){.menu button:hover{background:var(--accent);color:#fff}.menu button:hover kbd{color:#fff;background:rgba(255,255,255,.2)}}
+
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.18);display:grid;place-items:start center;padding-top:14vh;opacity:0;pointer-events:none}
+.scrim.open{opacity:1;pointer-events:auto}
+/* command bar: keyboard-first, so it opens instantly (no animation) */
+.cmdk{width:min(560px,calc(100vw - 32px));border-radius:16px;background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);overflow:hidden}
+.cmdk input{width:100%;height:52px;border:0;background:none;padding:0 18px;font:16px var(--font);color:var(--label);box-shadow:inset 0 -1px 0 var(--sep)}
+.cmdk input:focus{outline:none}
+.cmdk ul{list-style:none;margin:0;padding:6px;max-height:320px;overflow:auto}
+.cmdk li{display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;border-radius:9px;cursor:pointer;font-weight:500}
+.cmdk li span{margin-left:auto;font-size:12px;color:var(--label-2);font-weight:400}
+.cmdk li.sel{background:var(--accent);color:#fff}
+.cmdk li.sel span,.cmdk li.sel svg.i{color:#fff}
+.cmdk .grp{font-size:11.5px;color:var(--label-2);font-weight:600;padding:8px 12px 4px}
+
+.toasts{position:fixed;bottom:64px;left:calc(50% + 120px);transform:translateX(-50%);z-index:50;display:flex;flex-direction:column-reverse;gap:8px;align-items:center}
+.toast{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;font-weight:500;font-size:13px;background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out)}
+.toast svg.i{color:var(--green)}
+@starting-style{.toast{opacity:0;transform:translateY(8px) scale(.97)}}
+.toast.out{opacity:0;transform:translateY(6px);transition-duration:150ms}
+
+@media (max-width:1180px){
+  .hb{grid-template-columns:minmax(0,1fr) 320px}
+  .toc{display:none}
+}
+@media (max-width:980px){
+  body{grid-template-columns:72px minmax(0,1fr)}
+  .sidebar .brand b,.sidebar .search span,.sidebar .search kbd,.nav a span,.nav a .meta,.nav-label,.mini-spend,.engine span{display:none}
+  .nav a,.search{justify-content:center;padding:0}
+  .home-grid,.wiring,.hb{grid-template-columns:minmax(0,1fr)}
+  .board{grid-template-columns:minmax(0,1fr)}
+  .cart{position:static;max-height:none}
+  .page{padding:24px 20px 96px}
+  .toasts{left:calc(50% + 36px)}
+  .chapter{padding:22px 18px}
+  table{display:block;overflow-x:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  /* gentler, not zero: keep fades and colour, drop movement */
+  @keyframes rise{from{opacity:0}}
+  .meter i,.sk{animation:none}
+  .seg .pill{transition:none}
+  .btn:active,.proj:active,.type:active,.kcard:active,.check:active{transform:none}
+  .proj:hover{transform:none!important}
+  .menu{transform:none}
+  @starting-style{.toast{transform:none}}
+  .toast.out{transform:none}
+}
+@media (prefers-reduced-transparency:reduce){
+  .card,.sidebar,.menu,.cmdk,.toast,.cart{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--surface-solid)}
+}
+</style>
+<!-- icon sprite (Lucide-style strokes) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-x-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.8 9.8 0 0 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.8 9.8 0 0 1-6.7-2.7L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 10.5l-6.1 1.7L12 18l-1.9-5.8L4 10.5l6.1-1.7z"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-6-6-6M12 19h8"/></symbol>
+  <symbol id="i-package" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></symbol>
+  <symbol id="i-git" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="9" r="3"/><path d="M6 9v6M18 12a6 6 0 0 1-6 6H9"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+</svg>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" data-s="sidebar" aria-label="Main">
+  <div class="brand" data-s="brand"><div class="brand-mark" aria-hidden="true"></div><b>Workflow Hub</b></div>
+  <button class="search" data-s="search" data-cmdk><svg class="i"><use href="#i-search"/></svg><span>Search or jump to…</span><kbd>Ctrl K</kbd></button>
+  <nav class="nav" data-s="nav">
+    <a href="#home" data-s="nav-home"><svg class="i"><use href="#i-home"/></svg><span>Home</span></a>
+    <a href="#project" data-s="nav-projects"><svg class="i"><use href="#i-folder"/></svg><span>Projects</span><span class="meta" data-when="full">5</span></a>
+    <a href="#handbook" data-s="nav-handbook"><svg class="i"><use href="#i-book"/></svg><span>Handbook</span></a>
+    <a href="#library" data-s="nav-library" data-soon="Snippet library arrives in session 3"><svg class="i"><use href="#i-layers"/></svg><span>Library</span></a>
+  </nav>
+  <nav class="nav" data-s="nav-recent" data-when="full" aria-label="Recent projects">
+    <div class="nav-label">Recent</div>
+    <a href="#project" data-s="nav-rover"><span class="dot rob"></span><span>Rover-01</span></a>
+    <a href="#project" data-s="nav-kedai"><span class="dot app"></span><span>Kedai</span></a>
+    <a href="#project" data-s="nav-plant"><span class="dot rob"></span><span>Plant monitor</span></a>
+  </nav>
+  <div class="side-foot">
+    <div class="mini-spend" data-s="mini-spend">
+      <div class="row"><span class="muted">Haiku · Nov</span><b class="num"><span data-when="full loading error">RM1.71</span><span data-when="empty">RM0.00</span> / 10</b></div>
+      <div class="meter" data-when="full loading error"><i style="width:17%"></i></div>
+      <div class="meter" data-when="empty"><i style="width:0%"></i></div>
+    </div>
+    <div class="engine" data-s="engine">
+      <span class="dot ok on-ok"></span><span class="on-ok">Engine · :8765</span>
+      <span class="dot bad off"></span><span class="off" style="color:var(--red-text)">Engine offline</span>
+      <button class="btn ghost sm" data-s="theme-btn" id="themeBtn" aria-label="Toggle dark mode"><svg class="i"><use href="#i-moon"/></svg></button>
+    </div>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ================= HOME ================= -->
+<section class="route page" id="home" data-route="#home" data-s="home" aria-label="Home">
+  <header class="toolbar rise" data-s="home-toolbar">
+    <div class="titles">
+      <div class="eyebrow" data-s="home-date">Saturday, 14 November</div>
+      <h1 data-s="home-title">Today</h1>
+    </div>
+    <a class="btn primary" href="#new" data-s="home-new"><svg class="i"><use href="#i-plus"/></svg>New project</a>
+  </header>
+
+  <div class="banner bad rise" data-when="error" data-s="home-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span>Can't reach the engine on localhost:8765. Start it with <code>python -m engine</code>, then retry.</span>
+    <button class="btn sm" data-toast="Engine is back. Everything is synced." data-s="home-retry"><svg class="i"><use href="#i-refresh"/></svg>Retry</button>
+  </div>
+
+  <!-- empty: first launch -->
+  <div class="card rise" data-when="empty" data-s="home-empty">
+    <div class="empty">
+      <div class="art"><svg class="i"><use href="#i-folder"/></svg></div>
+      <h2>Start your first project</h2>
+      <p class="muted">Pick Robotics or App development. The hub sets up the folder, files and git in under five minutes.</p>
+      <a class="btn primary" href="#new" data-s="home-empty-cta"><svg class="i"><use href="#i-plus"/></svg>New project</a>
+    </div>
+  </div>
+
+  <div class="home-grid" data-when="full loading error">
+    <div style="display:flex;flex-direction:column;gap:24px;min-width:0">
+      <!-- today -->
+      <section class="rise" style="--d:40ms" data-s="today">
+        <div class="sec-head"><h2>Today's tasks</h2><span class="muted small num" data-s="today-count" data-when="full">1 of 5 done</span></div>
+        <div class="card" data-when="loading">
+          <div style="padding:14px 18px;display:flex;flex-direction:column;gap:16px">
+            <div class="sk" style="height:14px;width:62%"></div><div class="sk" style="height:14px;width:48%"></div><div class="sk" style="height:14px;width:70%"></div>
+          </div>
+        </div>
+        <div class="card" data-when="error"><p class="muted" style="padding:18px 20px">Tasks will show once the engine is running.</p></div>
+        <ul class="card tasks" data-when="full" data-s="today-list">
+          <li class="task" data-s="task-1"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Add 1k/2k divider on ECHO</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-2"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Calibrate HC-SR04 distance offset</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-3"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Wire Supabase auth into the login screen</b><span><i class="dot app"></i>Kedai</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-4"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Fix splash screen flicker on Android</b><span><i class="dot app"></i>Kedai</span></div><span class="due late">Overdue · Thu</span></li>
+          <li class="task done" data-s="task-5"><button class="check" aria-label="Mark not done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Log water-level sensor drift</b><span><i class="dot rob"></i>Plant monitor</span></div><span class="due">Done</span></li>
+        </ul>
+      </section>
+
+      <!-- recent projects -->
+      <section class="rise" style="--d:90ms" data-s="recent">
+        <div class="sec-head">
+          <h2>Recent projects</h2>
+          <div class="filters" role="group" aria-label="Filter by type" data-s="filters" data-when="full">
+            <button class="fchip" aria-pressed="true" data-f="all">All</button>
+            <button class="fchip" aria-pressed="false" data-f="rob">Robotics</button>
+            <button class="fchip" aria-pressed="false" data-f="app">Apps</button>
+          </div>
+        </div>
+        <div class="projects" data-when="loading">
+          <div class="card pad"><div class="sk" style="height:36px;width:36px;border-radius:10px"></div><div class="sk" style="height:12px;width:70%;margin-top:14px"></div><div class="sk" style="height:4px;margin-top:18px"></div></div>
+          <div class="card pad"><div class="sk" style="height:36px;width:36px;border-radius:10px"></div><div class="sk" style="height:12px;width:55%;margin-top:14px"></div><div class="sk" style="height:4px;margin-top:18px"></div></div>
+          <div class="card pad"><div class="sk" style="height:36px;width:36px;border-radius:10px"></div><div class="sk" style="height:12px;width:62%;margin-top:14px"></div><div class="sk" style="height:4px;margin-top:18px"></div></div>
+        </div>
+        <div class="projects" data-when="full error" data-s="project-grid">
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-rover">
+            <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Rover-01</b><span>ESP32 DevKit · 2WD</span></div></div>
+            <div class="bar"><i style="width:43%"></i></div>
+            <div class="foot"><span class="num">6 / 14 tasks</span><span>12 min ago</span></div>
+          </a>
+          <a href="#project" class="card proj app" data-m="app" data-s="proj-kedai">
+            <div class="top"><div class="tile app"><svg class="i"><use href="#i-phone"/></svg></div><div><b>Kedai</b><span>Expo + Supabase</span></div></div>
+            <div class="bar"><i style="width:41%"></i></div>
+            <div class="foot"><span class="num">9 / 22 tasks</span><span>2 h ago</span></div>
+          </a>
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-plant">
+            <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Plant monitor</b><span>ESP32-C3 · sensors</span></div></div>
+            <div class="bar"><i style="width:37%"></i></div>
+            <div class="foot"><span class="num">3 / 8 tasks</span><span>Yesterday</span></div>
+          </a>
+          <a href="#project" class="card proj app" data-m="app" data-s="proj-habit">
+            <div class="top"><div class="tile app"><svg class="i"><use href="#i-phone"/></svg></div><div><b>Habit streaks</b><span>Expo</span></div></div>
+            <div class="bar"><i style="width:92%"></i></div>
+            <div class="foot"><span class="num">11 / 12 tasks</span><span>3 days ago</span></div>
+          </a>
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-line">
+            <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Line follower</b><span>Arduino Nano</span></div></div>
+            <div class="bar"><i style="width:100%"></i></div>
+            <div class="foot"><span class="num">7 / 7 · shipped</span><span>Last week</span></div>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <!-- spend -->
+    <aside class="card pad spend rise" style="--d:130ms" data-s="spend">
+      <div class="sec-head" style="margin-bottom:10px"><h2>Haiku spend</h2><span class="chip">November</span></div>
+      <div data-when="loading"><div class="sk" style="height:34px;width:50%"></div><div class="sk" style="height:8px;margin-top:16px"></div><div class="sk" style="height:12px;width:80%;margin-top:22px"></div><div class="sk" style="height:12px;width:70%;margin-top:12px"></div></div>
+      <div data-when="error"><p class="muted">Spend is tracked by the engine. Start it to see this month's total.</p></div>
+      <div data-when="full">
+        <div class="big num" data-s="spend-total"><span id="spendNum">RM1.71</span> <small>of RM10</small></div>
+        <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="10" aria-valuenow="1.71" aria-label="Monthly Haiku spend"><i style="width:17.1%"></i></div>
+        <div class="small muted">RM8.29 left · resets 1 Dec · warns at RM7</div>
+        <dl data-s="spend-breakdown">
+          <dt><i class="dot" style="background:#0A84FF"></i>Docs answers</dt><dd class="num">612</dd><dd class="rm num">RM1.35</dd>
+          <dt><i class="dot" style="background:#30D158"></i>Commit messages</dt><dd class="num">241</dd><dd class="rm num">RM0.32</dd>
+          <dt><i class="dot" style="background:#FF9F0A"></i>Parts suggestions</dt><dd class="num">9</dd><dd class="rm num">RM0.02</dd>
+          <dt><i class="dot" style="background:#BF5AF2"></i>Weekly review</dt><dd class="num">2</dd><dd class="rm num">RM0.02</dd>
+        </dl>
+        <div class="note"><svg class="i" style="color:var(--green)"><use href="#i-check-c"/></svg>Cache answered 188 questions for free.</div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= NEW PROJECT ================= -->
+<section class="route page" data-route="#new" data-s="new" aria-label="New project">
+  <header class="toolbar rise" data-s="new-toolbar">
+    <div class="titles">
+      <a class="eyebrow" href="#home" data-s="new-back" style="display:inline-flex;align-items:center;gap:2px"><svg class="i" style="width:14px;height:14px"><use href="#i-left"/></svg>Home</a>
+      <h1>New project</h1>
+    </div>
+    <a class="btn primary" href="#handbook" id="continueBtn" data-s="new-continue" aria-disabled="true" data-when="full error">Continue to cart<svg class="i"><use href="#i-chev"/></svg></a>
+  </header>
+
+  <div class="steps rise" style="--d:30ms" data-s="steps">
+    <div class="s on"><span class="n">1</span>Type</div><div class="line"></div>
+    <div class="s"><span class="n">2</span>Cart</div><div class="line"></div>
+    <div class="s"><span class="n">3</span>Set up</div>
+  </div>
+
+  <div class="banner bad rise" data-when="error" data-s="new-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span><code>modules/app-dev/module.yaml</code> line 4: <b>color</b> is missing. Add it, then reload.</span>
+    <button class="btn sm" data-toast="Reloaded modules/ — 2 types found." data-s="new-reload"><svg class="i"><use href="#i-refresh"/></svg>Reload</button>
+  </div>
+
+  <div class="card rise" data-when="empty" data-s="new-empty">
+    <div class="empty">
+      <div class="art"><svg class="i"><use href="#i-package"/></svg></div>
+      <h2>No project types yet</h2>
+      <p class="muted">Add a folder with a <span class="mono">module.yaml</span> inside <span class="mono">modules/</span>, then reload.</p>
+      <button class="btn" data-toast="Reloaded modules/ — still empty." data-s="new-empty-reload"><svg class="i"><use href="#i-refresh"/></svg>Reload</button>
+    </div>
+  </div>
+
+  <div class="types" data-when="loading">
+    <div class="card pad"><div class="sk" style="width:48px;height:48px;border-radius:13px"></div><div class="sk" style="height:14px;width:40%;margin-top:16px"></div><div class="sk" style="height:12px;width:85%;margin-top:10px"></div></div>
+    <div class="card pad"><div class="sk" style="width:48px;height:48px;border-radius:13px"></div><div class="sk" style="height:14px;width:50%;margin-top:16px"></div><div class="sk" style="height:12px;width:75%;margin-top:10px"></div></div>
+  </div>
+  <p class="muted small" data-when="loading" style="margin-top:12px">Reading modules/…</p>
+
+  <div class="types" role="radiogroup" aria-label="Project type" data-when="full error" data-s="types">
+    <button class="card type rise" style="--d:60ms" role="radio" aria-checked="false" data-type="rob" data-s="type-robotics">
+      <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
+      <div class="tile rob lg"><svg class="i"><use href="#i-cpu"/></svg></div>
+      <div><h3>Robotics</h3><p class="muted" style="margin-top:4px">ESP32 and Arduino with PlatformIO. Wiring view writes pins.h for you.</p></div>
+      <div class="meta"><span class="chip rob">Board + parts</span><span class="chip">VS Code</span><span class="chip">Arduino IDE</span></div>
+    </button>
+    <button class="card type rise" style="--d:100ms" role="radio" aria-checked="false" data-type="app" data-s="type-appdev" data-when="full">
+      <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
+      <div class="tile app lg"><svg class="i"><use href="#i-phone"/></svg></div>
+      <div><h3>App development</h3><p class="muted" style="margin-top:4px">Expo, Next.js or Tauri. Theme, env and git set up in one go.</p></div>
+      <div class="meta"><span class="chip app">Stack</span><span class="chip">VS Code</span><span class="chip">GitHub</span></div>
+    </button>
+    <div class="card type bad rise" style="--d:100ms" data-when="error" data-s="type-appdev-bad">
+      <div class="tile app lg" style="opacity:.5"><svg class="i"><use href="#i-phone"/></svg></div>
+      <div><h3>App development</h3><p style="margin-top:4px;color:var(--red-text)">Can't load: module.yaml is missing <b>color</b>.</p></div>
+    </div>
+    <div class="type add rise" style="--d:130ms" data-s="type-add">
+      <div class="tile lg"><svg class="i"><use href="#i-package"/></svg></div>
+      <div><h3>More types later</h3><p class="muted" style="margin-top:4px">Copy a folder in <span class="mono">modules/</span> and edit its module.yaml. A new card appears here.</p></div>
+    </div>
+  </div>
+
+  <div class="name-row rise" style="--d:160ms" data-when="full error" data-s="name-row">
+    <div class="field">
+      <label for="pname">Project name</label>
+      <input class="input" id="pname" placeholder="e.g. Rover-02" value="Rover-02" data-s="name-input" autocomplete="off">
+    </div>
+    <div class="path" data-s="name-path">~/projects/<span id="slug">rover-02</span></div>
+  </div>
+</section>
+
+<!-- ================= HANDBOOK ================= -->
+<section class="route page" data-route="#handbook" data-s="handbook" aria-label="Handbook" style="max-width:1320px">
+  <header class="toolbar rise" data-s="hb-toolbar">
+    <div class="titles">
+      <div class="eyebrow">New robotics project · Step 2 of 3</div>
+      <h1>Handbook</h1>
+    </div>
+  </header>
+
+  <div class="banner bad rise" data-when="error" data-s="hb-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span><code>handbook/parts/hc-sr04.md</code> line 6: <b>pins</b> must be a list. Fix the YAML block, then reload.</span>
+    <button class="btn sm" data-toast="Chapter reloaded." data-s="hb-reload"><svg class="i"><use href="#i-refresh"/></svg>Reload</button>
+  </div>
+
+  <div class="hb">
+    <!-- toc -->
+    <nav class="card toc rise" aria-label="Chapters" data-s="toc">
+      <input class="input" placeholder="Search handbook" aria-label="Search handbook" data-s="toc-search">
+      <h4>App stacks</h4>
+      <a href="#handbook">Expo + Supabase</a><a href="#handbook">Next.js</a><a href="#handbook">Tauri</a>
+      <h4>Electronics parts</h4>
+      <a href="#handbook">ESP32 DevKit V1</a><a href="#handbook">L298N driver</a>
+      <a href="#handbook" class="on" data-s="toc-active" aria-current="page">HC-SR04 ultrasonic</a>
+      <a href="#handbook">SG90 servo</a><a href="#handbook">TT gear motor</a>
+      <h4>My notes</h4>
+      <a href="#handbook">ESP32 boot loops</a><a href="#handbook">Expo env vars</a>
+    </nav>
+
+    <!-- chapter -->
+    <article class="card chapter rise" style="--d:50ms" data-s="chapter">
+      <div data-when="loading">
+        <div class="sk" style="height:12px;width:30%"></div><div class="sk" style="height:26px;width:60%;margin-top:14px"></div>
+        <div class="sk" style="height:14px;width:85%;margin-top:18px"></div><div class="sk" style="height:14px;width:70%;margin-top:10px"></div>
+        <div class="sk" style="height:120px;margin-top:26px;border-radius:12px"></div>
+      </div>
+      <div data-when="error" class="empty"><p class="muted">This chapter can't be shown until its YAML block is fixed.</p></div>
+      <div data-when="full empty">
+        <div class="crumb">Electronics parts <svg class="i"><use href="#i-chev"/></svg> Sensors</div>
+        <h1 data-s="ch-title">HC-SR04 ultrasonic sensor</h1>
+        <p class="lead" data-s="ch-lead">Measures 2–400 cm with a sound ping. Cheap and reliable indoors; blind under 2 cm and on soft surfaces.</p>
+        <div class="facts" data-s="ch-facts"><span class="chip">Sensor</span><span class="chip">5V · 15 mA</span><span class="chip">No library</span><span class="chip ok">RM5–10</span></div>
+        <div class="callout" data-s="ch-warn"><svg class="i"><use href="#i-alert"/></svg><span>ECHO outputs 5V. On ESP32, put a 1k/2k voltage divider between ECHO and the GPIO.</span></div>
+        <table data-s="ch-pins">
+          <thead><tr><th>Pin</th><th>Mode</th><th>Voltage</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">VCC</td><td>Power</td><td>5V</td><td class="muted">From VIN, not 3V3</td></tr>
+            <tr><td class="mono">TRIG</td><td>Output</td><td>3.3V ok</td><td class="muted">10 µs pulse starts a ping</td></tr>
+            <tr><td class="mono">ECHO</td><td>Input</td><td><span class="chip warn">5V</span></td><td class="muted">Needs divider on 3.3V boards</td></tr>
+            <tr><td class="mono">GND</td><td>Ground</td><td>—</td><td class="muted">Share ground with the board</td></tr>
+          </tbody>
+        </table>
+        <h2>Reading it without blocking</h2>
+        <p class="body">Trigger every 60 ms and time ECHO with <span class="mono">pulseIn</span> and a 25 ms timeout, so a missed echo can't freeze the motor loop. Distance in cm is the echo time in µs divided by 58.</p>
+        <div class="acts">
+          <button class="btn tinted" id="addBtn" data-s="ch-add"><svg class="i"><use href="#i-plus"/></svg>Add to project</button>
+          <button class="btn ghost" data-toast="Comparison opens in session 5." data-s="ch-compare">Compare sensors</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- cart -->
+    <aside class="card cart rise" style="--d:100ms" aria-label="Project cart" data-s="cart">
+      <div class="cart-head">
+        <div class="row"><svg class="i" style="color:var(--accent-text)"><use href="#i-bag"/></svg><h2>Project cart</h2><span class="chip rob">Robotics</span></div>
+        <button class="select" data-s="cart-preset" data-when="full error" data-toast="Presets: 2WD obstacle robot, Line follower, Plant monitor"><span>Preset: 2WD obstacle robot</span><svg class="i"><use href="#i-chev"/></svg></button>
+      </div>
+
+      <div class="cart-body" data-when="loading">
+        <div class="sk" style="height:12px;width:30%;margin-top:14px"></div><div class="sk" style="height:32px;margin-top:10px"></div>
+        <div class="sk" style="height:12px;width:30%;margin-top:18px"></div><div class="sk" style="height:32px;margin-top:10px"></div><div class="sk" style="height:32px;margin-top:8px"></div>
+      </div>
+
+      <div class="cart-body" data-when="empty" data-s="cart-empty">
+        <div class="empty" style="padding:36px 8px">
+          <div class="art"><svg class="i"><use href="#i-bag"/></svg></div>
+          <h3>Your cart is empty</h3>
+          <p class="muted small">Open a chapter and press <b>Add to project</b>, or start from a preset.</p>
+          <button class="btn sm" data-toast="Loaded preset: 2WD obstacle robot" data-s="cart-empty-preset">Use 2WD robot preset</button>
+        </div>
+      </div>
+
+      <div class="cart-body" data-when="full error" id="cartBody">
+        <div class="slot-label">Board</div>
+        <div class="item" data-s="cart-board"><div class="nm"><b>ESP32 DevKit V1</b><span>esp32dev · 115200 baud</span></div><button class="btn ghost sm" data-toast="Board picker opens in session 6.">Change</button></div>
+        <div class="slot-label">Parts</div>
+        <div id="partsList">
+          <div class="item" data-s="cart-l298n"><div class="nm"><b>L298N motor driver</b><span>2 A per channel</span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div></div>
+          <div class="item" data-s="cart-motor"><div class="nm"><b>TT gear motor</b><span>Stall 1.5 A @ 6V</span></div><div class="qty"><button aria-label="Fewer">−</button><output>2</output><button aria-label="More">+</button></div></div>
+          <div class="item" data-s="cart-servo"><div class="nm"><b>SG90 micro servo</b><span>Signal on GPIO <span id="servoPin">12</span></span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div></div>
+          <div class="item" data-s="cart-batt"><div class="nm"><b>18650 2S holder + BMS</b><span>7.4V nominal</span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div></div>
+        </div>
+        <div class="slot-label">Checks</div>
+        <div class="checks" data-s="cart-checks">
+          <div class="chk bad" id="chkStrap" data-s="chk-strap"><svg class="i"><use href="#i-x-c"/></svg><span id="chkStrapText"><b>SG90</b> on GPIO 12, a strapping pin that can stop boot. Move it to GPIO 13.</span><button class="btn sm" id="fixBtn" data-s="chk-fix">Fix</button></div>
+          <div class="chk warn" id="chkEcho" data-s="chk-echo" hidden><svg class="i"><use href="#i-alert"/></svg><span><b>HC-SR04</b> ECHO is 5V into GPIO 18 (3.3V). Add a 1k/2k divider.</span></div>
+          <div class="chk ok" data-s="chk-current"><svg class="i"><use href="#i-check-c"/></svg><span><b>L298N</b> 2 A covers TT motor stall 1.5 A.</span></div>
+        </div>
+      </div>
+
+      <div class="cart-foot" data-when="full error empty">
+        <div class="tot"><span class="muted small">Estimated cost</span><b class="num" id="cartTotal" data-when="full error">RM67</b><b class="num" data-when="empty">RM0</b><span class="hint" id="createHint" data-when="full error">Fix 1 problem to continue</span></div>
+        <button class="btn primary" id="createBtn" disabled data-s="cart-create">Create project</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= PROJECT ================= -->
+<section class="route page" data-route="#project" data-s="project" aria-label="Project">
+  <header class="p-head rise" data-s="p-head">
+    <div class="tile rob lg"><svg class="i"><use href="#i-cpu"/></svg></div>
+    <div class="titles">
+      <h1 data-s="p-title">Rover-01</h1>
+      <div class="meta" data-s="p-meta"><span class="chip rob">Robotics</span><span class="chip">ESP32 DevKit V1</span><span class="chip mono" style="font-weight:500">~/projects/rover-01</span><span class="chip" data-when="full empty"><svg class="i" style="width:12px;height:12px"><use href="#i-git"/></svg>main · 2 changes</span></div>
+    </div>
+    <div class="menu-wrap" data-s="p-more">
+      <button class="btn ghost" id="moreBtn" aria-haspopup="menu" aria-expanded="false" aria-label="More launch options"><svg class="i"><use href="#i-more"/></svg></button>
+      <div class="menu" id="moreMenu" role="menu">
+        <button role="menuitem" data-toast="Opening Arduino IDE…"><svg class="i"><use href="#i-cpu"/></svg>Open in Arduino IDE</button>
+        <button role="menuitem" data-toast="Terminal opened in ~/projects/rover-01"><svg class="i"><use href="#i-terminal"/></svg>Open terminal</button>
+        <button role="menuitem" data-toast="Claude Code started in ~/projects/rover-01"><svg class="i"><use href="#i-terminal"/></svg>Open Claude Code here</button>
+      </div>
+    </div>
+    <button class="btn primary" data-toast="Opening Rover-01 in VS Code…" data-s="p-vscode" data-when="full empty loading"><svg class="i"><use href="#i-code"/></svg>Open in VS Code</button>
+  </header>
+
+  <div class="banner bad rise" data-when="error" data-s="p-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span>Folder <code>~/projects/rover-01</code> not found. It was moved or renamed. Point the hub to its new place.</span>
+    <button class="btn sm" data-toast="Folder picker opens on desktop." data-s="p-locate">Locate folder</button>
+  </div>
+
+  <div class="seg rise" style="--d:40ms" role="tablist" aria-label="Project sections" data-s="tabs" data-when="full empty loading">
+    <span class="pill" aria-hidden="true"></span>
+    <button role="tab" aria-selected="true" data-tab="tasks" data-s="tab-tasks">Tasks</button>
+    <button role="tab" aria-selected="false" data-tab="wiring" data-s="tab-wiring">Wiring</button>
+    <button role="tab" aria-selected="false" data-tab="parts" data-s="tab-parts">Parts</button>
+  </div>
+
+  <!-- TASKS -->
+  <div class="tab on rise" style="--d:80ms" data-tab-panel="tasks" data-when="full empty loading">
+    <div class="board" data-when="loading">
+      <div class="card col"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:54px;margin-top:14px"></div><div class="sk" style="height:54px;margin-top:8px"></div></div>
+      <div class="card col"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:54px;margin-top:14px"></div></div>
+      <div class="card col"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:54px;margin-top:14px"></div></div>
+    </div>
+    <div class="card" data-when="empty" data-s="tasks-empty">
+      <div class="empty">
+        <div class="art"><svg class="i"><use href="#i-check-c"/></svg></div>
+        <h2>No tasks yet</h2>
+        <p class="muted">The setup checklist lands here after the wizard runs. Add your own any time.</p>
+        <button class="btn" data-toast="New task added to To do." data-s="tasks-empty-add"><svg class="i"><use href="#i-plus"/></svg>Add task</button>
+      </div>
+    </div>
+    <div class="board" data-when="full" data-s="kanban">
+      <div class="card col" data-s="col-todo">
+        <div class="col-head"><h3>To do</h3><span class="count">3</span></div>
+        <div class="kcard" data-s="k-divider"><b>Add 1k/2k divider on ECHO</b><div class="r"><span class="due today">Today</span>· from check</div></div>
+        <div class="kcard" data-s="k-servo"><b>Move servo to GPIO 13</b><div class="r"><span class="due today">Today</span>· from check</div></div>
+        <div class="kcard" data-s="k-order"><b>Order 18650 2S holder + BMS</b><div class="r"><span class="due">Mon 16 Nov</span>· RM14</div></div>
+        <button class="btn ghost sm" style="width:100%" data-toast="New task added to To do." data-s="todo-add"><svg class="i"><use href="#i-plus"/></svg>Add task</button>
+      </div>
+      <div class="card col" data-s="col-doing">
+        <div class="col-head"><h3>Doing</h3><span class="count">2</span></div>
+        <div class="kcard" data-s="k-calib"><b>Calibrate HC-SR04 distance offset</b><div class="r"><span class="due today">Today</span></div></div>
+        <div class="kcard" data-s="k-pwm"><b>Tune left/right PWM so it drives straight</b><div class="r"><span class="due">Tue 17 Nov</span></div></div>
+      </div>
+      <div class="card col" data-s="col-done">
+        <div class="col-head"><h3>Done</h3><span class="count">6</span></div>
+        <div class="kcard done" data-s="k-pins"><b>Generate pins.h from wiring</b><div class="r"><svg class="i" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg>Thu</div></div>
+        <div class="kcard done" data-s="k-mount"><b>Mount L298N on the chassis</b><div class="r"><svg class="i" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg>Wed</div></div>
+        <div class="kcard done" data-s="k-blink"><b>Flash blink test over CP210x</b><div class="r"><svg class="i" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg>Tue</div></div>
+        <button class="btn ghost sm" style="width:100%" data-toast="Showing all 6 done tasks." data-s="done-more">Show 3 more</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIRING -->
+  <div class="tab" data-tab-panel="wiring" data-when="full empty loading">
+    <div class="card" data-when="loading" style="padding:20px"><div class="sk" style="height:260px;border-radius:12px"></div></div>
+    <div class="card" data-when="empty" data-s="wiring-empty">
+      <div class="empty">
+        <div class="art"><svg class="i"><use href="#i-cpu"/></svg></div>
+        <h2>No wires yet</h2>
+        <p class="muted">Add parts in the cart, then drag from a part pin to a board pin. pins.h updates as you go.</p>
+        <a class="btn" href="#handbook" data-s="wiring-empty-cart"><svg class="i"><use href="#i-bag"/></svg>Open cart</a>
+      </div>
+    </div>
+    <div data-when="full">
+      <div class="wiring">
+        <div class="card diagram" id="diagram" data-s="diagram">
+          <svg viewBox="0 0 520 330" role="img" aria-label="Wiring diagram: ESP32 connected to L298N, HC-SR04 and SG90">
+            <!-- board -->
+            <rect x="200" y="40" width="120" height="250" rx="10" fill="#1F3A5F"/>
+            <rect x="236" y="54" width="48" height="34" rx="4" fill="#C9D1D9" opacity=".85"/>
+            <text x="260" y="122" text-anchor="middle" class="lbl" style="fill:#fff">ESP32</text>
+            <text x="260" y="136" text-anchor="middle" style="fill:#9FB3C8">DevKit V1</text>
+            <!-- left pins -->
+            <g style="fill:#E8C26B">
+              <circle cx="210" cy="160" r="4"/><circle cx="210" cy="180" r="4"/><circle cx="210" cy="200" r="4"/>
+              <circle cx="210" cy="220" r="4"/><circle cx="210" cy="240" r="4"/><circle cx="210" cy="260" r="4"/>
+              <circle cx="310" cy="160" r="4"/><circle cx="310" cy="180" r="4"/><circle cx="310" cy="220" r="4"/>
+            </g>
+            <g style="fill:#9FB3C8;font-size:9px">
+              <text x="220" y="163">25</text><text x="220" y="183">26</text><text x="220" y="203">27</text>
+              <text x="220" y="223">14</text><text x="220" y="243">32</text><text x="220" y="263">33</text>
+              <text x="300" y="163" text-anchor="end">19</text><text x="300" y="183" text-anchor="end">18</text><text x="300" y="223" text-anchor="end">12</text>
+            </g>
+            <!-- L298N -->
+            <rect x="16" y="150" width="104" height="124" rx="8" fill="#B91C1C"/>
+            <text x="68" y="172" text-anchor="middle" class="lbl" style="fill:#fff">L298N</text>
+            <!-- HC-SR04 -->
+            <rect x="404" y="120" width="104" height="70" rx="8" fill="#0E7490"/>
+            <circle cx="430" cy="146" r="13" fill="#CBD5E1"/><circle cx="482" cy="146" r="13" fill="#CBD5E1"/>
+            <text x="456" y="182" text-anchor="middle" class="lbl" style="fill:#fff">HC-SR04</text>
+            <!-- SG90 -->
+            <rect x="404" y="214" width="104" height="54" rx="8" fill="#1D4ED8"/>
+            <text x="456" y="246" text-anchor="middle" class="lbl" style="fill:#fff">SG90</text>
+            <!-- wires -->
+            <path class="wire" data-w="w1" d="M120 190 C160 190 170 160 206 160" stroke="#F56300"/>
+            <path class="wire" data-w="w2" d="M120 200 C160 200 170 180 206 180" stroke="#FF9F0A"/>
+            <path class="wire" data-w="w3" d="M120 210 C160 210 170 200 206 200" stroke="#FFD60A"/>
+            <path class="wire" data-w="w4" d="M120 230 C160 230 170 220 206 220" stroke="#30D158"/>
+            <path class="wire" data-w="w5" d="M120 240 C160 240 170 240 206 240" stroke="#64D2FF"/>
+            <path class="wire" data-w="w6" d="M120 250 C160 250 170 260 206 260" stroke="#BF5AF2"/>
+            <path class="wire" data-w="w7" d="M314 160 C360 160 370 170 404 170" stroke="#5E5CE6"/>
+            <path class="wire" data-w="w8" d="M314 180 C360 180 370 178 404 178" stroke="#FF375F" stroke-dasharray="5 4"/>
+            <path class="wire" data-w="w9" d="M314 220 C360 220 370 240 404 240" stroke="#FF453A"/>
+          </svg>
+          <p class="small muted" style="padding:4px 8px 2px">Dashed = needs attention. Click a row to trace its wire.</p>
+        </div>
+        <div class="card" style="overflow:hidden" data-s="pin-table">
+          <table>
+            <thead><tr><th>Signal</th><th>Part pin</th><th>GPIO</th><th></th></tr></thead>
+            <tbody>
+              <tr class="pin-row" data-w="w1"><td class="mono">leftMotorPWM</td><td>L298N ENA</td><td class="num">25</td><td></td></tr>
+              <tr class="pin-row" data-w="w2"><td class="mono">leftMotorIN1</td><td>L298N IN1</td><td class="num">26</td><td></td></tr>
+              <tr class="pin-row" data-w="w3"><td class="mono">leftMotorIN2</td><td>L298N IN2</td><td class="num">27</td><td></td></tr>
+              <tr class="pin-row" data-w="w4"><td class="mono">rightMotorPWM</td><td>L298N ENB</td><td class="num">14</td><td></td></tr>
+              <tr class="pin-row" data-w="w5"><td class="mono">rightMotorIN3</td><td>L298N IN3</td><td class="num">32</td><td></td></tr>
+              <tr class="pin-row" data-w="w6"><td class="mono">rightMotorIN4</td><td>L298N IN4</td><td class="num">33</td><td></td></tr>
+              <tr class="pin-row" data-w="w7"><td class="mono">sonarTrig</td><td>HC-SR04 TRIG</td><td class="num">19</td><td></td></tr>
+              <tr class="pin-row" data-w="w8" data-s="pin-echo"><td class="mono">sonarEcho</td><td>HC-SR04 ECHO</td><td class="num">18</td><td><span class="chip warn" title="5V into 3.3V pin. Add a 1k/2k divider.">5V</span></td></tr>
+              <tr class="pin-row" data-w="w9" data-s="pin-servo"><td class="mono">servoSignal</td><td>SG90 signal</td><td class="num">12</td><td><span class="chip bad" title="Strapping pin. Move to GPIO 13.">Strap</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card code" data-s="pins-h">
+        <div class="code-head"><svg class="i" style="color:var(--label-2)"><use href="#i-code"/></svg><b>include/pins.h</b><span class="chip">AUTO-GENERATED · 2 min ago</span><button class="btn ghost sm" data-toast="pins.h copied." aria-label="Copy pins.h"><svg class="i"><use href="#i-copy"/></svg></button></div>
+<pre><span class="c">// AUTO-GENERATED by Workflow Hub from wiring.json. Do not edit.</span>
+<span class="k">#pragma once</span>
+<span class="k">#define</span> LEFT_MOTOR_PWM   <span class="n">25</span>
+<span class="k">#define</span> LEFT_MOTOR_IN1   <span class="n">26</span>
+<span class="k">#define</span> LEFT_MOTOR_IN2   <span class="n">27</span>
+<span class="k">#define</span> RIGHT_MOTOR_PWM  <span class="n">14</span>
+<span class="k">#define</span> RIGHT_MOTOR_IN3  <span class="n">32</span>
+<span class="k">#define</span> RIGHT_MOTOR_IN4  <span class="n">33</span>
+<span class="k">#define</span> SONAR_TRIG       <span class="n">19</span>
+<span class="k">#define</span> SONAR_ECHO       <span class="n">18</span>  <span class="c">// via 1k/2k divider</span>
+<span class="k">#define</span> SERVO_SIGNAL     <span class="n">12</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTS -->
+  <div class="tab" data-tab-panel="parts" data-when="full empty loading">
+    <div class="card" data-when="loading" style="padding:20px"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:14px;margin-top:16px"></div><div class="sk" style="height:14px;margin-top:12px"></div><div class="sk" style="height:14px;margin-top:12px"></div></div>
+    <div class="card" data-when="empty" data-s="parts-empty">
+      <div class="empty">
+        <div class="art"><svg class="i"><use href="#i-bag"/></svg></div>
+        <h2>No parts listed</h2>
+        <p class="muted">Pick a board and parts in the cart. They show here with prices and order status.</p>
+        <a class="btn" href="#handbook" data-s="parts-empty-cart"><svg class="i"><use href="#i-bag"/></svg>Open cart</a>
+      </div>
+    </div>
+    <div class="card" style="overflow:hidden" data-when="full" data-s="parts-table">
+      <table>
+        <thead><tr><th>Part</th><th>Qty</th><th>Status</th><th style="text-align:right">Price</th></tr></thead>
+        <tbody>
+          <tr><td>ESP32 DevKit V1 (38-pin)</td><td class="num">1</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM25</td></tr>
+          <tr><td>L298N motor driver</td><td class="num">1</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM9</td></tr>
+          <tr><td>TT gear motor + wheel</td><td class="num">2</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM12</td></tr>
+          <tr><td>HC-SR04 ultrasonic</td><td class="num">1</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM6</td></tr>
+          <tr><td>SG90 micro servo</td><td class="num">1</td><td><span class="chip warn">Ordered</span></td><td class="num" style="text-align:right">RM7</td></tr>
+          <tr><td>18650 2S holder + BMS</td><td class="num">1</td><td><span class="chip bad">Need</span></td><td class="num" style="text-align:right">RM14</td></tr>
+          <tr><td>Resistors 1k + 2k (divider)</td><td class="num">1</td><td><span class="chip bad">Need</span></td><td class="num" style="text-align:right">RM1</td></tr>
+          <tr><td><b>Total</b></td><td></td><td class="muted small">RM15 still to buy</td><td class="num" style="text-align:right"><b>RM74</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIBRARY stub ================= -->
+<section class="route page" data-route="#library" aria-label="Library">
+  <div class="card rise"><div class="empty"><div class="art"><svg class="i"><use href="#i-layers"/></svg></div><h2>Snippet library</h2><p class="muted">Arrives in session 3: tags, search and quick capture.</p><a class="btn" href="#home">Back home</a></div></div>
+</section>
+</main>
+
+<!-- command bar -->
+<div class="scrim" id="scrim" aria-hidden="true">
+  <div class="cmdk" role="dialog" aria-modal="true" aria-label="Command bar" data-s="cmdk">
+    <input id="cmdkInput" placeholder="Jump to a project, chapter or action…" aria-label="Command">
+    <ul id="cmdkList">
+      <li class="grp">Projects</li>
+      <li data-go="#project"><span class="dot rob"></span>Rover-01<span>Robotics</span></li>
+      <li data-go="#project"><span class="dot app"></span>Kedai<span>App</span></li>
+      <li class="grp">Handbook</li>
+      <li data-go="#handbook"><svg class="i"><use href="#i-book"/></svg>HC-SR04 ultrasonic<span>Parts</span></li>
+      <li data-go="#handbook"><svg class="i"><use href="#i-book"/></svg>Expo + Supabase<span>Stacks</span></li>
+      <li class="grp">Actions</li>
+      <li data-go="#new"><svg class="i"><use href="#i-plus"/></svg>New project<span>Ctrl N</span></li>
+      <li data-go="#home"><svg class="i"><use href="#i-home"/></svg>Go home<span></span></li>
+    </ul>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* toasts */
+const toast=msg=>{const t=document.createElement('div');t.className='toast';t.innerHTML='<svg class="i"><use href="#i-check-c"/></svg>';t.append(msg);$('#toasts').append(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),160)},2400)};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-toast]');if(b){toast(b.dataset.toast);closeMenu()}});
+
+/* theme */
+const themeBtn=$('#themeBtn');
+const syncTheme=()=>{const d=document.documentElement.dataset.theme==='dark';themeBtn.innerHTML=`<svg class="i"><use href="#i-${d?'sun':'moon'}"/></svg>`;themeBtn.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode')};
+themeBtn.onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('wh-theme',r.dataset.theme)}catch(e){};syncTheme()};
+syncTheme();
+
+/* router */
+const route=()=>{const h=location.hash||'#home';
+  $$('.route').forEach(s=>{const on=s.dataset.route===h;if(on&&!s.classList.contains('on')){s.classList.add('on');if(!s.dataset.v){s.dataset.v=1;stagger(s)}else s.classList.add('seen')}else if(!on)s.classList.remove('on')});
+  if(!$$('.route').some(s=>s.dataset.route===h)){location.hash='#home';return}
+  $$('.nav a').forEach(a=>a.toggleAttribute('aria-current',false));
+  const cur=$(`.nav a[href="${h}"]`);if(cur)cur.setAttribute('aria-current','page');
+  $('#main').scrollTop=0;closeMenu();if(h==='#project')requestAnimationFrame(movePill);if(h==='#home'&&!countUp.done){countUp.done=1;countUp()}};
+
+/* count-up for the spend figure (skipped under reduced motion) */
+const countUp=()=>{const el=$('#spendNum'),end=1.71;if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent='RM'+end.toFixed(2);return}
+  const t0=performance.now(),dur=650;const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent='RM'+(end*e).toFixed(2);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)};
+addEventListener('hashchange',route);
+
+/* non-uniform stagger for list items inside the page entrance */
+const stagger=sec=>{$$('.task,.proj,.kcard',sec).forEach((el,i)=>{el.style.animation='none';void el.offsetWidth;
+  el.style.animation=`rise 220ms var(--ease-out) both ${Math.round(50+30*Math.pow(i,.8))}ms`;el.addEventListener('animationend',()=>el.style.animation='',{once:true})})};
+
+/* library stub keeps toast */
+$$('[data-soon]').forEach(a=>a.addEventListener('click',()=>toast(a.dataset.soon)));
+
+/* today tasks */
+const countDone=()=>{const all=$$('#home .task'),d=all.filter(t=>t.classList.contains('done')).length;$('[data-s="today-count"]').textContent=`${d} of ${all.length} done`};
+$$('#home .task .check').forEach(c=>c.onclick=()=>{const t=c.closest('.task');t.classList.toggle('done');
+  c.setAttribute('aria-label',t.classList.contains('done')?'Mark not done':'Mark done');countDone()});
+
+/* filters */
+$$('.fchip').forEach(f=>f.onclick=()=>{$$('.fchip').forEach(x=>x.setAttribute('aria-pressed',x===f));
+  $$('.proj').forEach(p=>p.hidden=f.dataset.f!=='all'&&p.dataset.m!==f.dataset.f)});
+
+/* type picker */
+const cont=$('#continueBtn');
+cont.addEventListener('click',e=>{if(cont.getAttribute('aria-disabled')==='true'){e.preventDefault();toast('Pick a project type first.')}});
+cont.style.opacity='.45';
+$$('.type[role="radio"]').forEach(t=>t.onclick=()=>{$$('.type[role="radio"]').forEach(x=>x.setAttribute('aria-checked',x===t));
+  cont.setAttribute('aria-disabled','false');cont.style.opacity=''});
+$('#pname').addEventListener('input',e=>{$('#slug').textContent=(e.target.value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'untitled'});
+
+/* cart */
+const prices={'cart-l298n':9,'cart-motor':6,'cart-servo':7,'cart-batt':14,'cart-sonar':6};
+const total=()=>{let t=25;$$('#partsList .item').forEach(i=>t+=(prices[i.dataset.s]||0)*+$('output',i).value);$('#cartTotal').textContent='RM'+t};
+$('#partsList').addEventListener('click',e=>{const b=e.target.closest('.qty button');if(!b)return;const o=$('output',b.parentElement);
+  o.value=Math.max(0,+o.value+(b.textContent==='+'?1:-1));total()});
+let fixed=false,sonar=false;
+const canCreate=()=>{$('#createBtn').disabled=!fixed};
+$('#fixBtn').onclick=()=>{fixed=true;const c=$('#chkStrap');c.className='chk ok';c.querySelector('use').setAttribute('href','#i-check-c');
+  $('#chkStrapText').innerHTML='<b>SG90</b> moved to GPIO 13. pins.h will update.';$('#fixBtn').remove();$('#servoPin').textContent='13';$('#createHint').hidden=true;canCreate()};
+$('#addBtn').onclick=()=>{if(sonar){toast('HC-SR04 is already in the cart.');return}sonar=true;
+  const el=document.createElement('div');el.className='item flash';el.dataset.s='cart-sonar';
+  el.innerHTML='<div class="nm"><b>HC-SR04 ultrasonic</b><span>TRIG 19 · ECHO 18</span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div>';
+  $('#partsList').append(el);$('#chkEcho').hidden=false;total();toast('HC-SR04 added to the cart.')};
+$('#createBtn').onclick=()=>{toast('Creating Rover-02: pio init, pins.h, main.cpp, git init…');setTimeout(()=>location.hash='#project',900)};
+
+/* project tabs */
+const pill=$('.seg .pill');
+function movePill(){const a=$('.seg [aria-selected="true"]');if(!a||!a.offsetWidth)return;pill.style.width=a.offsetWidth+'px';pill.style.transform=`translateX(${a.offsetLeft}px)`}
+$$('.seg [role="tab"]').forEach(b=>b.onclick=()=>{$$('.seg [role="tab"]').forEach(x=>x.setAttribute('aria-selected',x===b));
+  $$('[data-tab-panel]').forEach(p=>p.classList.toggle('on',p.dataset.tabPanel===b.dataset.tab));movePill()});
+$('.seg').addEventListener('keydown',e=>{if(!/Arrow(Left|Right)/.test(e.key))return;const tabs=$$('.seg [role="tab"]'),i=tabs.findIndex(t=>t.getAttribute('aria-selected')==='true');
+  const seg=$('.seg');seg.classList.add('kb');const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.click();n.focus();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>seg.classList.remove('kb')))});
+addEventListener('resize',movePill);
+
+/* wiring trace */
+$$('.pin-row').forEach(r=>r.onclick=()=>{const on=!r.classList.contains('hot');$$('.pin-row').forEach(x=>x.classList.remove('hot'));$$('.wire').forEach(w=>w.classList.remove('hot'));
+  $('#diagram').classList.toggle('focus',on);if(on){r.classList.add('hot');$(`.wire[data-w="${r.dataset.w}"]`).classList.add('hot')}});
+
+/* more menu */
+const menu=$('#moreMenu'),moreBtn=$('#moreBtn');
+function closeMenu(){menu.classList.remove('open');moreBtn.setAttribute('aria-expanded','false')}
+moreBtn.onclick=e=>{e.stopPropagation();const o=!menu.classList.contains('open');menu.classList.toggle('open',o);moreBtn.setAttribute('aria-expanded',o)};
+document.addEventListener('click',e=>{if(!e.target.closest('.menu-wrap'))closeMenu()});
+
+/* command bar */
+const scrim=$('#scrim'),inp=$('#cmdkInput');let sel=0;
+const items=()=>$$('#cmdkList li[data-go]').filter(li=>!li.hidden);
+const paint=()=>{const it=items();it.forEach((li,i)=>li.classList.toggle('sel',i===sel))};
+const openK=()=>{scrim.classList.add('open');scrim.setAttribute('aria-hidden','false');inp.value='';$$('#cmdkList li').forEach(l=>l.hidden=false);sel=0;paint();setTimeout(()=>inp.focus(),10)};
+const closeK=()=>{scrim.classList.remove('open');scrim.setAttribute('aria-hidden','true')};
+$$('[data-cmdk]').forEach(b=>b.onclick=openK);
+scrim.onclick=e=>{if(e.target===scrim)closeK()};
+$('#cmdkList').onclick=e=>{const li=e.target.closest('li[data-go]');if(li){location.hash=li.dataset.go;closeK()}};
+inp.oninput=()=>{const q=inp.value.toLowerCase();$$('#cmdkList li[data-go]').forEach(li=>li.hidden=!li.textContent.toLowerCase().includes(q));sel=0;paint()};
+addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();scrim.classList.contains('open')?closeK():openK();return}
+  if(!scrim.classList.contains('open')){if(e.key==='Escape')closeMenu();return}
+  const it=items();
+  if(e.key==='Escape')closeK();
+  else if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(sel+1,it.length-1);paint()}
+  else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(sel-1,0);paint()}
+  else if(e.key==='Enter'&&it[sel]){location.hash=it[sel].dataset.go;closeK()}
+});
+
+route();
+})();
+</script>
+<script>
+/* Artifact review dock: state switcher + "Pick to change" that opens claude.ai's comment composer on the picked element. */
+(()=>{
+const STATES=window.SCRATCH_STATES||['empty','loading','error','full'];
+const ss={get:k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}}};
+const mk=(t,p={},...c)=>{const e=document.createElement(t);Object.assign(e,p);c.forEach(x=>e.append(x));return e};
+
+/* state rules */
+document.head.append(mk('style',{textContent:STATES.map(s=>`body[data-state="${s}"] [data-when]:not([data-when~="${s}"]){display:none!important}`).join('')+`
+#rv{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:6px;padding:5px;border-radius:999px;
+ background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);font:600 12px var(--font);max-width:calc(100vw - 32px)}
+#rv .grp{display:flex;gap:2px;padding:2px;border-radius:999px;background:var(--fill)}
+#rv button{border:0;background:none;color:var(--label-2);font:600 11.5px var(--font);height:28px;padding:0 10px;border-radius:999px;cursor:pointer;transition:background-color 150ms ease,color 150ms ease,transform 160ms var(--ease-out)}
+#rv button:active{transform:scale(.97)}
+#rv .grp button[aria-pressed="true"]{background:var(--surface-solid);color:var(--label);box-shadow:var(--hl),0 1px 2px rgba(0,0,0,.12)}
+#rv .pick{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--on-accent);padding:0 14px}
+#rv .pick[aria-pressed="true"]{background:var(--label);color:var(--bg)}
+#rv .msg{color:var(--label-2);font-weight:500;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rv-hl{outline:2px solid var(--accent)!important;outline-offset:3px!important;border-radius:6px;cursor:crosshair!important}
+#rv-tag{position:fixed;z-index:61;pointer-events:none;padding:2px 7px;border-radius:6px;background:var(--accent);color:var(--on-accent);font:600 11px var(--mono);white-space:nowrap}
+body.rv-picking *{cursor:crosshair!important}
+@media (max-width:640px){#rv .msg{display:none}#rv .grp button{padding:0 7px}}
+`}));
+
+/* give every data-s element a stable id so comment anchors name it */
+document.querySelectorAll('[data-s]').forEach(el=>{if(!el.id)el.id='s-'+el.dataset.s});
+
+/* dock */
+const dock=mk('div',{id:'rv'});dock.setAttribute('data-uncommentable','');dock.setAttribute('role','toolbar');dock.setAttribute('aria-label','Review tools');
+const grp=mk('div',{className:'grp'});grp.setAttribute('role','group');grp.setAttribute('aria-label','Screen state');
+const setState=s=>{document.body.dataset.state=s;ss.set('rv-state',s);[...grp.children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===s))};
+STATES.forEach(s=>{const b=mk('button',{textContent:s[0].toUpperCase()+s.slice(1)});b.dataset.v=s;b.onclick=()=>setState(s);grp.append(b)});
+const pick=mk('button',{className:'pick',innerHTML:'<svg class="i" style="width:14px;height:14px"><use href="#i-search"/></svg><span>Pick to change</span>'});
+pick.setAttribute('aria-pressed','false');
+const msg=mk('span',{className:'msg',textContent:''});
+dock.append(grp,pick,msg);document.body.append(dock);
+setState(STATES.includes(ss.get('rv-state'))?ss.get('rv-state'):'full');
+
+/* comments */
+let comments=null;
+(async()=>{try{comments=await window.claude?.use?.('comments')}catch(e){}
+  if(!comments)say('Use the comment button in the artifact toolbar to leave notes.')})();
+let sayT;const say=(t,ms=5000)=>{msg.textContent=t;clearTimeout(sayT);if(ms)sayT=setTimeout(()=>msg.textContent='',ms)};
+
+/* pick mode */
+let picking=false,hl=null;const tag=mk('div',{id:'rv-tag'});tag.hidden=true;document.body.append(tag);
+const target=e=>e.closest('[data-s]')||e;
+const clearHl=()=>{if(hl)hl.classList.remove('rv-hl');hl=null;tag.hidden=true};
+const setPick=v=>{picking=v;pick.setAttribute('aria-pressed',v);pick.querySelector('span').textContent=v?'Cancel':'Pick to change';
+  document.body.classList.toggle('rv-picking',v);if(v)say('Click the part you want changed. Esc cancels.',0);else{clearHl();if(msg.textContent.startsWith('Click'))say('')}};
+pick.onclick=()=>setPick(!picking);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&picking)setPick(false)});
+document.addEventListener('mouseover',e=>{if(!picking||e.target.closest('#rv'))return;const t=target(e.target);if(t===hl)return;clearHl();hl=t;t.classList.add('rv-hl');
+  const r=t.getBoundingClientRect();tag.textContent=(t.dataset.s||t.tagName.toLowerCase())+' · '+(location.hash||'#home')+' · '+document.body.dataset.state;
+  tag.hidden=false;tag.style.left=Math.max(8,Math.min(r.left,innerWidth-tag.offsetWidth-8))+'px';tag.style.top=Math.max(8,r.top-26)+'px'},true);
+document.addEventListener('click',async e=>{if(!picking||e.target.closest('#rv'))return;e.preventDefault();e.stopPropagation();
+  const t=target(e.target);setPick(false);
+  if(!comments){say('Comments are off in this view. Use the comment button in the artifact toolbar.');return}
+  try{const r=await comments.openComposer({element:t});
+    say(r&&r.opened?'Type your change, then press Send to Claude.':'Close the open comment first, then pick again.')}
+  catch(err){say(err&&err.code==='rate_limited'?'Too many picks at once. Wait a moment.':'Use the comment button in the artifact toolbar.')}},true);
+})();
+</script>
