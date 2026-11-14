@@ -110,6 +110,21 @@ App project ({names}). Set up by Workflow Hub.
 """
 
 
+GITIGNORE = """# Workflow Hub starter .gitignore (yours to edit)
+node_modules/
+.env
+.env.local
+.env.*.local
+.expo/
+dist/
+web-build/
+.next/
+out/
+src-tauri/target/
+*.log
+.DS_Store
+"""
+
 PRETTIER = '{\n  "singleQuote": false,\n  "semi": true,\n  "printWidth": 100,\n  "trailingComma": "all"\n}\n'
 
 
@@ -191,6 +206,7 @@ def setup(ctx: dict) -> dict:
     owned(".env.example", render_env_example(ctx))
     once("CLAUDE.md", render_claude_md(ctx))
     once(".prettierrc", PRETTIER)
+    once(".gitignore", GITIGNORE)
     return {"files": report, "steps": []}
 
 
