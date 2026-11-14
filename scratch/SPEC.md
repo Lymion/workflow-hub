@@ -29,7 +29,7 @@ Data (sample)
 - Rover-01 parts: ESP32 DevKit V1 RM25, L298N RM9, 2× TT motor RM12, HC-SR04 RM6, SG90 RM7, 18650 2S holder + BMS RM14, 1k/2k resistors RM1 → RM74
 
 Actions
-- New project → #new; pick type → enables Continue → #handbook
+- New project → #new; name + type + tiles → Create project → #project
 - Task checkbox → done (strike, count updates)
 - Filter chips → filter recent projects by module
 - Add to project → part added to cart + toast
