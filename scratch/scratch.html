@@ -108,6 +108,23 @@ a{color:inherit;text-decoration:none}
   .btn.ghost:hover,.btn.tinted:hover{background:var(--fill)}
   .btn:not(.primary):not(.ghost):not(.tinted):not([disabled]):hover{background:color-mix(in srgb,var(--surface-solid) 92%,var(--label))}
 }
+/* glow CTA: rotating conic stroke + bloom on hover, slight lift, inset shadow */
+@property --ga{syntax:'<angle>';inherits:false;initial-value:0deg}
+.btn.glow{position:relative;--ring:conic-gradient(from var(--ga),#FF9F0A,#FF375F,#BF5AF2,#0A84FF,#64D2FF,#30D158,#FF9F0A);
+  transition:transform 220ms var(--ease-out),box-shadow 220ms var(--ease-out),background-color 160ms ease}
+.btn.glow::before,.btn.glow::after{content:"";position:absolute;inset:-2px;border-radius:12px;background:var(--ring);pointer-events:none;
+  opacity:0;transition:opacity 220ms var(--ease-out);animation:ga-spin 3.2s linear infinite;animation-play-state:paused}
+.btn.glow::before{padding:1.5px;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.btn.glow::after{inset:-30px;padding:30px;border-radius:40px;background-clip:content-box;filter:blur(10px);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+@keyframes ga-spin{to{--ga:360deg}}
+@media (hover:hover) and (pointer:fine){
+  .btn.glow:hover{transform:translateY(-1px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 5px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.08),0 2px 4px rgba(0,0,0,.12),0 12px 28px -10px color-mix(in srgb,var(--accent) 80%,transparent)}
+  .btn.glow:hover::before{opacity:1;animation-play-state:running}
+  .btn.glow:hover::after{opacity:.6;animation-play-state:running}
+  .btn.glow:active{transform:translateY(0) scale(.97)}
+}
 kbd{font:600 11px var(--font);color:var(--label-2);background:var(--fill);border-radius:5px;padding:1px 6px}
 
 /* ---------- surfaces ---------- */
@@ -125,7 +142,17 @@ kbd{font:600 11px var(--font);color:var(--label-2);background:var(--fill);border
 .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--label-3)}
 .dot.rob{background:var(--robotics)}.dot.app{background:var(--appdev)}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
 
-.tile{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px -2px rgba(0,0,0,.25)}
+/* project "needs doing" badges (cards + sidebar), driven by today's open tasks */
+.pbadge,.proj .top .pbadge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:grid;place-items:center;
+  font:700 11px/1 var(--font);font-variant-numeric:tabular-nums;color:#fff;background:var(--accent);
+  box-shadow:0 0 0 2px var(--surface-solid),0 2px 5px -1px rgba(0,0,0,.25);transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out)}
+.proj .top .pbadge.late{background:var(--red)}
+.proj .top .pbadge.off{opacity:0;transform:scale(.6)}
+.nav a .cnt{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;font:700 11px/18px var(--font);text-align:center;color:#fff;background:var(--accent);font-variant-numeric:tabular-nums}
+.nav a .cnt.late{background:var(--red)}
+.proj .top .due-line{display:block;font-size:12px;font-weight:600;color:var(--accent-text)}
+.proj .top .due-line.late{color:var(--red-text)}
+.tile{position:relative;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px -2px rgba(0,0,0,.25)}
 .tile svg.i{width:19px;height:19px}
 .tile.rob{background:linear-gradient(160deg,#FFA94D,#F56300)}
 .tile.app{background:linear-gradient(160deg,#9A98FF,#5E5CE6)}
@@ -435,6 +462,8 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
   .btn:active,.proj:active,.type:active,.kcard:active,.check:active{transform:none}
   .proj:hover{transform:none!important}
   .menu{transform:none}
+  .btn.glow::before,.btn.glow::after{animation:none}
+  .btn.glow:hover{transform:none!important}
   @starting-style{.toast{transform:none}}
   .toast.out{transform:none}
 }
@@ -486,9 +515,9 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
   </nav>
   <nav class="nav" data-s="nav-recent" data-when="full" aria-label="Recent projects">
     <div class="nav-label">Recent</div>
-    <a href="#project" data-s="nav-rover"><span class="dot rob"></span><span>Rover-01</span></a>
-    <a href="#project" data-s="nav-kedai"><span class="dot app"></span><span>Kedai</span></a>
-    <a href="#project" data-s="nav-plant"><span class="dot rob"></span><span>Plant monitor</span></a>
+    <a href="#project" data-s="nav-rover" data-pid="rover"><span class="dot rob"></span><span>Rover-01</span></a>
+    <a href="#project" data-s="nav-kedai" data-pid="kedai"><span class="dot app"></span><span>Kedai</span></a>
+    <a href="#project" data-s="nav-plant" data-pid="plant"><span class="dot rob"></span><span>Plant monitor</span></a>
   </nav>
   <div class="side-foot">
     <div class="mini-spend" data-s="mini-spend" tabindex="0" aria-describedby="spendPop">
@@ -529,7 +558,7 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
       <div class="eyebrow" data-s="home-date">Saturday, 14 November</div>
       <h1 data-s="home-title">Today</h1>
     </div>
-    <a class="btn primary" href="#new" data-s="home-new"><svg class="i"><use href="#i-plus"/></svg>New project</a>
+    <a class="btn primary glow" href="#new" data-s="home-new"><svg class="i"><use href="#i-plus"/></svg>New project</a>
   </header>
 
   <div class="banner bad rise" data-when="error" data-s="home-error">
@@ -565,11 +594,11 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
         </div>
         <div class="card" data-when="error"><p class="muted" style="padding:18px 20px">Tasks will show once the engine is running.</p></div>
         <ul class="card tasks" data-when="full" data-s="today-list">
-          <li class="task" data-s="task-1"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Add 1k/2k divider on ECHO</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
-          <li class="task" data-s="task-2"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Calibrate HC-SR04 distance offset</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
-          <li class="task" data-s="task-3"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Wire Supabase auth into the login screen</b><span><i class="dot app"></i>Kedai</span></div><span class="due today">Today</span></li>
-          <li class="task" data-s="task-4"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Fix splash screen flicker on Android</b><span><i class="dot app"></i>Kedai</span></div><span class="due late">Overdue · Thu</span></li>
-          <li class="task done" data-s="task-5"><button class="check" aria-label="Mark not done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Log water-level sensor drift</b><span><i class="dot rob"></i>Plant monitor</span></div><span class="due">Done</span></li>
+          <li class="task" data-s="task-1" data-p="rover"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Add 1k/2k divider on ECHO</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-2" data-p="rover"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Calibrate HC-SR04 distance offset</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-3" data-p="kedai"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Wire Supabase auth into the login screen</b><span><i class="dot app"></i>Kedai</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-4" data-p="kedai"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Fix splash screen flicker on Android</b><span><i class="dot app"></i>Kedai</span></div><span class="due late">Overdue · Thu</span></li>
+          <li class="task done" data-s="task-5" data-p="plant"><button class="check" aria-label="Mark not done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Log water-level sensor drift</b><span><i class="dot rob"></i>Plant monitor</span></div><span class="due">Done</span></li>
         </ul>
       </section>
 
@@ -589,27 +618,27 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
           <div class="card pad"><div class="sk" style="height:36px;width:36px;border-radius:10px"></div><div class="sk" style="height:12px;width:62%;margin-top:14px"></div><div class="sk" style="height:4px;margin-top:18px"></div></div>
         </div>
         <div class="projects" data-when="full error" data-s="project-grid">
-          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-rover">
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-rover" data-pid="rover">
             <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Rover-01</b><span>ESP32 DevKit · 2WD</span></div></div>
             <div class="bar"><i style="width:43%"></i></div>
             <div class="foot"><span class="num">6 / 14 tasks</span><span>12 min ago</span></div>
           </a>
-          <a href="#project" class="card proj app" data-m="app" data-s="proj-kedai">
+          <a href="#project" class="card proj app" data-m="app" data-s="proj-kedai" data-pid="kedai">
             <div class="top"><div class="tile app"><svg class="i"><use href="#i-phone"/></svg></div><div><b>Kedai</b><span>Expo + Supabase</span></div></div>
             <div class="bar"><i style="width:41%"></i></div>
             <div class="foot"><span class="num">9 / 22 tasks</span><span>2 h ago</span></div>
           </a>
-          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-plant">
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-plant" data-pid="plant">
             <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Plant monitor</b><span>ESP32-C3 · sensors</span></div></div>
             <div class="bar"><i style="width:37%"></i></div>
             <div class="foot"><span class="num">3 / 8 tasks</span><span>Yesterday</span></div>
           </a>
-          <a href="#project" class="card proj app" data-m="app" data-s="proj-habit">
+          <a href="#project" class="card proj app" data-m="app" data-s="proj-habit" data-pid="habit">
             <div class="top"><div class="tile app"><svg class="i"><use href="#i-phone"/></svg></div><div><b>Habit streaks</b><span>Expo</span></div></div>
             <div class="bar"><i style="width:92%"></i></div>
             <div class="foot"><span class="num">11 / 12 tasks</span><span>3 days ago</span></div>
           </a>
-          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-line">
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-line" data-pid="line">
             <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Line follower</b><span>Arduino Nano</span></div></div>
             <div class="bar"><i style="width:100%"></i></div>
             <div class="foot"><span class="num">7 / 7 · shipped</span><span>Last week</span></div>
@@ -1061,7 +1090,7 @@ const countDone=()=>{const all=$$('#home .task'),d=all.filter(t=>t.classList.con
   $('[data-s="today-count"]').textContent=`${d} of ${all.length} done`;
   $('#todayBar').style.transform=`scaleX(${d/all.length})`;$('[data-s="today-bar"]').setAttribute('aria-valuenow',d);
   const isAll=d===all.length,box=$('#allDone');box.hidden=!isAll;
-  if(isAll&&!wasAll)setTimeout(()=>burst(box.querySelector('.badge'),18,56),120);wasAll=isAll};
+  if(isAll&&!wasAll)setTimeout(()=>burst(box.querySelector('.badge'),18,56),120);wasAll=isAll;if(typeof updateBadges==='function')updateBadges()};
 $$('#home .task .due').forEach(d=>d.dataset.orig=d.textContent);
 $$('#home .task .check').forEach(c=>c.onclick=()=>{const t=c.closest('.task'),done=t.classList.toggle('done'),due=$('.due',t);
   due.textContent=done?'Done':(due.dataset.orig==='Done'?'Today':due.dataset.orig);
@@ -1072,6 +1101,23 @@ $$('#home .task .check').forEach(c=>c.onclick=()=>{const t=c.closest('.task'),do
     t.animate([{backgroundColor:'var(--green-tint)'},{backgroundColor:'transparent'}],{duration:700,easing:'ease-out'});
     burst(c)}
   countDone()});
+
+/* badges: count each project's open tasks due today; red if any is overdue */
+const prevCount={};
+const updateBadges=()=>{const open={},late={};
+  $$('#home .task').forEach(t=>{if(t.classList.contains('done'))return;const p=t.dataset.p;open[p]=(open[p]||0)+1;if($('.due.late',t))late[p]=1});
+  $$('.proj[data-pid]').forEach(card=>{const p=card.dataset.pid,n=open[p]||0,tile=$('.tile',card);
+    let b=$('.pbadge',tile);if(!b){b=document.createElement('span');b.className='pbadge off';b.setAttribute('role','img');tile.append(b)}
+    let line=$('.due-line',card);if(!line){line=document.createElement('span');line.className='due-line';$('.top div:last-child',card).append(line)}
+    const label=n?`${n} task${n>1?'s':''} due${late[p]?', 1 overdue':' today'}`:'';
+    b.classList.toggle('late',!!late[p]);b.setAttribute('aria-label',label);if(n)b.textContent=n;b.classList.toggle('off',!n);
+    line.textContent=n?(late[p]?'Overdue task':`${n} due today`):'';line.classList.toggle('late',!!late[p]);line.hidden=!n;
+    if(prevCount[p]!==undefined&&n&&n<prevCount[p]&&!calm())b.animate([{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(.23,1,.32,1)'});
+    prevCount[p]=n});
+  $$('.nav a[data-pid]').forEach(a=>{const p=a.dataset.pid,n=open[p]||0;let c=$('.cnt',a);
+    if(!c){c=document.createElement('span');c.className='cnt';a.append(c)}c.textContent=n;c.hidden=!n;c.classList.toggle('late',!!late[p]);
+    c.setAttribute('aria-label',n?`${n} open`:'')})};
+updateBadges();
 
 /* filters */
 $$('.fchip').forEach(f=>f.onclick=()=>{$$('.fchip').forEach(x=>x.setAttribute('aria-pressed',x===f));
