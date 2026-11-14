@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "haykal": {
+      "source": {
+        "source": "github",
+        "repo": "Lymion/skills-collections"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "haykal-skills@haykal": true
+  }
+}
