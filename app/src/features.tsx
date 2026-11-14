@@ -2,7 +2,10 @@
 import { api } from "./lib/api";
 import { go } from "./lib/router";
 import { COMMAND_SOURCES } from "./components/CommandBar";
-import { PAGES } from "./pages/registry";
+import { PAGES, SIDEBAR_FOOTERS } from "./pages/registry";
+import { Guide } from "./pages/Guide";
+import { SettingsPage } from "./pages/Settings";
+import { SpendMeter } from "./components/SpendMeter";
 import { MODULE_TABS, TRAILING_TABS } from "./pages/project/tabs";
 import { PartsTab } from "./pages/project/PartsTab";
 import { Library, LIBRARY_SECTIONS } from "./pages/Library";
@@ -41,3 +44,9 @@ ADD_TO_PROJECT.fn = async (ch, project) => {
   await api.post(`/projects/${project.id}/parts`, { items: [{ key: ch.key, qty: 1 }] });
   return `${ch.title} added to ${project.name} → Parts. pins.h updated.`;
 };
+
+// ---- session 8: docs guide, spend meter, settings ----
+PAGES.guide = Guide;
+PAGES.settings = SettingsPage;
+SIDEBAR_FOOTERS.push(SpendMeter);
+SEARCH_LINKS.doc = () => "#guide";

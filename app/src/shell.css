@@ -225,3 +225,11 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .sw-foot { display: flex; align-items: center; gap: 12px; padding-top: 10px; box-shadow: inset 0 1px 0 var(--sep); }
 @media (max-width: 1180px) { .ap-grid { grid-template-columns: minmax(0, 1fr); } .sel-win { position: sticky; bottom: 16px; top: auto; } }
 @media (max-width: 760px) { .cost-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- session 8: spend meter ---------- */
+.mini-spend { position: relative; padding: 12px; border-radius: 12px; background: var(--surface); box-shadow: var(--hl), var(--shadow-1); outline-offset: 3px; }
+.spend-pop { position: absolute; left: calc(100% + 14px); bottom: -6px; width: 290px; padding: 16px 18px; border-radius: 16px; z-index: 30; background: var(--surface-solid); box-shadow: var(--hl), var(--shadow-2);
+  transform-origin: left bottom; opacity: 0; transform: scale(.96) translateX(-4px); pointer-events: none; transition: opacity 100ms var(--ease-out), transform 100ms var(--ease-out); }
+.mini-spend:focus-visible .spend-pop { opacity: 1; transform: none; transition-duration: 160ms; }
+@media (hover: hover) and (pointer: fine) { .mini-spend:hover .spend-pop { opacity: 1; transform: none; pointer-events: auto; transition-duration: 160ms; transition-delay: 90ms; } .mini-spend:hover { box-shadow: var(--hl), var(--shadow-2); } }
+@media (max-width: 980px) { .mini-spend { display: none; } }

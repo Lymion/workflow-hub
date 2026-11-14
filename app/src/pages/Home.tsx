@@ -8,6 +8,7 @@ import { Empty, PageHead, Sk } from "../components/ui";
 import { ProjectCard } from "../components/ProjectCard";
 import { useToast } from "../components/Toast";
 import type { ModulesResponse } from "./NewProject";
+import { SpendWarning } from "../components/SpendMeter";
 
 const today = () => new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
 
@@ -76,6 +77,7 @@ export function Home() {
         </a>
       </PageHead>
 
+      <SpendWarning />
       {noProjects ? (
         <div className="card rise">
           <Empty icon="folder" title="Start your first project" action={<a className="btn btn-primary" href="#new"><Icon name="plus" />New project</a>}>

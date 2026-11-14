@@ -177,7 +177,7 @@ def ask(request: Request, body: AskIn) -> dict:
     project = get_project(hub, body.project_id) if body.project_id else None
     module = project["module"] if project else None
     sources = retrieve(hub, f"{body.question} {body.error_text[:300]}", module)
-    past = matches(hub, body.error_text or body.question) if (body.error_text or len(body.question) > 20) else []
+    past = matches(hub, body.error_text) if body.error_text.strip() else [e for e in matches(hub, body.question) if e["similarity"] >= 0.5]
     base = {
         "sources": [{k: s[k] for k in ("id", "kind", "title", "url")} for s in sources],
         "past_errors": [{"id": e["id"], "error_text": e["error_text"][:200], "cause": e["cause"], "fix": e["fix"], "similarity": e["similarity"]} for e in past],
