@@ -491,6 +491,28 @@ tr:last-child td{box-shadow:none}
 .pin-sel{appearance:none;-webkit-appearance:none;min-width:150px;height:30px;padding:0 26px 0 10px;border:0;border-radius:8px;font:600 13px var(--font);font-variant-numeric:tabular-nums;color:var(--label);cursor:pointer;
   background:var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238E8E95' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 9px center}
 .pin-sel:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.pin-sel{text-align:left}
+.pin-sel[aria-expanded="true"]{box-shadow:inset 0 0 0 1.5px var(--accent)!important}
+#pinPop{position:fixed;z-index:85;width:292px;padding:12px;border-radius:14px;background:var(--surface-solid);box-shadow:var(--hl),var(--shadow-2);
+  opacity:0;transform:scale(.96);pointer-events:none;transition:opacity 100ms var(--ease-out),transform 100ms var(--ease-out)}
+#pinPop.open{opacity:1;transform:none;pointer-events:auto;transition-duration:150ms}
+#pinPop.instant{transition:none}
+#pinPop .pp-title{font-size:12.5px;color:var(--label-2);padding:0 2px 2px}
+#pinPop .pp-title b{color:var(--label);font-family:var(--mono);font-weight:600}
+#pinPop .pp-h{font-size:11.5px;font-weight:600;color:var(--label-2);margin:10px 2px 6px}
+#pinPop .pp-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.pp-opt{position:relative;height:34px;border:0;border-radius:8px;background:var(--fill);color:var(--label);font:600 13px var(--font);font-variant-numeric:tabular-nums;cursor:pointer;
+  transition:background-color 120ms ease,color 120ms ease}
+.pp-opt:active{transform:scale(.96)}
+.pp-opt:focus{outline:none}
+.pp-opt:focus-visible,.pp-opt:hover{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.pp-opt[aria-selected="true"]{background:var(--accent);color:#fff}
+.pp-opt .d{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%}
+.pp-opt.warn .d{background:var(--amber)}
+.pp-opt.bad .d,.pp-opt.used .d{background:var(--red)}
+.pp-opt.used{color:var(--label-3)}
+.pp-foot{margin-top:12px;padding:10px 2px 0;box-shadow:inset 0 1px 0 var(--sep);font-size:12px;line-height:1.4;color:var(--label-2);min-height:44px}
+.pp-foot b{color:var(--label);font-variant-numeric:tabular-nums}
 .pin-row.bad .pin-sel{box-shadow:inset 0 0 0 1.5px var(--red)}
 .pin-row.warn .pin-sel{box-shadow:inset 0 0 0 1.5px var(--amber)}
 .pin-msg{display:flex;align-items:flex-start;gap:7px;font-size:12px;line-height:1.35;font-weight:500}
@@ -560,6 +582,7 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
   .btn:active,.proj:active,.type:active,.kcard:active,.check:active{transform:none}
   .proj:hover{transform:none!important}
   .menu{transform:none}
+  #pinPop{transform:none}
   .btn.glow::before,.btn.glow::after{animation:none}
   .btn.glow:hover{transform:none!important}
   @starting-style{.toast{transform:none}}
@@ -1360,7 +1383,7 @@ $('.seg').addEventListener('keydown',e=>{if(!/Arrow(Left|Right)/.test(e.key))ret
 addEventListener('resize',movePill);
 
 /* ---------- wiring: signals, ESP32 pin rules, diagram + pins.h ---------- */
-const ESP_PINS=[4,13,14,16,17,18,19,21,22,23,25,26,27,32,33,0,2,5,12,15,34,35,36,39];
+const ESP_PINS=[13,4,14,16,17,18,19,21,22,23,25,26,27,32,33,0,2,5,12,15,34,35,36,39];
 const PIN_NAME={36:'VP',39:'VN',16:'RX2',17:'TX2'};
 const pinName=g=>PIN_NAME[g]||('D'+g);
 const SIGS=[
@@ -1392,16 +1415,12 @@ function freeGood(sig){return ESP_PINS.find(g=>!SIGS.some(o=>o!==sig&&o.gpio===g
 function renderPins(changed){
   const body=$('#pinRows');body.innerHTML='';
   SIGS.forEach(sig=>{const [lvl,txt]=pinCheck(sig,sig.gpio),tr=document.createElement('tr');tr.className='pin-row '+lvl;tr.dataset.w=sig.id;tr.dataset.s='pin-'+sig.id;tr.id='s-pin-'+sig.id;
-    const good=[],risky=[];ESP_PINS.forEach(g=>{const [l,t]=pinCheck(sig,g);const used=SIGS.find(o=>o!==sig&&o.gpio===g);
-      const label=`GPIO ${g}`+(used?` · used by ${used.id}`:l==='bad'?(([34,35,36,39].includes(g))?' · input only':' · boot pin'):l==='warn'&&!sig.five?' · boot pulse':'');
-      (l==='bad'||(l==='warn'&&!sig.five)?risky:good).push(`<option value="${g}"${g===sig.gpio?' selected':''}>${label}</option>`)});
     const fix=lvl==='bad'?freeGood(sig):null;
     tr.innerHTML=`<td class="mono">${sig.id}</td><td>${sig.part} ${sig.pp}</td>
-      <td><select class="pin-sel" aria-label="GPIO for ${sig.id}"><optgroup label="Good for ${sig.pp}">${good.join('')}</optgroup><optgroup label="Might not work">${risky.join('')}</optgroup></select></td>
+      <td><button class="pin-sel" aria-haspopup="listbox" aria-expanded="false" aria-label="GPIO for ${sig.id}: ${sig.gpio}">GPIO ${sig.gpio}</button></td>
       <td><span class="pin-msg ${lvl}">${lvl==='ok'?'<svg class="i" style="width:15px;height:15px"><use href="#i-check-c"/></svg>':'<span class="bang" aria-hidden="true">!</span>'}<span>${lvl==='ok'?'OK':txt+(fix?` Try GPIO ${fix}.`:'')}</span></span></td>`;
-    const sel=$('select',tr);sel.addEventListener('click',e=>e.stopPropagation());
-    sel.addEventListener('change',()=>{sig.gpio=+sel.value;renderPins(sig.id);const [l]=pinCheck(sig,sig.gpio);
-      toast(l==='bad'?`${sig.id} on GPIO ${sig.gpio} might not work. Check the warning.`:`${sig.id} moved to GPIO ${sig.gpio}. pins.h updated.`)});
+    const btn=$('.pin-sel',tr);
+    btn.addEventListener('click',e=>{e.stopPropagation();popSig===sig?closePinPicker(true):openPinPicker(sig,btn,e.detail===0)});
     tr.onclick=()=>trace(sig.id);body.append(tr)});
   renderWires();renderPinsH(changed);if(traced)trace(traced,true)}
 function renderWires(){const svg=$('#wires');let h='';
@@ -1424,6 +1443,41 @@ function trace(id,keep){const on=keep||traced!==id;traced=on?id:null;
   $$('.pin-row').forEach(r=>r.classList.toggle('hot',on&&r.dataset.w===id));
   $$('#wires g').forEach(g=>g.querySelectorAll('*').forEach(el=>el.classList.toggle('hot',on&&g.dataset.w===id)));
   $('#diagram').classList.toggle('focus',on)}
+/* ---------- pin picker: grouped grid popover ---------- */
+const pinLevel=(sig,g)=>{const [l,t]=pinCheck(sig,g);return sig.five&&l==='warn'&&t.startsWith('ECHO')?'ok':l};
+const NOTE={34:'input only',35:'input only',36:'input only',39:'input only',12:'can stop boot',0:'BOOT button',2:'onboard LED',5:'pulses at boot',15:'pulses at boot'};
+const pop=document.createElement('div');pop.id='pinPop';pop.setAttribute('role','listbox');document.body.append(pop);
+let popSig=null,popBtn=null;
+function popFoot(sig,g){const used=SIGS.find(o=>o!==sig&&o.gpio===g),[l,t]=pinCheck(sig,g),lv=used?'bad':pinLevel(sig,g);
+  $('.pp-foot',pop).innerHTML=`<b>GPIO ${g}</b> · `+(used?`Used by ${used.id}. Picking it causes a conflict.`:lv==='ok'?(sig.five?'Good pin. Keep the 1k/2k divider on ECHO.':`Good pin for ${sig.pp}.`):t)}
+function openPinPicker(sig,btn,viaKey){closePinPicker();popSig=sig;popBtn=btn;
+  const G={rec:[],risk:[],used:[]};
+  [...ESP_PINS].sort((a,b)=>a-b).forEach(g=>{const used=SIGS.find(o=>o!==sig&&o.gpio===g),l=pinLevel(sig,g);
+    (used?G.used:l==='ok'?G.rec:G.risk).push(`<button class="pp-opt ${used?'used':l}" role="option" aria-selected="${g===sig.gpio}" data-g="${g}" title="${used?'used by '+used.id:NOTE[g]||'recommended'}">${g}${l!=='ok'||used?'<span class="d"></span>':''}</button>`)});
+  const sec=(h,arr)=>arr.length?`<div class="pp-h">${h}</div><div class="pp-grid">${arr.join('')}</div>`:'';
+  pop.innerHTML=`<div class="pp-title">GPIO for <b>${sig.id}</b></div>`+sec(`Recommended for ${sig.pp}`,G.rec)+sec('Might not work',G.risk)+sec('In use',G.used)+'<div class="pp-foot"></div>';
+  pop.setAttribute('aria-label',`GPIO for ${sig.id}`);popFoot(sig,sig.gpio);
+  const r=btn.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight,x=Math.max(8,Math.min(r.left,innerWidth-w-8));
+  let y=r.bottom+6,up=y+h>innerHeight-8;if(up)y=Math.max(8,r.top-h-6);
+  pop.style.left=x+'px';pop.style.top=y+'px';pop.style.transformOrigin=`${r.left+r.width/2-x}px ${up?'100%':'0'}`;
+  pop.classList.toggle('instant',!!viaKey||calm());pop.classList.add('open');btn.setAttribute('aria-expanded','true');
+  ($('.pp-opt[aria-selected="true"]',pop)||$('.pp-opt',pop)).focus({preventScroll:true})}
+function closePinPicker(focusBack){if(!popSig)return;pop.classList.remove('open');popBtn&&popBtn.setAttribute('aria-expanded','false');
+  if(focusBack&&popBtn)popBtn.focus();popSig=null;popBtn=null}
+pop.addEventListener('click',e=>{const o=e.target.closest('.pp-opt');if(!o||!popSig)return;const sig=popSig,g=+o.dataset.g;closePinPicker();
+  if(g!==sig.gpio){sig.gpio=g;renderPins(sig.id);const l=pinCheck(sig,g)[0];
+    toast(l==='bad'?`${sig.id} on GPIO ${g} might not work. Check the warning.`:`${sig.id} moved to GPIO ${g}. pins.h updated.`)}
+  $(`[data-s="pin-${sig.id}"] .pin-sel`).focus()});
+pop.addEventListener('mouseover',e=>{const o=e.target.closest('.pp-opt');if(o&&popSig)popFoot(popSig,+o.dataset.g)});
+pop.addEventListener('focusin',e=>{const o=e.target.closest('.pp-opt');if(o&&popSig)popFoot(popSig,+o.dataset.g)});
+pop.addEventListener('keydown',e=>{const opts=$$('.pp-opt',pop),i=opts.indexOf(document.activeElement);
+  const mv={ArrowRight:1,ArrowLeft:-1,ArrowDown:5,ArrowUp:-5}[e.key];
+  if(mv!==undefined){e.preventDefault();opts[Math.max(0,Math.min(opts.length-1,i+mv))].focus()}
+  else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closePinPicker(true)}
+  else if(e.key==='Tab')closePinPicker()});
+document.addEventListener('click',e=>{if(popSig&&!e.target.closest('#pinPop'))closePinPicker()});
+document.getElementById('main').addEventListener('scroll',()=>closePinPicker(),{passive:true});
+addEventListener('resize',()=>closePinPicker());
 /* scale the fixed 640x340 stage to the card */
 const fitStage=()=>{const w=$('#stageWrap').clientWidth;if(w)$('#stage').style.transform=`scale(${w/640})`};
 new ResizeObserver(fitStage).observe($('#stageWrap'));
