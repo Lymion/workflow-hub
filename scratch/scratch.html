@@ -333,6 +333,38 @@ body[data-state="error"] .kind [data-kind="app"]{opacity:.45}
 .kt[aria-checked="true"] .ck svg{stroke-dashoffset:0}
 #pickArea.swap{animation:rise 220ms var(--ease-out) both}
 .np-checks{margin-top:24px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.parts-full{display:grid;gap:16px}
+.cost-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.cost-row .lbl{display:flex;align-items:center;gap:6px}
+.cost-row b{display:block;font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
+.cost-bar{display:flex;gap:2px;height:8px;margin-top:14px;border-radius:999px;overflow:hidden;background:var(--fill-strong)}
+.cost-bar i{display:block;flex:0 0 0;min-width:0;flex-basis:0}
+.cost-bar .have{background:var(--green)}.cost-bar .ord{background:var(--amber)}.cost-bar .need{background:var(--red)}
+.st-btn{border:0;cursor:pointer;font-family:var(--font)}
+.st-btn:active{transform:scale(.96)}
+tr.row-flash td{animation:flash 1100ms var(--ease-out)}
+.addparts{margin-top:8px}
+.addparts>.gh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ap-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start;margin-top:4px}
+#catArea .kgroup:first-child{margin-top:12px}
+.kt .inp{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;color:var(--green-text)}
+.sel-win{position:sticky;top:16px;margin-top:12px;padding:14px;border-radius:var(--r-l);background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);display:grid;gap:10px}
+.sw-head{display:flex;align-items:center;justify-content:space-between}
+.sw-list{display:grid;gap:2px;max-height:300px;overflow:auto}
+.sw-empty{padding:8px 2px 4px;line-height:1.5}
+.sw-item{display:flex;align-items:center;gap:8px;padding:6px 0}
+.sw-item + .sw-item{box-shadow:inset 0 1px 0 var(--sep)}
+.sw-item .g{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;color:#fff;font:700 10px var(--font)}
+.sw-item .nm{flex:1;min-width:0}
+.sw-item .nm b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw-item .nm span{font-size:12px;color:var(--label-2);font-variant-numeric:tabular-nums}
+.sel-win .checks{display:grid;gap:6px}
+.sw-foot{display:flex;align-items:center;gap:12px;padding-top:10px;box-shadow:inset 0 1px 0 var(--sep)}
+.sw-foot>div{flex:1}
+.sw-foot b{display:block;font-size:18px;letter-spacing:-.01em}
+@media (max-width:1180px){.ap-grid{grid-template-columns:minmax(0,1fr)}.sel-win{position:sticky;bottom:16px;top:auto}}
+@media (max-width:760px){.cost-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .np-checks .checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
 .np-bar{position:sticky;bottom:16px;z-index:5;margin-top:24px;display:flex;align-items:center;gap:16px;padding:10px 10px 10px 18px;border-radius:16px;
   background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2)}
@@ -1119,20 +1151,34 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
         <a class="btn" href="#handbook" data-s="parts-empty-cart"><svg class="i"><use href="#i-bag"/></svg>Open cart</a>
       </div>
     </div>
-    <div class="card" style="overflow:hidden" data-when="full" data-s="parts-table">
-      <table>
-        <thead><tr><th>Part</th><th>Qty</th><th>Status</th><th style="text-align:right">Price</th></tr></thead>
-        <tbody>
-          <tr><td>ESP32 DevKit V1 (38-pin)</td><td class="num">1</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM25</td></tr>
-          <tr><td>L298N motor driver</td><td class="num">1</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM9</td></tr>
-          <tr><td>TT gear motor + wheel</td><td class="num">2</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM12</td></tr>
-          <tr><td>HC-SR04 ultrasonic</td><td class="num">1</td><td><span class="chip ok">In hand</span></td><td class="num" style="text-align:right">RM6</td></tr>
-          <tr><td>SG90 micro servo</td><td class="num">1</td><td><span class="chip warn">Ordered</span></td><td class="num" style="text-align:right">RM7</td></tr>
-          <tr><td>18650 2S holder + BMS</td><td class="num">1</td><td><span class="chip bad">Need</span></td><td class="num" style="text-align:right">RM14</td></tr>
-          <tr><td>Resistors 1k + 2k (divider)</td><td class="num">1</td><td><span class="chip bad">Need</span></td><td class="num" style="text-align:right">RM1</td></tr>
-          <tr><td><b>Total</b></td><td></td><td class="muted small">RM15 still to buy</td><td class="num" style="text-align:right"><b>RM74</b></td></tr>
-        </tbody>
-      </table>
+    <div data-when="full" class="parts-full">
+      <div class="card pad cost" data-s="cost">
+        <div class="cost-row">
+          <div><span class="lbl">Estimated total</span><b class="num" id="costTotal">RM74</b></div>
+          <div><span class="lbl"><i class="dot ok"></i>In hand</span><b class="num" id="costHave">RM58</b></div>
+          <div><span class="lbl"><i class="dot" style="background:var(--amber)"></i>Ordered</span><b class="num" id="costOrd">RM7</b></div>
+          <div><span class="lbl"><i class="dot bad"></i>Still to buy</span><b class="num" id="costNeed">RM15</b></div>
+        </div>
+        <div class="cost-bar" aria-hidden="true"><i class="have"></i><i class="ord"></i><i class="need"></i></div>
+      </div>
+      <div class="card" style="overflow:hidden" data-s="parts-table">
+        <table>
+          <thead><tr><th>Part</th><th>Qty</th><th>Status</th><th style="text-align:right">Price</th><th><span class="sr-only">Remove</span></th></tr></thead>
+          <tbody id="partsBody"></tbody>
+        </table>
+      </div>
+      <section class="addparts" data-s="add-parts">
+        <div class="gh"><h2>Add components</h2><span class="muted small">Tick what you need, then add them to Rover-01. Hover a tile for what it’s good for.</span></div>
+        <div class="ap-grid">
+          <div id="catArea"></div>
+          <aside class="sel-win" data-s="selection" aria-label="Selected components">
+            <div class="sw-head"><h3>Selected</h3><span class="chip num" id="selCount">0</span></div>
+            <div id="selList" class="sw-list"></div>
+            <div id="selChecks" class="checks"></div>
+            <div class="sw-foot"><div><span class="muted small">Adds to the total</span><b class="num" id="selTotal">RM0</b></div><button class="btn primary" id="selAdd" disabled data-s="sel-add">Add to project</button></div>
+          </aside>
+        </div>
+      </section>
     </div>
   </div>
 </section>
@@ -1268,27 +1314,42 @@ const KITS={
    {id:'esp32',name:'ESP32 DevKit V1',sub:'Wi-Fi + BLE · 3.3V',g:'E32',c:'#1F3A5F',price:25,good:'The best all-rounder: Wi-Fi, Bluetooth, lots of PWM pins and plenty of speed for robots.',watch:'3.3V logic. GPIO 0, 2, 12 and 15 are strapping pins.'},
    {id:'nano',name:'Arduino Nano',sub:'5V · breadboard size',g:'NA',c:'#00878A',price:18,good:'Small 5V board that plugs into a breadboard. Simple and beginner-friendly.',watch:'No wireless and only 2 KB of RAM.'},
    {id:'uno',name:'Arduino Uno',sub:'5V · shields',g:'UNO',c:'#0E7C86',price:35,good:'Learning and prototyping with shields and 5V sensors.',watch:'Large, and no wireless.'},
-   {id:'c3',name:'ESP32-C3 Super Mini',sub:'Tiny · Wi-Fi + BLE',g:'C3',c:'#334155',price:15,good:'Tiny, cheap wireless sensor nodes that sip power.',watch:'Fewer pins than the DevKit.'}]},
-  {id:'motion',title:'Motion',hint:'Tick any',items:[
-   {id:'l298n',name:'L298N driver',sub:'2 DC motors · 2 A',g:'DRV',c:'#B91C1C',price:9,good:'Driving two DC motors forward and back with speed control.',watch:'Drops about 2V and runs warm.'},
-   {id:'tt',name:'TT gear motor ×2',sub:'With wheels · 3–6V',g:'TT',c:'#CA8A04',price:12,good:'Cheap wheels for small 2WD robots.',watch:'Stall current up to 1.5 A each. Needs a driver.'},
-   {id:'sg90',name:'SG90 servo',sub:'180° · 9 g',g:'SV',c:'#1D4ED8',price:7,good:'Turning a sensor head or a small arm to an exact angle.',watch:'Jitters on weak power. Avoid strapping pins.'}]},
-  {id:'sense',title:'Sensors',hint:'Tick any',items:[
-   {id:'hcsr04',name:'HC-SR04',sub:'Ultrasonic distance',g:'US',c:'#0E7490',price:6,good:'Measuring distance to obstacles in front of the robot.',watch:'ECHO is 5V. Use a divider on 3.3V boards.'},
-   {id:'ir',name:'IR line sensor',sub:'Line following',g:'IR',c:'#7C3AED',price:4,good:'Following a black line on the floor.',watch:'Strong sunlight confuses it.'},
-   {id:'mpu',name:'MPU6050',sub:'Gyro + accel · I2C',g:'IMU',c:'#DB2777',price:10,good:'Knowing tilt and heading so the robot drives straight.',watch:'Drifts over time; calibrate at start.'}]},
-  {id:'power',title:'Power and display',hint:'Tick any',items:[
-   {id:'batt',name:'18650 2S pack + BMS',sub:'7.4V rechargeable',g:'BAT',c:'#15803D',price:14,good:'Separate power for motors so the board doesn’t brown out.',watch:'Never short it. Always use the BMS.'},
-   {id:'oled',name:'SSD1306 OLED',sub:'0.96" · I2C',g:'OL',c:'#111827',price:12,good:'Showing distance, battery or status right on the robot.',watch:'Shares the I2C pins with other sensors.'}]}],
-  presets:[{name:'2WD obstacle robot',ids:['esp32','l298n','tt','hcsr04','sg90','batt']},{name:'Line follower',ids:['nano','l298n','tt','ir','batt']}]}};
+   {id:'c3',name:'ESP32-C3 Super Mini',sub:'Tiny · Wi-Fi + BLE',g:'C3',c:'#334155',price:15,good:'Tiny, cheap wireless sensor nodes that sip power.',watch:'Fewer pins than the DevKit.'}]}],
+  presets:[]}};
+/* parts catalog for the project Parts tab (price is per unit) */
+const CAT=[
+ {id:'motion',title:'Motors and drivers',items:[
+  {id:'l298n',name:'L298N driver',sub:'2 DC motors · 2 A',g:'DRV',c:'#B91C1C',price:9,good:'Driving two DC motors forward and back with speed control.',watch:'Drops about 2V and runs warm.'},
+  {id:'tt',name:'TT gear motor',sub:'With wheel · 3–6V',g:'TT',c:'#CA8A04',price:6,good:'Cheap wheels for small 2WD robots.',watch:'Stall current up to 1.5 A each. Needs a driver.'},
+  {id:'sg90',name:'SG90 servo',sub:'180° · 9 g',g:'SV',c:'#1D4ED8',price:7,good:'Turning a sensor head or a small arm to an exact angle.',watch:'Jitters on weak power. Avoid strapping pins.'},
+  {id:'mg996r',name:'MG996R servo',sub:'Metal gear · 10 kg·cm',g:'MG',c:'#1E3A8A',price:22,good:'Arms and grippers that need real torque.',watch:'Pulls up to 2.5 A; give it its own 5–6V supply.'},
+  {id:'stepper',name:'28BYJ-48 + ULN2003',sub:'Stepper with driver',g:'ST',c:'#475569',price:9,good:'Slow, exact positioning like dials, blinds or turntables.',watch:'Slow and weak; not for driving wheels.'}]},
+ {id:'sense',title:'Sensors',items:[
+  {id:'hcsr04',name:'HC-SR04',sub:'Ultrasonic distance',g:'US',c:'#0E7490',price:6,good:'Measuring distance to obstacles in front of the robot.',watch:'ECHO is 5V. Use a divider on 3.3V boards.'},
+  {id:'ir',name:'IR line sensor',sub:'Line following',g:'IR',c:'#7C3AED',price:4,good:'Following a black line on the floor.',watch:'Strong sunlight confuses it.'},
+  {id:'mpu',name:'MPU6050',sub:'Gyro + accel · I2C',g:'IMU',c:'#DB2777',price:10,good:'Knowing tilt and heading so the robot drives straight.',watch:'Drifts over time; calibrate at start.'},
+  {id:'vl53',name:'VL53L0X',sub:'Laser distance · I2C',g:'ToF',c:'#1F6F8B',price:15,good:'Precise distance up to 2 m, works on soft surfaces.',watch:'Narrow beam; misses thin objects to the side.'},
+  {id:'dht22',name:'DHT22',sub:'Temp + humidity',g:'DHT',c:'#0F766E',price:12,good:'Room or greenhouse climate readings.',watch:'Read at most once every 2 s.'}]},
+ {id:'power',title:'Power',items:[
+  {id:'batt',name:'18650 2S pack + BMS',sub:'7.4V rechargeable',g:'BAT',c:'#15803D',price:14,good:'Separate power for motors so the board doesn’t brown out.',watch:'Never short it. Always use the BMS.'},
+  {id:'buck',name:'LM2596 buck converter',sub:'Adjustable 1.2–35V',g:'BCK',c:'#1E40AF',price:6,good:'Stepping the battery down to a clean 5V for servos and the board.',watch:'Set the voltage with a meter before connecting.'}]},
+ {id:'io',title:'Display and controls',items:[
+  {id:'oled',name:'SSD1306 OLED',sub:'0.96" · I2C',g:'OL',c:'#111827',price:12,good:'Showing distance, battery or status right on the robot.',watch:'Shares the I2C pins with other sensors.'},
+  {id:'buzzer',name:'Active buzzer',sub:'5V beeper',g:'BZ',c:'#3F3F46',price:2,good:'Beeps for alarms, start-up and warnings.',watch:'Loud at 5V; add a resistor for quieter beeps.'},
+  {id:'btn',name:'Push buttons ×5',sub:'Tactile 6 mm',g:'BTN',c:'#52525B',price:2,good:'Start, stop and mode buttons.',watch:'Use INPUT_PULLUP and debounce in code.'}]},
+ {id:'passive',title:'Wiring and passives',items:[
+  {id:'res',name:'Resistor kit (1k + 2k)',sub:'For the ECHO divider',g:'Ω',c:'#92400E',price:1,good:'Voltage dividers and LED current limiting.',watch:'Check colour bands; 1k is brown-black-red.'},
+  {id:'jumpers',name:'Jumper wires ×40',sub:'M-M, M-F, F-F',g:'JW',c:'#BE185D',price:5,good:'Breadboard and header connections.',watch:'Cheap ones break inside; test if a signal vanishes.'},
+  {id:'bb',name:'Half breadboard',sub:'400 points',g:'BB',c:'#A1A1AA',price:5,good:'Trying circuits before soldering.',watch:'Loose contacts cause random faults; press parts in firmly.'}]}];
 const ITEM={};Object.values(KITS).forEach(k=>k.groups.forEach(g=>g.items.forEach(it=>{it.group=g;ITEM[it.id]=it})));
-const npSel={app:new Set(['expo','supabase']),rob:new Set(['esp32','l298n','tt','hcsr04','sg90'])};
+CAT.forEach(g=>g.items.forEach(it=>{it.group=g;ITEM[it.id]=it}));
+const npSel={app:new Set(['expo','supabase']),rob:new Set(['esp32'])};
 let npKind='rob';
 const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fw=()=>[...npSel.app].find(id=>ITEM[id].group.id==='fw');
 const blocked=it=>it.only&&fw()!==it.only;
 
-function renderPresets(){const box=$('.presets');box.innerHTML='<span class="muted small">Start from</span>';
+function renderPresets(){const box=$('.presets');box.hidden=!KITS[npKind].presets.length;box.innerHTML='<span class="muted small">Start from</span>';
   KITS[npKind].presets.forEach(pr=>{const b=document.createElement('button');b.className='fchip';b.textContent=pr.name;
     const on=pr.ids.length===npSel[npKind].size&&pr.ids.every(i=>npSel[npKind].has(i));b.setAttribute('aria-pressed',on);
     b.onclick=()=>{npSel[npKind]=new Set(pr.ids);renderTiles(false);npUpdate()};box.append(b)})}
@@ -1312,25 +1373,20 @@ function renderTiles(animate){const area=$('#pickArea');area.innerHTML='';
 function npChecks(){const S=npSel[npKind],has=id=>S.has(id),out=[];
   if(npKind==='rob'){const board=['esp32','nano','uno','c3'].find(has);
     if(!board)out.push(['bad','<b>Board</b> missing. Pick one to continue.']);
-    if(has('tt')&&!has('l298n'))out.push(['bad','<b>TT motors</b> can’t run from a GPIO pin. Add the L298N driver.']);
-    if((has('tt')||has('l298n'))&&!has('batt'))out.push(['warn','<b>Motors</b> need their own power. Add the 18650 2S pack.']);
-    if(has('hcsr04')&&(board==='esp32'||board==='c3'))out.push(['warn','<b>HC-SR04</b> ECHO is 5V; ESP32 pins are 3.3V. A 1k/2k divider goes on the parts list.']);
-    if(has('l298n')&&has('tt'))out.push(['ok','<b>L298N</b> 2 A covers TT motor stall 1.5 A.']);
-    if(has('mpu')&&has('oled'))out.push(['ok','<b>MPU6050</b> and <b>OLED</b> share I2C, no extra pins needed.'])}
+    else out.push(['ok','<b>Parts</b> come next: add motors, sensors and power in the project\u2019s Parts tab.'])}
   else{const f=fw();
     if(!f)out.push(['bad','<b>Framework</b> missing. Pick one to continue.']);
     if(f==='tauri')out.push(['warn','<b>Tauri</b> needs Rust. Setup installs rustup if it’s missing.']);
     if(f==='next'&&has('sqlite'))out.push(['warn','<b>SQLite</b> in Next.js runs on the server only, not in the browser.']);
     if(f==='expo'&&has('supabase'))out.push(['ok','<b>Supabase</b> works in Expo. Keys go in .env, never in code.']);
     if(f==='expo'&&!has('eas'))out.push(['ok','<b>Builds</b> run locally. Tick EAS Build for cloud APKs.'])}
-  if(!out.some(c=>c[0]!=='ok'))out.unshift(['ok','<b>Everything fits together.</b>']);return out}
+  if(npKind==='app'&&!out.some(c=>c[0]!=='ok'))out.unshift(['ok','<b>Everything fits together.</b>']);return out}
 function npUpdate(){const S=npSel[npKind],name=$('#pname').value.trim();
   $$('#pickArea .kt').forEach(b=>{const it=ITEM[b.dataset.id];b.setAttribute('aria-checked',S.has(it.id));b.setAttribute('aria-disabled',npKind==='app'&&!!blocked(it))});
   const checks=npChecks(),ic={bad:'x-c',warn:'alert',ok:'check-c'};
   $('#npChecks').innerHTML=checks.map(([l,h])=>`<div class="chk ${l}"><svg class="i"><use href="#i-${ic[l]}"/></svg><span>${h}</span></div>`).join('');
   const picked=KITS[npKind].groups.flatMap(g=>g.items).filter(i=>S.has(i.id));let sum,meta;
-  if(npKind==='rob'){const b=picked.find(i=>i.group.id==='board'),parts=picked.filter(i=>i.group.id!=='board');
-    sum=(b?b.name:'No board')+(parts.length?` + ${parts.length} part${parts.length>1?'s':''}`:'');meta=`RM${picked.reduce((t,i)=>t+(i.price||0),0)} estimated`}
+  if(npKind==='rob'){const b=picked[0];sum=b?b.name:'No board';meta=b?`RM${b.price} board · add parts after creating`:''}
   else{sum=picked.length?picked.map(i=>i.name).join(' + '):'No stack yet';meta=`${picked.length} package${picked.length===1?'':'s'} · free tiers`}
   const bad=checks.find(c=>c[0]==='bad'),why=!name?'Add a project name.':bad?bad[1].replace(/<[^>]+>/g,''):'';
   $('#npSum').textContent=sum;$('#npMeta').innerHTML=why?`<span class="why">${esc(why)}</span>`:esc(meta);
@@ -1348,7 +1404,7 @@ addEventListener('resize',moveKpill);
 $('#pname').addEventListener('input',e=>{$('#slug').textContent=(e.target.value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'untitled';npUpdate()});
 $('#npCreate').onclick=()=>{const n=$('#pname').value.trim();
   toast(npKind==='rob'?`Creating ${n}: pio project init, platformio.ini, pins.h, main.cpp, git init…`:`Creating ${n}: scaffold, theme file, .env.example, git init…`);
-  setTimeout(()=>location.hash='#project',900)};
+  setTimeout(()=>{location.hash='#project';if(npKind==='rob')setTimeout(()=>$('[data-tab="parts"]').click(),60)},900)};
 /* tooltip: first one waits 350 ms, neighbours open instantly (no animation) */
 const tip=document.createElement('div');tip.id='tip';tip.setAttribute('role','tooltip');document.body.append(tip);
 let tipT=0,tipLast=0;
@@ -1358,19 +1414,18 @@ function showTip(el,instant){const it=ITEM[el.dataset.id];if(!it)return;
   let x=Math.max(8,Math.min(r.left+r.width/2-w/2,innerWidth-w-8)),y=r.top-h-10,below=y<8;if(below)y=r.bottom+10;
   tip.style.left=x+'px';tip.style.top=y+'px';tip.style.transformOrigin=`${r.left+r.width/2-x}px ${below?'0':'100%'}`;tip.classList.add('on')}
 function hideTip(now){clearTimeout(tipT);if(tip.classList.contains('on'))tipLast=Date.now();tip.classList.toggle('instant',!!now);tip.classList.remove('on')}
-function bindTips(){$$('#pickArea .kt').forEach(b=>{
-  b.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;clearTimeout(tipT);const warm=tip.classList.contains('on')||Date.now()-tipLast<500;
-    if(warm)showTip(b,true);else tipT=setTimeout(()=>showTip(b,calm()),350)});
-  b.addEventListener('pointerleave',()=>hideTip());
-  b.addEventListener('focus',()=>{if(b.matches(':focus-visible'))showTip(b,true)});b.addEventListener('blur',()=>hideTip(true))})}
+function bindTips(){}
+document.addEventListener('pointerover',e=>{const b=e.target.closest('.kt[data-id]');if(!b||e.pointerType!=='mouse'||b.contains(e.relatedTarget))return;
+  clearTimeout(tipT);const warm=tip.classList.contains('on')||Date.now()-tipLast<500;if(warm)showTip(b,true);else tipT=setTimeout(()=>showTip(b,calm()),350)});
+document.addEventListener('pointerout',e=>{const b=e.target.closest('.kt[data-id]');if(!b||b.contains(e.relatedTarget))return;hideTip()});
+document.addEventListener('focusin',e=>{const b=e.target.closest('.kt[data-id]');if(b&&b.matches(':focus-visible'))showTip(b,true)});
+document.addEventListener('focusout',e=>{if(e.target.closest('.kt[data-id]'))hideTip(true)});
 addEventListener('keydown',e=>{if(e.key==='Escape')hideTip(true)});
 document.getElementById('main').addEventListener('scroll',()=>hideTip(true),{passive:true});
 setKind('rob',false);
 
 /* handbook: Add to project bumps the part in Rover-01 -> Parts */
-$('#addBtn').onclick=()=>{const row=$$('[data-s="parts-table"] tbody tr').find(tr=>tr.cells[0].textContent.startsWith('HC-SR04'));
-  if(row){const q=row.cells[1];q.textContent=+q.textContent+1;const tot=$$('[data-s="parts-table"] tbody tr').at(-1).cells[3];tot.innerHTML='<b>RM'+(parseInt(tot.textContent.replace(/\D/g,''))+6)+'</b>'}
-  toast(`HC-SR04 added to Rover-01 → Parts${row?' (now '+row.cells[1].textContent+')':''}.`)};
+$('#addBtn').onclick=()=>{addToProject({hcsr04:1});toast(`HC-SR04 added to Rover-01 → Parts (now ${projectParts.find(p=>p.id==='hcsr04').qty}).`)};
 
 /* project tabs */
 const pill=$('.seg .pill');
@@ -1484,6 +1539,56 @@ new ResizeObserver(fitStage).observe($('#stageWrap'));
 /* if the Wokwi parts never load, say so (wires and table still work) */
 Promise.race([customElements.whenDefined('wokwi-esp32-devkit-v1'),new Promise((_,r)=>setTimeout(r,8000))]).catch(()=>{$('#diagNote').hidden=false});
 renderPins();
+
+/* ---------- Parts tab: cost tracker, parts list, catalog + selection window ---------- */
+const projectParts=[{id:'esp32',qty:1,st:'have'},{id:'l298n',qty:1,st:'have'},{id:'tt',qty:2,st:'have'},{id:'hcsr04',qty:1,st:'have'},
+  {id:'sg90',qty:1,st:'ordered'},{id:'batt',qty:1,st:'need'},{id:'res',qty:1,st:'need'}];
+const ST={have:['ok','In hand'],ordered:['warn','Ordered'],need:['bad','Need']},NEXT={need:'ordered',ordered:'have',have:'need'};
+const selection=new Map();
+const rm=n=>'RM'+n;
+function renderParts(flashIds=[]){const body=$('#partsBody');
+  body.innerHTML=projectParts.map(p=>{const it=ITEM[p.id],[cls,lbl]=ST[p.st],board=it.group.id==='board';
+    return `<tr data-id="${p.id}" class="${flashIds.includes(p.id)?'row-flash':''}"><td><b style="font-weight:500">${esc(it.name)}</b><span class="muted small" style="display:block">${esc(it.sub)}</span></td>
+      <td>${board?'1':`<span class="qty"><button aria-label="Fewer ${esc(it.name)}" data-q="-1">−</button><output>${p.qty}</output><button aria-label="More ${esc(it.name)}" data-q="1">+</button></span>`}</td>
+      <td><button class="chip ${cls} st-btn" title="Click to change status" aria-label="${esc(it.name)}: ${lbl}. Click to change.">${lbl}</button></td>
+      <td class="num" style="text-align:right">${rm(it.price*p.qty)}</td>
+      <td style="text-align:right">${board?'':`<button class="btn ghost sm rm-btn" aria-label="Remove ${esc(it.name)}">✕</button>`}</td></tr>`}).join('');
+  const sum=st=>projectParts.filter(p=>!st||p.st===st).reduce((t,p)=>t+ITEM[p.id].price*p.qty,0),T=sum(),H=sum('have'),O=sum('ordered'),N=sum('need');
+  $('#costTotal').textContent=rm(T);$('#costHave').textContent=rm(H);$('#costOrd').textContent=rm(O);$('#costNeed').textContent=rm(N);
+  const bar=$('.cost-bar');bar.children[0].style.flexGrow=H;bar.children[1].style.flexGrow=O;bar.children[2].style.flexGrow=N;
+  renderCatalog()}
+$('#partsBody').addEventListener('click',e=>{const tr=e.target.closest('tr');if(!tr)return;const p=projectParts.find(x=>x.id===tr.dataset.id);
+  if(e.target.closest('.st-btn')){p.st=NEXT[p.st];renderParts();return}
+  const q=e.target.closest('[data-q]');if(q){p.qty=Math.max(1,p.qty+ +q.dataset.q);renderParts();return}
+  if(e.target.closest('.rm-btn')){projectParts.splice(projectParts.indexOf(p),1);renderParts();toast(`${ITEM[p.id].name} removed from Rover-01.`)}});
+function renderCatalog(){const area=$('#catArea');
+  area.innerHTML=CAT.map(g=>`<section class="kgroup" data-s="cat-${g.id}" id="s-cat-${g.id}"><div class="gh"><h3>${g.title}</h3></div><div class="ktiles" role="group" aria-label="${g.title}">`+
+    g.items.map(it=>{const inP=projectParts.find(p=>p.id===it.id),on=selection.has(it.id);
+      return `<button class="kt" role="checkbox" aria-checked="${on}" data-id="${it.id}" data-s="cat-${it.id}" id="s-cat-${it.id}" aria-describedby="tip"><span class="g" style="background:${it.c}">${it.g}</span><span class="tx"><b>${esc(it.name)}</b><span class="s">${esc(it.sub)} · RM${it.price}</span>${inP?`<span class="inp">In project ×${inP.qty}</span>`:''}</span><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span></button>`}).join('')+'</div></section>').join('');
+  renderSelection()}
+$('#catArea').addEventListener('click',e=>{const b=e.target.closest('.kt');if(!b)return;const id=b.dataset.id;
+  selection.has(id)?selection.delete(id):selection.set(id,1);b.setAttribute('aria-checked',selection.has(id));renderSelection()});
+function partChecks(){const all=new Set([...projectParts.map(p=>p.id),...selection.keys()]),has=id=>all.has(id),newly=id=>selection.has(id),out=[];
+  if(has('tt')&&!has('l298n'))out.push(['bad','<b>TT motors</b> need a driver. Add the L298N.']);
+  if((newly('tt')||newly('l298n')||newly('mg996r'))&&!has('batt'))out.push(['warn','<b>Motors</b> need their own power. Add the 18650 pack.']);
+  if(newly('mg996r')&&!has('buck'))out.push(['warn','<b>MG996R</b> wants a steady 5–6V. Add the buck converter.']);
+  if((newly('hcsr04'))&&!has('res'))out.push(['warn','<b>HC-SR04</b> ECHO is 5V. Add the resistor kit for the divider.']);
+  if([...selection.keys()].filter(id=>['mpu','vl53','oled'].includes(id)).length&&[...all].filter(id=>['mpu','vl53','oled'].includes(id)).length>1)out.push(['ok','<b>I2C</b> parts share SDA 21 / SCL 22. No extra pins needed.']);
+  return out}
+function renderSelection(){const list=$('#selList'),ids=[...selection.keys()];
+  $('#selCount').textContent=ids.length;
+  list.innerHTML=ids.length?ids.map(id=>{const it=ITEM[id],q=selection.get(id);return `<div class="sw-item" data-id="${id}"><span class="g" style="background:${it.c}">${it.g}</span><span class="nm"><b>${esc(it.name)}</b><span>${rm(it.price*q)}</span></span><span class="qty"><button aria-label="Fewer" data-sq="-1">−</button><output>${q}</output><button aria-label="More" data-sq="1">+</button></span><button class="btn ghost sm" data-sx aria-label="Remove ${esc(it.name)} from selection">✕</button></div>`}).join('')
+    :'<p class="muted small sw-empty">Nothing selected yet. Tick components on the left and they collect here.</p>';
+  const ic={bad:'x-c',warn:'alert',ok:'check-c'};
+  $('#selChecks').innerHTML=partChecks().map(([l,h])=>`<div class="chk ${l}"><svg class="i"><use href="#i-${ic[l]}"/></svg><span>${h}</span></div>`).join('');
+  $('#selTotal').textContent=rm(ids.reduce((t,id)=>t+ITEM[id].price*selection.get(id),0));$('#selAdd').disabled=!ids.length}
+$('#selList').addEventListener('click',e=>{const row=e.target.closest('.sw-item');if(!row)return;const id=row.dataset.id;
+  const q=e.target.closest('[data-sq]');if(q){selection.set(id,Math.max(1,selection.get(id)+ +q.dataset.sq));renderSelection();return}
+  if(e.target.closest('[data-sx]')){selection.delete(id);const t=$(`#catArea .kt[data-id="${id}"]`);t&&t.setAttribute('aria-checked','false');renderSelection()}});
+function addToProject(map){const ids=[];Object.entries(map).forEach(([id,q])=>{const p=projectParts.find(x=>x.id===id);if(p)p.qty+=q;else projectParts.push({id,qty:q,st:'need'});ids.push(id)});renderParts(ids)}
+$('#selAdd').onclick=()=>{const n=selection.size,cost=[...selection].reduce((t,[id,q])=>t+ITEM[id].price*q,0);addToProject(Object.fromEntries(selection));selection.clear();renderCatalog();
+  toast(`Added ${n} component${n>1?'s':''} to Rover-01. ${rm(cost)} more to buy.`);if(!calm())$('[data-s="parts-table"]').scrollIntoView({block:'nearest',behavior:'smooth'})};
+renderParts();
 
 /* more menu */
 const menu=$('#moreMenu'),moreBtn=$('#moreBtn');
