@@ -75,3 +75,46 @@ def test_pin_options_rate_every_pin(client):
     other = next(x for x in wires if x["signalName"] != ena["signalName"] and x.get("boardPin"))
     assert opts[str(other["boardPin"])]["used_by"] == other["signalName"]
     assert any(o["level"] == "ok" for o in r["options"])
+
+
+# ---------- guide mode ----------
+
+def test_guides_listed_per_module(client):
+    gs = {g["module"]: g for g in client.get("/handbook/guide").json()}
+    assert {"robotics", "app-dev"} <= set(gs)
+    q = gs["robotics"]["questions"][0]
+    assert q["id"] == "motion" and "Drive on wheels" in q["options"]
+
+
+def test_robot_answers_rank_the_right_chapters(client):
+    r = client.post("/handbook/guide/robotics", json={"answers": {
+        "motion": ["Drive on wheels"], "sense": ["Obstacles ahead", "A line on the floor"],
+        "power": ["Batteries, it roams free"], "wireless": ["Yes, control it from a phone"]}}).json()
+    keys = [x["key"] for x in r["results"]]
+    assert {"tt-motor", "l298n", "hc-sr04", "ir-tcrt5000", "esp32-devkit", "18650-2s-bms"} <= set(keys)
+    top = r["results"][0]
+    assert top["path"].startswith("robotics/") and top["why"]
+    assert "sg90" not in keys
+
+
+def test_app_answers_pick_expo_supabase(client):
+    r = client.post("/handbook/guide/app-dev", json={"answers": {"platform": ["On their phone"], "accounts": ["Yes, with accounts and sync"], "ship": ["An APK for Android friends"]}}).json()
+    keys = [x["key"] for x in r["results"]]
+    assert keys[0] == "expo" and "supabase" in keys[:3] and "eas" in keys
+
+
+def test_unknown_guide_says_how_to_add_one(client):
+    r = client.post("/handbook/guide/business", json={"answers": {}})
+    assert r.status_code == 404 and "guide.yaml" in r.json()["detail"]
+
+
+def test_every_guide_boost_points_at_a_real_chapter(client, hub):
+    from engine.routes.guidemode import guides
+    from engine.routes.handbook import current
+    hb = current(hub)
+    for g in guides(hub.paths.root).values():
+        for q in g["questions"]:
+            for o in q["options"]:
+                assert isinstance(o["label"], str) and set(o) <= {"label", "boost"}, f"{g['module']}/{q['id']}: quote labels that contain commas"
+                for key in (o.get("boost") or {}):
+                    assert hb.by_key(key), f"{g['module']}/{q['id']}: no chapter '{key}'"

@@ -1,0 +1,41 @@
+# Guide mode: answer a few questions, get the handbook chapters to read. Plain data; boosts are chapter keys.
+title: Find parts for your robot
+questions:
+  - id: motion
+    q: How should it move?
+    options:
+      - { label: "Drive on wheels", boost: { tt-motor: 3, l298n: 3, 18650-2s-bms: 1 } }
+      - { label: "Move an arm or flap", boost: { sg90: 3, mg996r: 2 } }
+      - { label: "Turn in exact steps", boost: { stepper-28byj48: 3 } }
+      - { label: "It doesn't move", boost: {} }
+  - id: sense
+    q: What should it notice?
+    multi: true
+    options:
+      - { label: "Obstacles ahead", boost: { hc-sr04: 3, vl53l0x: 2 } }
+      - { label: "A line on the floor", boost: { ir-tcrt5000: 3 } }
+      - { label: "Tilt or bumps", boost: { mpu6050: 3 } }
+      - { label: "Temperature or humidity", boost: { dht22: 3 } }
+      - { label: "Button presses", boost: { buttons: 3 } }
+  - id: weight
+    q: How heavy is what it moves?
+    options:
+      - { label: "Light (under 200 g)", boost: { sg90: 2, tt-motor: 1 } }
+      - { label: "Heavy (a real arm or a big chassis)", boost: { mg996r: 3, l298n: 1, lm2596: 2 } }
+  - id: power
+    q: How is it powered?
+    options:
+      - { label: "USB cable is fine", boost: {} }
+      - { label: "Batteries, it roams free", boost: { 18650-2s-bms: 3, lm2596: 3 } }
+  - id: wireless
+    q: Does it need Wi-Fi or Bluetooth?
+    options:
+      - { label: "Yes, control it from a phone", boost: { esp32-devkit: 3, esp32-c3-mini: 2 } }
+      - { label: "No", boost: { arduino-nano: 2, arduino-uno: 2, esp32-devkit: 1 } }
+  - id: feedback
+    q: How should it tell you things?
+    multi: true
+    options:
+      - { label: "A small screen", boost: { ssd1306: 3 } }
+      - { label: "Beeps", boost: { buzzer: 3 } }
+      - { label: "Serial monitor is enough", boost: {} }

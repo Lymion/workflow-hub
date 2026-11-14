@@ -1,3 +1,4 @@
+import { HandbookGuide } from "./HandbookGuide";
 import { useEffect, useState } from "react";
 import { api, notifyChanged, useLoad } from "../lib/api";
 import { go } from "../lib/router";
@@ -30,7 +31,8 @@ export function Handbook({ params }: PageProps) {
   const [hits, setHits] = useState<{ ref: string; title: string }[] | null>(null);
   const [newNote, setNewNote] = useState(false);
   const firstPath = toc.data?.parts.find((p) => p.id !== "notes")?.sections[0]?.chapters[0]?.path;
-  const path = params.length ? params.join("/") : firstPath;
+  const guide = params[0] === "guide";
+  const path = guide ? undefined : params.length ? params.join("/") : firstPath;
 
   useEffect(() => {
     if (!q.trim()) return setHits(null);
@@ -41,6 +43,7 @@ export function Handbook({ params }: PageProps) {
   return (
     <>
       <PageHead eyebrow="Parts, boards and stacks" title="Handbook">
+        <a className="btn" href="#handbook/guide" aria-current={guide ? "page" : undefined}><Icon name="spark" />Guide me</a>
         <button className="btn" onClick={() => setNewNote(true)}><Icon name="plus" />New note</button>
       </PageHead>
       {toc.data?.errors.map((e) => (
@@ -68,7 +71,7 @@ export function Handbook({ params }: PageProps) {
             ))
           )}
         </nav>
-        {newNote ? <NoteEditor onDone={(p) => { setNewNote(false); toc.reload(); if (p) go(`#handbook/${p}`); }} /> : path ? <ChapterView path={path} onChanged={toc.reload} /> : !toc.loading && <div className="card"><Empty icon="book" title="No chapters yet">Add markdown files to modules/&lt;type&gt;/handbook/ or write a note.</Empty></div>}
+        {guide && !newNote ? <HandbookGuide /> : newNote ? <NoteEditor onDone={(p) => { setNewNote(false); toc.reload(); if (p) go(`#handbook/${p}`); }} /> : path ? <ChapterView path={path} onChanged={toc.reload} /> : !toc.loading && <div className="card"><Empty icon="book" title="No chapters yet">Add markdown files to modules/&lt;type&gt;/handbook/ or write a note.</Empty></div>}
       </div>
     </>
   );
