@@ -17,12 +17,13 @@ def is_owned(path: Path) -> bool:
         head = path.read_text(encoding="utf-8", errors="replace")[:400]
     except OSError:
         return False
-    return MARKER in head
+    # the header must be at the top (first 3 lines), not just mentioned somewhere in the text
+    return any(MARKER in line for line in head.splitlines()[:3])
 
 
 def write_owned(path: Path, content: str) -> str:
     """Returns 'wrote', 'unchanged' or 'skipped' (exists and is the user's file)."""
-    if MARKER not in content[:400]:
+    if not any(MARKER in line for line in content[:400].splitlines()[:3]):
         raise ValueError(f"{path.name}: owned files must start with an {MARKER} header")
     if path.exists():
         if not is_owned(path):

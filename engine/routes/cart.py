@@ -229,6 +229,12 @@ def after_create(hub: Hub, project: dict) -> None:
     start_background(hub, project, ctx)
 
 
+def after_update(hub: Hub, project: dict, changed: set[str]) -> None:
+    """Stack or board edited: regenerate the hub-owned files (.env.example, theme, pins.h)."""
+    if changed & {"stack", "board"}:
+        refresh_files(hub, project)
+
+
 def start_background(hub: Hub, project: dict, ctx: dict, **flags) -> dict | None:
     if not hasattr(ctx["wizard"], "background"):
         return None

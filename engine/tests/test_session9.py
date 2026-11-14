@@ -184,3 +184,23 @@ def test_next_screen_is_a_route_folder(client):
     p = app(client, stack=("nextjs",), name="Shop Admin")
     r = client.post(f"/projects/{p['id']}/screens", json={"name": "Orders"})
     assert r.json()["file"] == "src/app/orders/page.tsx"
+
+
+def test_stack_edit_regenerates_env_example(client):
+    p = app(client, stack=("expo",))
+    env = Path(p["path"]) / ".env.example"
+    assert "SUPABASE" not in env.read_text()
+    client.patch(f"/projects/{p['id']}", json={"stack": ["expo", "supabase"]})
+    assert "EXPO_PUBLIC_SUPABASE_URL=" in env.read_text()
+
+
+def test_app_presets_are_listed(client):
+    names = {p["preset"]: p for p in client.get("/presets?module=app-dev").json()}
+    assert names["expo-supabase"]["stack"][0] == "expo" and "tauri" in names["desktop-tool"]["stack"]
+
+
+def test_claude_md_mentioning_the_marker_is_still_the_users(client):
+    p = app(client)
+    files = {f["file"]: f for f in client.get(f"/projects/{p['id']}/setup").json()["files"]}
+    assert files["CLAUDE.md"]["exists"] and not files["CLAUDE.md"]["owned"]
+    assert files["src/theme/tokens.ts"]["owned"]

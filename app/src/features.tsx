@@ -13,6 +13,8 @@ import { ErrorLog } from "./pages/ErrorLog";
 import { SEARCH_LINKS } from "./lib/links";
 import { SnippetsTab } from "./pages/project/SnippetsTab";
 import { ADD_TO_PROJECT, Handbook } from "./pages/Handbook";
+import { PICKERS } from "./pages/NewProject";
+import { STACK_PICKER, StackTab, TokensTab } from "./pages/project/AppTabs";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -50,3 +52,8 @@ PAGES.guide = Guide;
 PAGES.settings = SettingsPage;
 SIDEBAR_FOOTERS.push(SpendMeter);
 SEARCH_LINKS.doc = () => "#guide";
+
+// ---- session 9: app stack picker, Stack tab, Design tokens tab ----
+PICKERS.stack = STACK_PICKER;
+MODULE_TABS.stack = { id: "stack", label: "Stack", Component: StackTab };
+MODULE_TABS["design-tokens"] = { id: "design-tokens", label: "Design tokens", Component: TokensTab };

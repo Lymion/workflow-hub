@@ -16,6 +16,8 @@ router = APIRouter()
 
 # Called after a project is created: (hub, project) -> None. Wizards register here.
 AFTER_CREATE: list = []
+# Hooks run after a project is edited: fn(hub, project, changed_fields). Later sessions add to it.
+AFTER_UPDATE: list = []
 
 
 def hub_of(request: Request) -> Hub:
@@ -132,7 +134,11 @@ def update_project(request: Request, project_id: int, body: ProjectPatch) -> dic
     if fields:
         with hub.tx() as c:
             c.execute(f"UPDATE projects SET {', '.join(fields)}, updated_at = datetime('now') WHERE id = ?", (*params, project_id))
-    return get_project(hub, project_id)
+    project = get_project(hub, project_id)
+    changed = set(body.model_dump(exclude_unset=True))
+    for hook in AFTER_UPDATE:
+        hook(hub, project, changed)
+    return project
 
 
 @router.delete("/projects/{project_id}", status_code=204)

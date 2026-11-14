@@ -22,4 +22,6 @@ def register(app: FastAPI) -> None:
     app.include_router(guide.router)  # session 8
     if cart.after_create not in projects.AFTER_CREATE:
         projects.AFTER_CREATE.append(cart.after_create)
+    if cart.after_update not in projects.AFTER_UPDATE:
+        projects.AFTER_UPDATE.append(cart.after_update)
     app.include_router(design.router)  # session 9

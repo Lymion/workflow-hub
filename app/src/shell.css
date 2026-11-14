@@ -233,3 +233,34 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .mini-spend:focus-visible .spend-pop { opacity: 1; transform: none; transition-duration: 160ms; }
 @media (hover: hover) and (pointer: fine) { .mini-spend:hover .spend-pop { opacity: 1; transform: none; pointer-events: auto; transition-duration: 160ms; transition-delay: 90ms; } .mini-spend:hover { box-shadow: var(--hl), var(--shadow-2); } }
 @media (max-width: 980px) { .mini-spend { display: none; } }
+
+/* ---------- session 9: app stack, setup job, design tokens ---------- */
+.stack-chip { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px 0 4px; border-radius: 999px; background: var(--fill); font-size: 13px; font-weight: 600;
+  box-shadow: var(--hl); transition: background-color 150ms ease, transform 160ms var(--ease-out); }
+.stack-chip .g { width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; color: #fff; font: 700 10px theme("fontFamily.mono"); box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+.stack-chip:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) { .stack-chip:hover { background: var(--accent-tint); } }
+.opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--fill); font-size: 13px; cursor: pointer; }
+.opt input { margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex: none; }
+.job-log { margin: 0; max-height: 180px; overflow: auto; padding: 10px 14px; border-radius: 12px; background: #0B0B0F; color: #D7D7DE; font: 12px/1.55 theme("fontFamily.mono"); white-space: pre-wrap;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 0 0 1px rgba(255,255,255,.04); }
+.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg) } }
+.tok-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+.tok-side { position: sticky; top: 16px; display: grid; gap: 12px; }
+.tok-colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+.tok-color { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 12px; background: var(--fill); cursor: pointer; transition: box-shadow 150ms ease; }
+.tok-color.bad { box-shadow: inset 0 0 0 1.5px var(--red); }
+.tok-color input[type="color"] { width: 36px; height: 36px; flex: none; padding: 0; border: 0; border-radius: 10px; background: none; cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.12); }
+.tok-color input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.tok-color input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 10px; }
+.tok-color .hex { width: 100%; background: none; border: 0; padding: 0; font: 12px theme("fontFamily.mono"); color: var(--label-2); outline: none; }
+.tok-color .hex:focus { color: var(--label); }
+.tok-num { width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+.phone { position: relative; height: 560px; border-radius: 44px; overflow: hidden; padding-top: 44px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 0 0 9px #16161A, 0 0 0 10px rgba(255,255,255,.08), 0 2px 4px rgba(0,0,0,.2), 0 30px 60px -20px rgba(0,0,0,.45);
+  margin: 10px; transition: background-color 240ms var(--ease-out), color 240ms var(--ease-out); }
+.phone-notch { position: absolute; top: 12px; left: 50%; width: 96px; height: 26px; margin-left: -48px; border-radius: 999px; background: #000; }
+@media (max-width: 1100px) { .tok-grid { grid-template-columns: minmax(0, 1fr); } .tok-side { position: static; max-width: 360px; } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
