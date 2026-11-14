@@ -3,12 +3,13 @@ import { api } from "./lib/api";
 import { go } from "./lib/router";
 import { COMMAND_SOURCES } from "./components/CommandBar";
 import { PAGES } from "./pages/registry";
-import { TRAILING_TABS } from "./pages/project/tabs";
+import { MODULE_TABS, TRAILING_TABS } from "./pages/project/tabs";
+import { PartsTab } from "./pages/project/PartsTab";
 import { Library, LIBRARY_SECTIONS } from "./pages/Library";
 import { ErrorLog } from "./pages/ErrorLog";
 import { SEARCH_LINKS } from "./lib/links";
 import { SnippetsTab } from "./pages/project/SnippetsTab";
-import { Handbook } from "./pages/Handbook";
+import { ADD_TO_PROJECT, Handbook } from "./pages/Handbook";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -31,3 +32,12 @@ COMMAND_SOURCES.push(async (q) =>
 // ---- session 5: handbook ----
 PAGES.handbook = Handbook;
 SEARCH_LINKS.handbook = (ref) => `#handbook/${ref}`;
+
+// ---- session 7: project cart (parts + costs), wizard setup ----
+MODULE_TABS.parts = { id: "parts", label: "Parts", Component: PartsTab };
+const stackAdd = ADD_TO_PROJECT.fn;
+ADD_TO_PROJECT.fn = async (ch, project) => {
+  if (ch.section !== "parts" && ch.section !== "boards") return stackAdd(ch, project);
+  await api.post(`/projects/${project.id}/parts`, { items: [{ key: ch.key, qty: 1 }] });
+  return `${ch.title} added to ${project.name} → Parts. pins.h updated.`;
+};
