@@ -26,6 +26,7 @@ def hub_root(tmp_path: Path) -> Path:
 @pytest.fixture()
 def paths(hub_root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> HubPaths:
     monkeypatch.setenv("WORKFLOW_HUB_PROJECTS", str(tmp_path / "projects"))
+    monkeypatch.setenv("WORKFLOW_HUB_EMBED", "0")  # keyword search in tests; hybrid is tested with a fake embedder
     return HubPaths(root=hub_root, data=tmp_path / "data")
 
 

@@ -5,9 +5,12 @@ from fastapi import FastAPI
 
 
 def register(app: FastAPI) -> None:
-    from . import launch, projects, snippets
+    from . import errors, launch, projects, snippets
 
     app.include_router(projects.router)  # session 2
     app.include_router(launch.router)  # session 2
     app.include_router(snippets.router)  # session 3
+    app.include_router(errors.router)  # session 4
+    snippets.AFTER_REINDEX.append(errors.index_snippets)
     snippets.reindex(app.state.hub)
+    errors.reindex_errors(app.state.hub)
