@@ -324,3 +324,75 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .git-log li { position: relative; padding-left: 16px; }
 .git-log li::before { content: ""; position: absolute; left: 2px; top: 6px; width: 7px; height: 7px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
 @media (max-width: 1000px) { .git-grid { grid-template-columns: minmax(0, 1fr); } .git-log { position: static; } }
+
+/* ---------- session 12: wiring view ---------- */
+:root { --mat: #EEF1F5; --mat-dot: rgba(0,0,0,.09); }
+:root[data-theme="dark"] { --mat: #15171C; --mat-dot: rgba(255,255,255,.07); }
+.wire-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.wire-code { position: sticky; top: 16px; }
+.diagram { padding: 10px; }
+.stage-wrap { position: relative; width: 100%; overflow: hidden; border-radius: 12px;
+  background: radial-gradient(circle, var(--mat-dot) 1px, transparent 1.4px) 0 0 / 14px 14px, var(--mat);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 0 0 1px var(--sep), inset 0 10px 30px -18px rgba(0,0,0,.25); }
+.stage { position: absolute; left: 0; top: 0; display: flex; align-items: flex-start; gap: 110px; padding: 24px 28px; transform-origin: 0 0; width: max-content; }
+.stage .col { display: flex; flex-direction: column; gap: 22px; align-items: center; min-width: 40px; }
+.stage .board-col { padding-top: 6px; }
+.wk-board { display: block; transform-origin: 0 0; }
+.wk-part { display: block; }
+.part { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)) drop-shadow(0 8px 14px rgba(0,0,0,.14)); }
+.part figcaption { font-size: 11px; font-weight: 600; color: var(--label-2); filter: none; }
+.gen-board { filter: drop-shadow(0 1px 1px rgba(0,0,0,.2)) drop-shadow(0 10px 18px rgba(0,0,0,.18)); }
+.stage svg.wires { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.stage svg.wires g, .stage svg.wires .wire-grab, .stage svg.wires .pin-hit { pointer-events: auto; }
+.wire { fill: none; stroke-width: 2.6; stroke-linecap: round; transition: opacity 200ms ease; cursor: pointer; }
+.wire-sh { fill: none; stroke: rgba(0,0,0,.28); stroke-width: 4.4; stroke-linecap: round; transition: opacity 200ms ease; }
+.wire.dash { stroke-dasharray: 6 5; }
+.wire-end { stroke: rgba(0,0,0,.35); stroke-width: 1; }
+.wire-grab { stroke: #fff; stroke-width: 1.5; cursor: grab; transition: r 150ms var(--ease-out); }
+.wire-grab:active { cursor: grabbing; }
+.pin-hit { fill: rgba(10,132,255,.25); stroke: var(--accent); stroke-width: 1; }
+.pin-hit.on { fill: var(--accent); }
+.diagram.focus .wire, .diagram.focus .wire-sh, .diagram.focus .wire-end, .diagram.focus .wire-grab { opacity: .15; }
+.diagram.focus g.hot * { opacity: 1 !important; }
+.pin-tbl td { vertical-align: middle; }
+.pin-row { cursor: pointer; transition: background-color 150ms ease; }
+.pin-row.hot { background: var(--accent-tint); }
+.wdot { display: inline-block; width: 8px; height: 8px; border-radius: 999px; margin-right: 8px; vertical-align: middle; box-shadow: 0 0 0 2px var(--surface-solid); }
+.sig-in { width: 150px; border: 0; background: none; padding: 4px 6px; margin-left: -6px; border-radius: 6px; font: 600 12.5px theme("fontFamily.mono"); color: var(--label); }
+.sig-in:hover { background: var(--fill); }
+.sig-in:focus { outline: none; background: var(--surface-solid); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.pin-sel { display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 130px; height: 30px; padding: 0 8px 0 10px; border: 0; border-radius: 8px;
+  background: var(--fill); font: 600 13px theme("fontFamily.sans"); font-variant-numeric: tabular-nums; color: var(--label); cursor: pointer; }
+.pin-sel svg { width: 12px; height: 12px; color: var(--label-2); }
+.pin-sel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pin-sel[aria-expanded="true"] { box-shadow: inset 0 0 0 1.5px var(--accent) !important; }
+.pin-row.bad .pin-sel { box-shadow: inset 0 0 0 1.5px var(--red); }
+.pin-row.warn .pin-sel { box-shadow: inset 0 0 0 1.5px var(--amber); }
+.pin-msg { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; line-height: 1.35; font-weight: 500; }
+.pin-msg svg { width: 15px; height: 15px; flex: none; }
+.pin-msg .bang { width: 18px; height: 18px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; font: 800 12px/1 theme("fontFamily.sans"); }
+.pin-msg.bad { color: var(--red-text); } .pin-msg.bad .bang { background: var(--red); }
+.pin-msg.warn { color: var(--amber-text); } .pin-msg.warn .bang { background: var(--amber); }
+.pin-msg.ok { color: var(--green-text); }
+#pinPop { position: fixed; z-index: 85; width: 292px; padding: 12px; border-radius: 14px; background: var(--surface-solid); box-shadow: var(--hl), var(--shadow-2);
+  opacity: 0; transform: scale(.96); pointer-events: none; transition: opacity 100ms var(--ease-out), transform 100ms var(--ease-out); }
+#pinPop.open { opacity: 1; transform: none; pointer-events: auto; transition-duration: 150ms; }
+#pinPop.instant { transition: none; }
+#pinPop .pp-title { font-size: 12.5px; color: var(--label-2); padding: 0 2px 2px; }
+#pinPop .pp-title b { color: var(--label); font-family: theme("fontFamily.mono"); font-weight: 600; }
+#pinPop .pp-h { font-size: 11.5px; font-weight: 600; color: var(--label-2); margin: 10px 2px 6px; }
+#pinPop .pp-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+.pp-opt { position: relative; height: 34px; border: 0; border-radius: 8px; background: var(--fill); color: var(--label); font: 600 13px theme("fontFamily.sans"); font-variant-numeric: tabular-nums; cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, transform 120ms var(--ease-out); }
+.pp-opt:active { transform: scale(.96); }
+.pp-opt:focus { outline: none; }
+.pp-opt:focus-visible, .pp-opt:hover { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.pp-opt[aria-selected="true"] { background: var(--accent); color: #fff; }
+.pp-opt .d { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; }
+.pp-opt.warn .d { background: var(--amber); }
+.pp-opt.bad .d, .pp-opt.used .d { background: var(--red); }
+.pp-opt.used { color: var(--label-3); }
+.pp-foot { margin-top: 12px; padding: 10px 2px 0; box-shadow: inset 0 1px 0 var(--sep); font-size: 12px; line-height: 1.4; color: var(--label-2); min-height: 44px; }
+.pp-foot b { color: var(--label); font-variant-numeric: tabular-nums; }
+@media (max-width: 1100px) { .wire-grid { grid-template-columns: minmax(0, 1fr); } .wire-code { position: static; } }
+@media (prefers-reduced-motion: reduce) { #pinPop { transition: none; } }

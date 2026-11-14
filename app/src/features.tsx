@@ -17,6 +17,7 @@ import { PICKERS } from "./pages/NewProject";
 import { STACK_PICKER, StackTab, TokensTab } from "./pages/project/AppTabs";
 import { RunTab } from "./pages/project/RunTab";
 import { GitTab } from "./pages/project/GitTab";
+import { WiringTab } from "./pages/project/WiringTab";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -65,3 +66,6 @@ TRAILING_TABS.unshift({ id: "run", label: "Run", Component: RunTab });
 
 // ---- session 11: git helper ----
 TRAILING_TABS.splice(1, 0, { id: "git", label: "Git", Component: GitTab });
+
+// ---- session 12: wiring view ----
+MODULE_TABS.wiring = { id: "wiring", label: "Wiring", Component: WiringTab };
