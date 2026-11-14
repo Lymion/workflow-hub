@@ -1,5 +1,6 @@
 <title>Workflow Hub</title>
 <script>(function(){var s;try{s=sessionStorage.getItem('rv-state')}catch(e){}document.body.dataset.state=s||'full'})();</script>
+<script src="https://cdn.jsdelivr.net/npm/@wokwi/elements@1.9.2/dist/wokwi-elements.bundle.min.js" async></script>
 <script>window.SCRATCH_STATES=['empty','loading','error','full']</script>
 <script>
   (function(){var t;try{t=localStorage.getItem('wh-theme')}catch(e){}
@@ -35,6 +36,7 @@
   --shadow-2: 0 0 0 .5px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.06), 0 24px 48px -16px rgba(0,0,0,.22);
   --blur: blur(24px) saturate(180%);
 
+  --mat:#EEF0F4; --mat-dot:rgba(60,60,67,.16);
   --ease-out: cubic-bezier(.23,1,.32,1);
   --ease-drawer: cubic-bezier(.32,.72,0,1);
 }
@@ -56,6 +58,7 @@
   --amber:#FF9F0A; --amber-text:#FFC266; --amber-tint:rgba(255,159,10,.18);
   --red:#FF453A; --red-text:#FF7B73; --red-tint:rgba(255,69,58,.18);
   --hl: inset 0 1px 0 rgba(255,255,255,.07);
+  --mat:#1B1C20; --mat-dot:rgba(255,255,255,.08);
   --shadow-1: 0 0 0 .5px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -12px rgba(0,0,0,.6);
   --shadow-2: 0 0 0 .5px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4), 0 28px 56px -16px rgba(0,0,0,.7);
 }
@@ -350,10 +353,11 @@ body[data-state="error"] .kind [data-kind="app"]{opacity:.45}
 .path{font-family:var(--mono);font-size:12.5px;color:var(--label-2);padding-bottom:10px}
 
 /* ---------- handbook ---------- */
-.hb{display:grid;grid-template-columns:210px minmax(0,1fr) 330px;gap:20px;align-items:start}
+.hb{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start;max-width:1080px}
 .toc{position:sticky;top:0;padding:10px}
 .toc .input{height:32px;width:100%;font-size:13px;margin-bottom:8px}
-.toc h4{margin:12px 8px 4px;font-size:11.5px;font-weight:600;color:var(--label-2)}
+.toc h4{margin:14px 0 4px;padding:14px 8px 0;border-top:1px solid var(--sep);font-size:11.5px;font-weight:600;color:var(--label-2)}
+.toc .input + h4{margin-top:6px;padding-top:6px;border-top:0}
 .toc a{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:6px;font-size:13px}
 .toc a.on{background:var(--accent-tint);color:var(--accent-text);font-weight:600}
 @media (hover:hover) and (pointer:fine){.toc a:not(.on):hover{background:var(--fill)}}
@@ -424,16 +428,36 @@ tr:last-child td{box-shadow:none}
 .kcard b{font-weight:500;font-size:13.5px}
 .kcard .r{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--label-2)}
 .kcard.done b{color:var(--label-2)}
-.wiring{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
-.diagram{padding:12px}
-.diagram svg{width:100%;height:auto;display:block}
-.diagram text{font-family:var(--font);font-size:10px;fill:var(--label-2)}
-.diagram .lbl{font-size:11px;font-weight:600;fill:var(--label)}
-.wire{fill:none;stroke-width:2.4;stroke-linecap:round;transition:opacity 200ms ease}
-.diagram.focus .wire{opacity:.18}
-.diagram.focus .wire.hot{opacity:1;stroke-width:3.4}
+.wiring{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.diagram{padding:10px}
+.stage-wrap{position:relative;width:100%;max-width:880px;margin:0 auto;aspect-ratio:640/340;border-radius:10px;overflow:hidden;
+  background:radial-gradient(circle,var(--mat-dot) 1px,transparent 1.4px) 0 0/14px 14px,var(--mat)}
+.stage{position:absolute;left:0;top:0;width:640px;height:340px;transform-origin:0 0}
+.stage>*{position:absolute}
+.stage svg.wires{left:0;top:0;width:640px;height:340px;overflow:visible;pointer-events:none}
+.wire{fill:none;stroke-width:2.6;stroke-linecap:round;transition:opacity 200ms ease}
+.wire-sh{fill:none;stroke:rgba(0,0,0,.28);stroke-width:4.4;stroke-linecap:round;transition:opacity 200ms ease}
+.wire.dash{stroke-dasharray:6 5}
+.wire-end{stroke:rgba(0,0,0,.35);stroke-width:1}
+.diagram.focus .wire,.diagram.focus .wire-sh,.diagram.focus .wire-end{opacity:.15}
+.diagram.focus .hot{opacity:1!important}
+.diag-note{position:absolute;inset:auto 12px 12px 12px;font-size:12px;color:var(--label-2)}
 .pin-row{cursor:pointer;transition:background-color 150ms ease}
 .pin-row.hot{background:var(--accent-tint)}
+.pin-sel{appearance:none;-webkit-appearance:none;min-width:150px;height:30px;padding:0 26px 0 10px;border:0;border-radius:8px;font:600 13px var(--font);font-variant-numeric:tabular-nums;color:var(--label);cursor:pointer;
+  background:var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238E8E95' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 9px center}
+.pin-sel:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pin-row.bad .pin-sel{box-shadow:inset 0 0 0 1.5px var(--red)}
+.pin-row.warn .pin-sel{box-shadow:inset 0 0 0 1.5px var(--amber)}
+.pin-msg{display:flex;align-items:flex-start;gap:7px;font-size:12px;line-height:1.35;font-weight:500}
+.pin-msg .bang{width:18px;height:18px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font:800 12px/1 var(--font)}
+.pin-msg.bad{color:var(--red-text)}.pin-msg.bad .bang{background:var(--red)}
+.pin-msg.warn{color:var(--amber-text)}.pin-msg.warn .bang{background:var(--amber)}
+.pin-msg.ok{color:var(--green-text)}
+pre .ln{display:block;margin:0 -14px;padding:0 14px}
+pre .ln.flash{animation:lnflash 1100ms var(--ease-out)}
+@keyframes lnflash{from{background:var(--accent-tint)}to{background:transparent}}
+pre .warn-c{color:var(--red-text)}
 @media (hover:hover) and (pointer:fine){.pin-row:hover{background:var(--fill)}}
 .code{margin-top:16px}
 .code-head{display:flex;align-items:center;gap:8px;padding:10px 14px;box-shadow:inset 0 -1px 0 var(--sep)}
@@ -469,14 +493,14 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
 .toast.out{opacity:0;transform:translateY(6px);transition-duration:150ms}
 
 @media (max-width:1180px){
-  .hb{grid-template-columns:minmax(0,1fr) 320px}
-  .toc{display:none}
+  .hb{grid-template-columns:190px minmax(0,1fr)}
 }
 @media (max-width:980px){
   body{grid-template-columns:72px minmax(0,1fr)}
   .sidebar .brand b,.sidebar .search span,.sidebar .search kbd,.nav a span,.nav a .meta,.nav-label,.mini-spend,.engine span{display:none}
   .nav a,.search{justify-content:center;padding:0}
   .home-grid,.wiring,.hb{grid-template-columns:minmax(0,1fr)}
+  .toc{display:none}
   .board{grid-template-columns:minmax(0,1fr)}
   .cart{position:static;max-height:none}
   .page{padding:24px 20px 96px}
@@ -796,56 +820,12 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
         <h2>Reading it without blocking</h2>
         <p class="body">Trigger every 60 ms and time ECHO with <span class="mono">pulseIn</span> and a 25 ms timeout, so a missed echo can't freeze the motor loop. Distance in cm is the echo time in µs divided by 58.</p>
         <div class="acts">
-          <button class="btn tinted" id="addBtn" data-s="ch-add"><svg class="i"><use href="#i-plus"/></svg>Add to project</button>
+          <button class="btn tinted" id="addBtn" data-s="ch-add"><svg class="i"><use href="#i-plus"/></svg>Add to Rover-01</button>
           <button class="btn ghost" data-toast="Comparison opens in session 5." data-s="ch-compare">Compare sensors</button>
         </div>
       </div>
     </article>
 
-    <!-- cart -->
-    <aside class="card cart rise" style="--d:100ms" aria-label="Project cart" data-s="cart">
-      <div class="cart-head">
-        <div class="row"><svg class="i" style="color:var(--accent-text)"><use href="#i-bag"/></svg><h2>Project cart</h2><span class="chip rob">Robotics</span></div>
-        <button class="select" data-s="cart-preset" data-when="full error" data-toast="Presets: 2WD obstacle robot, Line follower, Plant monitor"><span>Preset: 2WD obstacle robot</span><svg class="i"><use href="#i-chev"/></svg></button>
-      </div>
-
-      <div class="cart-body" data-when="loading">
-        <div class="sk" style="height:12px;width:30%;margin-top:14px"></div><div class="sk" style="height:32px;margin-top:10px"></div>
-        <div class="sk" style="height:12px;width:30%;margin-top:18px"></div><div class="sk" style="height:32px;margin-top:10px"></div><div class="sk" style="height:32px;margin-top:8px"></div>
-      </div>
-
-      <div class="cart-body" data-when="empty" data-s="cart-empty">
-        <div class="empty" style="padding:36px 8px">
-          <div class="art"><svg class="i"><use href="#i-bag"/></svg></div>
-          <h3>Your cart is empty</h3>
-          <p class="muted small">Open a chapter and press <b>Add to project</b>, or start from a preset.</p>
-          <button class="btn sm" data-toast="Loaded preset: 2WD obstacle robot" data-s="cart-empty-preset">Use 2WD robot preset</button>
-        </div>
-      </div>
-
-      <div class="cart-body" data-when="full error" id="cartBody">
-        <div class="slot-label">Board</div>
-        <div class="item" data-s="cart-board"><div class="nm"><b>ESP32 DevKit V1</b><span>esp32dev · 115200 baud</span></div><button class="btn ghost sm" data-toast="Board picker opens in session 6.">Change</button></div>
-        <div class="slot-label">Parts</div>
-        <div id="partsList">
-          <div class="item" data-s="cart-l298n"><div class="nm"><b>L298N motor driver</b><span>2 A per channel</span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div></div>
-          <div class="item" data-s="cart-motor"><div class="nm"><b>TT gear motor</b><span>Stall 1.5 A @ 6V</span></div><div class="qty"><button aria-label="Fewer">−</button><output>2</output><button aria-label="More">+</button></div></div>
-          <div class="item" data-s="cart-servo"><div class="nm"><b>SG90 micro servo</b><span>Signal on GPIO <span id="servoPin">12</span></span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div></div>
-          <div class="item" data-s="cart-batt"><div class="nm"><b>18650 2S holder + BMS</b><span>7.4V nominal</span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div></div>
-        </div>
-        <div class="slot-label">Checks</div>
-        <div class="checks" data-s="cart-checks">
-          <div class="chk bad" id="chkStrap" data-s="chk-strap"><svg class="i"><use href="#i-x-c"/></svg><span id="chkStrapText"><b>SG90</b> on GPIO 12, a strapping pin that can stop boot. Move it to GPIO 13.</span><button class="btn sm" id="fixBtn" data-s="chk-fix">Fix</button></div>
-          <div class="chk warn" id="chkEcho" data-s="chk-echo" hidden><svg class="i"><use href="#i-alert"/></svg><span><b>HC-SR04</b> ECHO is 5V into GPIO 18 (3.3V). Add a 1k/2k divider.</span></div>
-          <div class="chk ok" data-s="chk-current"><svg class="i"><use href="#i-check-c"/></svg><span><b>L298N</b> 2 A covers TT motor stall 1.5 A.</span></div>
-        </div>
-      </div>
-
-      <div class="cart-foot" data-when="full error empty">
-        <div class="tot"><span class="muted small">Estimated cost</span><b class="num" id="cartTotal" data-when="full error">RM67</b><b class="num" data-when="empty">RM0</b><span class="hint" id="createHint" data-when="full error">Fix 1 problem to continue</span></div>
-        <button class="btn primary" id="createBtn" disabled data-s="cart-create">Create project</button>
-      </div>
-    </aside>
   </div>
 </section>
 
@@ -933,76 +913,39 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
     <div data-when="full">
       <div class="wiring">
         <div class="card diagram" id="diagram" data-s="diagram">
-          <svg viewBox="0 0 520 330" role="img" aria-label="Wiring diagram: ESP32 connected to L298N, HC-SR04 and SG90">
-            <!-- board -->
-            <rect x="200" y="40" width="120" height="250" rx="10" fill="#1F3A5F"/>
-            <rect x="236" y="54" width="48" height="34" rx="4" fill="#C9D1D9" opacity=".85"/>
-            <text x="260" y="122" text-anchor="middle" class="lbl" style="fill:#fff">ESP32</text>
-            <text x="260" y="136" text-anchor="middle" style="fill:#9FB3C8">DevKit V1</text>
-            <!-- left pins -->
-            <g style="fill:#E8C26B">
-              <circle cx="210" cy="160" r="4"/><circle cx="210" cy="180" r="4"/><circle cx="210" cy="200" r="4"/>
-              <circle cx="210" cy="220" r="4"/><circle cx="210" cy="240" r="4"/><circle cx="210" cy="260" r="4"/>
-              <circle cx="310" cy="160" r="4"/><circle cx="310" cy="180" r="4"/><circle cx="310" cy="220" r="4"/>
-            </g>
-            <g style="fill:#9FB3C8;font-size:9px">
-              <text x="220" y="163">25</text><text x="220" y="183">26</text><text x="220" y="203">27</text>
-              <text x="220" y="223">14</text><text x="220" y="243">32</text><text x="220" y="263">33</text>
-              <text x="300" y="163" text-anchor="end">19</text><text x="300" y="183" text-anchor="end">18</text><text x="300" y="223" text-anchor="end">12</text>
-            </g>
-            <!-- L298N -->
-            <rect x="16" y="150" width="104" height="124" rx="8" fill="#B91C1C"/>
-            <text x="68" y="172" text-anchor="middle" class="lbl" style="fill:#fff">L298N</text>
-            <!-- HC-SR04 -->
-            <rect x="404" y="120" width="104" height="70" rx="8" fill="#0E7490"/>
-            <circle cx="430" cy="146" r="13" fill="#CBD5E1"/><circle cx="482" cy="146" r="13" fill="#CBD5E1"/>
-            <text x="456" y="182" text-anchor="middle" class="lbl" style="fill:#fff">HC-SR04</text>
-            <!-- SG90 -->
-            <rect x="404" y="214" width="104" height="54" rx="8" fill="#1D4ED8"/>
-            <text x="456" y="246" text-anchor="middle" class="lbl" style="fill:#fff">SG90</text>
-            <!-- wires -->
-            <path class="wire" data-w="w1" d="M120 190 C160 190 170 160 206 160" stroke="#F56300"/>
-            <path class="wire" data-w="w2" d="M120 200 C160 200 170 180 206 180" stroke="#FF9F0A"/>
-            <path class="wire" data-w="w3" d="M120 210 C160 210 170 200 206 200" stroke="#FFD60A"/>
-            <path class="wire" data-w="w4" d="M120 230 C160 230 170 220 206 220" stroke="#30D158"/>
-            <path class="wire" data-w="w5" d="M120 240 C160 240 170 240 206 240" stroke="#64D2FF"/>
-            <path class="wire" data-w="w6" d="M120 250 C160 250 170 260 206 260" stroke="#BF5AF2"/>
-            <path class="wire" data-w="w7" d="M314 160 C360 160 370 170 404 170" stroke="#5E5CE6"/>
-            <path class="wire" data-w="w8" d="M314 180 C360 180 370 178 404 178" stroke="#FF375F" stroke-dasharray="5 4"/>
-            <path class="wire" data-w="w9" d="M314 220 C360 220 370 240 404 240" stroke="#FF453A"/>
-          </svg>
-          <p class="small muted" style="padding:4px 8px 2px">Dashed = needs attention. Click a row to trace its wire.</p>
+          <div class="stage-wrap" id="stageWrap" role="img" aria-label="Wiring diagram: ESP32 DevKit V1 wired to an L298N motor driver, HC-SR04 sensor and SG90 servo">
+            <div class="stage" id="stage">
+              <svg class="l298n" style="left:14px;top:96px" width="160" height="150" viewBox="0 0 160 150" aria-hidden="true">
+                <rect x="1" y="1" width="150" height="148" rx="6" fill="#B71C1C" stroke="#7F1212"/>
+                <rect x="34" y="8" width="70" height="54" rx="3" fill="#1F2933"/>
+                <g fill="#2E3A46"><rect x="38" y="12" width="5" height="46"/><rect x="47" y="12" width="5" height="46"/><rect x="56" y="12" width="5" height="46"/><rect x="65" y="12" width="5" height="46"/><rect x="74" y="12" width="5" height="46"/><rect x="83" y="12" width="5" height="46"/><rect x="92" y="12" width="5" height="46"/></g>
+                <rect x="8" y="16" width="18" height="34" rx="2" fill="#1565C0"/><rect x="8" y="98" width="18" height="34" rx="2" fill="#1565C0"/><rect x="40" y="118" width="46" height="22" rx="2" fill="#1565C0"/>
+                <g fill="#90A4AE"><circle cx="17" cy="25" r="4"/><circle cx="17" cy="41" r="4"/><circle cx="17" cy="107" r="4"/><circle cx="17" cy="123" r="4"/><circle cx="51" cy="129" r="4"/><circle cx="63" cy="129" r="4"/><circle cx="75" cy="129" r="4"/></g>
+                <rect x="40" y="72" width="16" height="10" rx="1" fill="#111"/><rect x="62" y="72" width="22" height="22" rx="2" fill="#263238"/>
+                <text x="70" y="104" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="11" font-weight="700">L298N</text>
+                <rect x="140" y="20" width="12" height="114" rx="2" fill="#111"/>
+                <g fill="#D4AF37"><rect x="143" y="27" width="6" height="6"/><rect x="143" y="47" width="6" height="6"/><rect x="143" y="67" width="6" height="6"/><rect x="143" y="87" width="6" height="6"/><rect x="143" y="107" width="6" height="6"/><rect x="143" y="127" width="6" height="6" transform="translate(0,-4)"/></g>
+                <g fill="#FFE0E0" font-family="ui-monospace,monospace" font-size="8" text-anchor="end"><text x="136" y="33">ENA</text><text x="136" y="53">IN1</text><text x="136" y="73">IN2</text><text x="136" y="93">IN3</text><text x="136" y="113">IN4</text><text x="136" y="129">ENB</text></g>
+              </svg>
+              <wokwi-esp32-devkit-v1 style="left:260px;top:24px;transform:scale(1.4);transform-origin:0 0"></wokwi-esp32-devkit-v1>
+              <wokwi-hc-sr04 style="left:450px;top:20px"></wokwi-hc-sr04>
+              <wokwi-servo style="left:462px;top:196px" angle="90"></wokwi-servo>
+              <svg class="wires" id="wires" viewBox="0 0 640 340" aria-hidden="true"></svg>
+            </div>
+            <p class="diag-note" id="diagNote" hidden>Couldn’t load the part drawings. The pin table and pins.h still update.</p>
+          </div>
+          <p class="small muted" style="padding:8px 6px 2px">Dashed wires need attention. Click a row to trace its wire. Parts drawn with Wokwi Elements (MIT).</p>
         </div>
         <div class="card" style="overflow:hidden" data-s="pin-table">
           <table>
-            <thead><tr><th>Signal</th><th>Part pin</th><th>GPIO</th><th></th></tr></thead>
-            <tbody>
-              <tr class="pin-row" data-w="w1"><td class="mono">leftMotorPWM</td><td>L298N ENA</td><td class="num">25</td><td></td></tr>
-              <tr class="pin-row" data-w="w2"><td class="mono">leftMotorIN1</td><td>L298N IN1</td><td class="num">26</td><td></td></tr>
-              <tr class="pin-row" data-w="w3"><td class="mono">leftMotorIN2</td><td>L298N IN2</td><td class="num">27</td><td></td></tr>
-              <tr class="pin-row" data-w="w4"><td class="mono">rightMotorPWM</td><td>L298N ENB</td><td class="num">14</td><td></td></tr>
-              <tr class="pin-row" data-w="w5"><td class="mono">rightMotorIN3</td><td>L298N IN3</td><td class="num">32</td><td></td></tr>
-              <tr class="pin-row" data-w="w6"><td class="mono">rightMotorIN4</td><td>L298N IN4</td><td class="num">33</td><td></td></tr>
-              <tr class="pin-row" data-w="w7"><td class="mono">sonarTrig</td><td>HC-SR04 TRIG</td><td class="num">19</td><td></td></tr>
-              <tr class="pin-row" data-w="w8" data-s="pin-echo"><td class="mono">sonarEcho</td><td>HC-SR04 ECHO</td><td class="num">18</td><td><span class="chip warn" title="5V into 3.3V pin. Add a 1k/2k divider.">5V</span></td></tr>
-              <tr class="pin-row" data-w="w9" data-s="pin-servo"><td class="mono">servoSignal</td><td>SG90 signal</td><td class="num">12</td><td><span class="chip bad" title="Strapping pin. Move to GPIO 13.">Strap</span></td></tr>
-            </tbody>
+            <thead><tr><th>Signal</th><th>Part pin</th><th>GPIO</th><th>Check</th></tr></thead>
+            <tbody id="pinRows"></tbody>
           </table>
         </div>
       </div>
       <div class="card code" data-s="pins-h">
-        <div class="code-head"><svg class="i" style="color:var(--label-2)"><use href="#i-code"/></svg><b>include/pins.h</b><span class="chip">AUTO-GENERATED · 2 min ago</span><button class="btn ghost sm" data-toast="pins.h copied." aria-label="Copy pins.h"><svg class="i"><use href="#i-copy"/></svg></button></div>
-<pre><span class="c">// AUTO-GENERATED by Workflow Hub from wiring.json. Do not edit.</span>
-<span class="k">#pragma once</span>
-<span class="k">#define</span> LEFT_MOTOR_PWM   <span class="n">25</span>
-<span class="k">#define</span> LEFT_MOTOR_IN1   <span class="n">26</span>
-<span class="k">#define</span> LEFT_MOTOR_IN2   <span class="n">27</span>
-<span class="k">#define</span> RIGHT_MOTOR_PWM  <span class="n">14</span>
-<span class="k">#define</span> RIGHT_MOTOR_IN3  <span class="n">32</span>
-<span class="k">#define</span> RIGHT_MOTOR_IN4  <span class="n">33</span>
-<span class="k">#define</span> SONAR_TRIG       <span class="n">19</span>
-<span class="k">#define</span> SONAR_ECHO       <span class="n">18</span>  <span class="c">// via 1k/2k divider</span>
-<span class="k">#define</span> SERVO_SIGNAL     <span class="n">12</span></pre>
+        <div class="code-head"><svg class="i" style="color:var(--label-2)"><use href="#i-code"/></svg><b>include/pins.h</b><span class="chip" id="pinsStamp">AUTO-GENERATED · 2 min ago</span><button class="btn ghost sm" data-toast="pins.h copied." aria-label="Copy pins.h"><svg class="i"><use href="#i-copy"/></svg></button></div>
+<pre id="pinsH"></pre>
       </div>
     </div>
   </div>
@@ -1266,34 +1209,92 @@ addEventListener('keydown',e=>{if(e.key==='Escape')hideTip(true)});
 document.getElementById('main').addEventListener('scroll',()=>hideTip(true),{passive:true});
 setKind('rob',false);
 
-/* cart */
-const prices={'cart-l298n':9,'cart-motor':6,'cart-servo':7,'cart-batt':14,'cart-sonar':6};
-const total=()=>{let t=25;$$('#partsList .item').forEach(i=>t+=(prices[i.dataset.s]||0)*+$('output',i).value);$('#cartTotal').textContent='RM'+t};
-$('#partsList').addEventListener('click',e=>{const b=e.target.closest('.qty button');if(!b)return;const o=$('output',b.parentElement);
-  o.value=Math.max(0,+o.value+(b.textContent==='+'?1:-1));total()});
-let fixed=false,sonar=false;
-const canCreate=()=>{$('#createBtn').disabled=!fixed};
-$('#fixBtn').onclick=()=>{fixed=true;const c=$('#chkStrap');c.className='chk ok';c.querySelector('use').setAttribute('href','#i-check-c');
-  $('#chkStrapText').innerHTML='<b>SG90</b> moved to GPIO 13. pins.h will update.';$('#fixBtn').remove();$('#servoPin').textContent='13';$('#createHint').hidden=true;canCreate()};
-$('#addBtn').onclick=()=>{if(sonar){toast('HC-SR04 is already in the cart.');return}sonar=true;
-  const el=document.createElement('div');el.className='item flash';el.dataset.s='cart-sonar';
-  el.innerHTML='<div class="nm"><b>HC-SR04 ultrasonic</b><span>TRIG 19 · ECHO 18</span></div><div class="qty"><button aria-label="Fewer">−</button><output>1</output><button aria-label="More">+</button></div>';
-  $('#partsList').append(el);$('#chkEcho').hidden=false;total();toast('HC-SR04 added to the cart.')};
-$('#createBtn').onclick=()=>{toast('Creating Rover-02: pio init, pins.h, main.cpp, git init…');setTimeout(()=>location.hash='#project',900)};
+/* handbook: Add to project bumps the part in Rover-01 -> Parts */
+$('#addBtn').onclick=()=>{const row=$$('[data-s="parts-table"] tbody tr').find(tr=>tr.cells[0].textContent.startsWith('HC-SR04'));
+  if(row){const q=row.cells[1];q.textContent=+q.textContent+1;const tot=$$('[data-s="parts-table"] tbody tr').at(-1).cells[3];tot.innerHTML='<b>RM'+(parseInt(tot.textContent.replace(/\D/g,''))+6)+'</b>'}
+  toast(`HC-SR04 added to Rover-01 → Parts${row?' (now '+row.cells[1].textContent+')':''}.`)};
 
 /* project tabs */
 const pill=$('.seg .pill');
 function movePill(){const a=$('.seg [aria-selected="true"]');if(!a||!a.offsetWidth)return;pill.style.width=a.offsetWidth+'px';pill.style.transform=`translateX(${a.offsetLeft}px)`}
 $$('.seg [role="tab"]').forEach(b=>b.onclick=()=>{$$('.seg [role="tab"]').forEach(x=>x.setAttribute('aria-selected',x===b));
-  $$('[data-tab-panel]').forEach(p=>p.classList.toggle('on',p.dataset.tabPanel===b.dataset.tab));movePill()});
+  $$('[data-tab-panel]').forEach(p=>p.classList.toggle('on',p.dataset.tabPanel===b.dataset.tab));movePill();requestAnimationFrame(fitStage)});
 $('.seg').addEventListener('keydown',e=>{if(!/Arrow(Left|Right)/.test(e.key))return;const tabs=$$('.seg [role="tab"]'),i=tabs.findIndex(t=>t.getAttribute('aria-selected')==='true');
   const seg=$('.seg');seg.classList.add('kb');const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.click();n.focus();
   requestAnimationFrame(()=>requestAnimationFrame(()=>seg.classList.remove('kb')))});
 addEventListener('resize',movePill);
 
-/* wiring trace */
-$$('.pin-row').forEach(r=>r.onclick=()=>{const on=!r.classList.contains('hot');$$('.pin-row').forEach(x=>x.classList.remove('hot'));$$('.wire').forEach(w=>w.classList.remove('hot'));
-  $('#diagram').classList.toggle('focus',on);if(on){r.classList.add('hot');$(`.wire[data-w="${r.dataset.w}"]`).classList.add('hot')}});
+/* ---------- wiring: signals, ESP32 pin rules, diagram + pins.h ---------- */
+const ESP_PINS=[4,13,14,16,17,18,19,21,22,23,25,26,27,32,33,0,2,5,12,15,34,35,36,39];
+const PIN_NAME={36:'VP',39:'VN',16:'RX2',17:'TX2'};
+const pinName=g=>PIN_NAME[g]||('D'+g);
+const SIGS=[
+ {id:'leftMotorPWM',mac:'LEFT_MOTOR_PWM',part:'L298N',pp:'ENA',at:[164,126],need:'pwm',col:'#F56300',gpio:25},
+ {id:'leftMotorIN1',mac:'LEFT_MOTOR_IN1',part:'L298N',pp:'IN1',at:[164,146],need:'out',col:'#FF9F0A',gpio:26},
+ {id:'leftMotorIN2',mac:'LEFT_MOTOR_IN2',part:'L298N',pp:'IN2',at:[164,166],need:'out',col:'#FFD60A',gpio:27},
+ {id:'rightMotorIN3',mac:'RIGHT_MOTOR_IN3',part:'L298N',pp:'IN3',at:[164,186],need:'out',col:'#64D2FF',gpio:32},
+ {id:'rightMotorIN4',mac:'RIGHT_MOTOR_IN4',part:'L298N',pp:'IN4',at:[164,206],need:'out',col:'#BF5AF2',gpio:33},
+ {id:'rightMotorPWM',mac:'RIGHT_MOTOR_PWM',part:'L298N',pp:'ENB',at:[164,222],need:'pwm',col:'#30D158',gpio:14},
+ {id:'sonarTrig',mac:'SONAR_TRIG',part:'HC-SR04',pp:'TRIG',at:[531.3,114.5],need:'out',col:'#5E5CE6',gpio:19},
+ {id:'sonarEcho',mac:'SONAR_ECHO',part:'HC-SR04',pp:'ECHO',at:[541.3,114.5],need:'in',col:'#FF375F',gpio:18,five:true},
+ {id:'servoSignal',mac:'SERVO_SIGNAL',part:'SG90',pp:'signal',at:[462,265],need:'pwm',col:'#FF453A',gpio:12}];
+/* ESP32 header geometry from the Wokwi element (pinInfo), scaled 1.4 at (260,24) */
+const ESP_GEO={EN:24,VP:34,VN:44,D34:53.1,D35:62.9,D32:72.2,D33:81.7,D25:91.3,D26:101,D27:110.8,D14:120,D12:130.4,D13:139.5,
+  D23:24,D22:34,D21:62.9,D19:72.2,D18:81.7,D5:91.3,TX2:101,RX2:110.8,D4:120,D2:130.4,D15:139.5};
+const RIGHT=new Set(['D23','D22','D21','D19','D18','D5','TX2','RX2','D4','D2','D15']);
+const pinXY=g=>{const n=pinName(g),y=24+ESP_GEO[n]*1.4,right=RIGHT.has(n);return{x:260+(right?101.3:5)*1.4,y,right}};
+/* one-line verdict for a signal on a GPIO: [level, text] */
+function pinCheck(sig,g){const other=SIGS.find(o=>o!==sig&&o.gpio===g);
+  if(other)return['bad',`GPIO ${g} is already used by ${other.id}.`];
+  if(sig.need!=='in'&&[34,35,36,39].includes(g))return['bad',`GPIO ${g} is input-only, so it can't drive ${sig.pp}.`];
+  if(g===12)return['bad','GPIO 12 is a strapping pin; a load here can stop boot.'];
+  if(g===0)return['bad','GPIO 0 is the BOOT button pin; it can stop the board from starting.'];
+  if(g===2)return['warn','GPIO 2 drives the onboard LED and must be low at boot.'];
+  if(g===5||g===15)return['warn',`GPIO ${g} pulses at boot, so ${sig.part} may twitch on power-up.`];
+  if(sig.five)return['warn','ECHO is 5V. Keep the 1k/2k divider before this pin.'];
+  return['ok','Good pin for this signal.']}
+function freeGood(sig){return ESP_PINS.find(g=>!SIGS.some(o=>o!==sig&&o.gpio===g)&&pinCheck(sig,g)[0]==='ok')}
+function renderPins(changed){
+  const body=$('#pinRows');body.innerHTML='';
+  SIGS.forEach(sig=>{const [lvl,txt]=pinCheck(sig,sig.gpio),tr=document.createElement('tr');tr.className='pin-row '+lvl;tr.dataset.w=sig.id;tr.dataset.s='pin-'+sig.id;tr.id='s-pin-'+sig.id;
+    const good=[],risky=[];ESP_PINS.forEach(g=>{const [l,t]=pinCheck(sig,g);const used=SIGS.find(o=>o!==sig&&o.gpio===g);
+      const label=`GPIO ${g}`+(used?` · used by ${used.id}`:l==='bad'?(([34,35,36,39].includes(g))?' · input only':' · boot pin'):l==='warn'&&!sig.five?' · boot pulse':'');
+      (l==='bad'||(l==='warn'&&!sig.five)?risky:good).push(`<option value="${g}"${g===sig.gpio?' selected':''}>${label}</option>`)});
+    const fix=lvl==='bad'?freeGood(sig):null;
+    tr.innerHTML=`<td class="mono">${sig.id}</td><td>${sig.part} ${sig.pp}</td>
+      <td><select class="pin-sel" aria-label="GPIO for ${sig.id}"><optgroup label="Good for ${sig.pp}">${good.join('')}</optgroup><optgroup label="Might not work">${risky.join('')}</optgroup></select></td>
+      <td><span class="pin-msg ${lvl}">${lvl==='ok'?'<svg class="i" style="width:15px;height:15px"><use href="#i-check-c"/></svg>':'<span class="bang" aria-hidden="true">!</span>'}<span>${lvl==='ok'?'OK':txt+(fix?` Try GPIO ${fix}.`:'')}</span></span></td>`;
+    const sel=$('select',tr);sel.addEventListener('click',e=>e.stopPropagation());
+    sel.addEventListener('change',()=>{sig.gpio=+sel.value;renderPins(sig.id);const [l]=pinCheck(sig,sig.gpio);
+      toast(l==='bad'?`${sig.id} on GPIO ${sig.gpio} might not work. Check the warning.`:`${sig.id} moved to GPIO ${sig.gpio}. pins.h updated.`)});
+    tr.onclick=()=>trace(sig.id);body.append(tr)});
+  renderWires();renderPinsH(changed);if(traced)trace(traced,true)}
+function renderWires(){const svg=$('#wires');let h='';
+  SIGS.forEach(sig=>{const [sx,sy]=sig.at,p=pinXY(sig.gpio),lvl=pinCheck(sig,sig.gpio)[0];let d;
+    const leftPart=sig.part==='L298N';
+    if(leftPart&&!p.right){const mx=(sx+p.x)/2;d=`M${sx} ${sy} C${mx} ${sy} ${mx} ${p.y} ${p.x} ${p.y}`}
+    else if(!leftPart&&p.right){d=sig.part==='HC-SR04'?`M${sx} ${sy} C${sx} ${sy+40} ${p.x+50} ${p.y} ${p.x} ${p.y}`:`M${sx} ${sy} C${sx-34} ${sy} ${p.x+40} ${p.y} ${p.x} ${p.y}`}
+    else{const ox=p.right?p.x+22:p.x-22;d=`M${sx} ${sy} C${sx} 336 ${ox} 336 ${ox} ${p.y} L${p.x} ${p.y}`}
+    h+=`<g data-w="${sig.id}"><path class="wire-sh" d="${d}"/><path class="wire${lvl!=='ok'&&!(sig.five&&lvl==='warn')?' dash':''}" d="${d}" stroke="${sig.col}"/><circle class="wire-end" cx="${p.x}" cy="${p.y}" r="3.2" fill="${sig.col}"/><circle class="wire-end" cx="${sx}" cy="${sy}" r="3.2" fill="${sig.col}"/></g>`});
+  svg.innerHTML=h}
+function renderPinsH(changed){const pad=s=>s.padEnd(17,' ');
+  const lines=['<span class="ln"><span class="c">// AUTO-GENERATED by Workflow Hub from wiring.json. Do not edit.</span></span>','<span class="ln"><span class="k">#pragma once</span></span>'];
+  SIGS.forEach(sig=>{const [l,t]=pinCheck(sig,sig.gpio);let tail='';
+    if(sig.five)tail='  <span class="c">// via 1k/2k divider</span>';
+    if(l==='bad')tail=`  <span class="warn-c">// ! ${t}</span>`;
+    lines.push(`<span class="ln${changed===sig.id?' flash':''}"><span class="k">#define</span> ${pad(sig.mac)}<span class="n">${sig.gpio}</span>${tail}</span>`)});
+  $('#pinsH').innerHTML=lines.join('');if(changed)$('#pinsStamp').textContent='AUTO-GENERATED · just now'}
+let traced=null;
+function trace(id,keep){const on=keep||traced!==id;traced=on?id:null;
+  $$('.pin-row').forEach(r=>r.classList.toggle('hot',on&&r.dataset.w===id));
+  $$('#wires g').forEach(g=>g.querySelectorAll('*').forEach(el=>el.classList.toggle('hot',on&&g.dataset.w===id)));
+  $('#diagram').classList.toggle('focus',on)}
+/* scale the fixed 640x340 stage to the card */
+const fitStage=()=>{const w=$('#stageWrap').clientWidth;if(w)$('#stage').style.transform=`scale(${w/640})`};
+new ResizeObserver(fitStage).observe($('#stageWrap'));
+/* if the Wokwi parts never load, say so (wires and table still work) */
+Promise.race([customElements.whenDefined('wokwi-esp32-devkit-v1'),new Promise((_,r)=>setTimeout(r,8000))]).catch(()=>{$('#diagNote').hidden=false});
+renderPins();
 
 /* more menu */
 const menu=$('#moreMenu'),moreBtn=$('#moreBtn');

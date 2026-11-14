@@ -1,19 +1,18 @@
 # Workflow Hub — core screens
 Goal: desktop project workshop for makers; plan, set up and remember everything around the code (code itself lives in VS Code).
-Screens/routes: #home, #new, #handbook (cart panel open), #project (Rover-01: Tasks, Wiring, Parts tabs)
+Screens/routes: #home, #new, #handbook, #project (Rover-01: Tasks, Wiring, Parts tabs)
 States: empty | loading | error | full
 
 Layout (every screen)
 - sidebar: translucent; search/Ctrl+K, nav (Home, Projects, Handbook, Library), recent projects, engine status, monthly spend mini-meter, theme toggle
 - main: toolbar (title + ONE primary action), content
-- right panel (optional): Project cart on #handbook
 
 Components
 - #home: greeting/date, primary "New project"; today-tasks (cross-project, checkable, completion celebration + progress bar); recent-projects (last 5, filter by module)
 - sidebar spend meter: segmented by feature; hover/focus shows breakdown (RM this month vs RM10 cap, per-feature, cache savings)
 - #new (one page): project name + folder preview; type toggle (App development / Robotics, one per module); preset chips; tick tiles grouped per module (App: Framework, Backend, Extras — Expo-only extras disable for other frameworks; Robotics: Board, Motion, Sensors, Power and display); hover/focus tooltip per tile (Good for / Watch out / price); live checks; sticky bar with summary + RM estimate + primary "Create project" (disabled with a one-line reason)
-- #handbook: toc (App stacks / Electronics parts / My notes, search); chapter (HC-SR04: facts chips, 5V warning callout, pins table, "Add to project"); cart panel (preset, board slot, parts with qty, checks with one-line fixes, total RM, primary "Create project")
-- #project: header (icon, name, board, folder, git), primary "Open in VS Code", More menu (Arduino IDE, terminal, Claude Code); segmented tabs: Tasks (To do / Doing / Done board), Wiring (board diagram + pin table + AUTO-GENERATED pins.h preview), Parts (table, status, total RM)
+- #handbook: toc (App stacks / Electronics parts / My notes, search, thin dividers between categories); chapter (HC-SR04: facts chips, 5V warning callout, pins table, "Add to Rover-01" which adds to that project's Parts tab). No cart panel: parts live in the project Parts tab
+- #project: header (icon, name, board, folder, git), primary "Open in VS Code", More menu (Arduino IDE, terminal, Claude Code); segmented tabs: Tasks (To do / Doing / Done board), Wiring (realistic parts via Wokwi Elements (MIT) + live wires; pin table with a GPIO dropdown per signal, ESP32 rules -> red ! (won't work) / amber ! (works with care) with a one-line fix; pins.h regenerates and flashes the changed line), Parts (table, status, total RM)
 - global: Ctrl+K command bar, toasts
 
 States
