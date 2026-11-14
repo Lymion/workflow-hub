@@ -179,3 +179,6 @@ pins:
   note: Analog input only.
 good_for: Small 5V board that plugs into a breadboard. Simple and beginner-friendly.
 watch_out: No wireless and only 2 KB of RAM. A6/A7 are analog input only.
+wokwi:
+  element: wokwi-arduino-nano
+  prefix: ''

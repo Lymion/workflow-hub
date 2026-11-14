@@ -17,6 +17,9 @@ good_for: Start, stop and mode buttons.
 watch_out: Use INPUT_PULLUP and debounce in code.
 signals:
   BTN: button
+wokwi:
+  element: wokwi-pushbutton
+  pins: {BTN: 1.l}
 ---
 # Push buttons (6 mm)
 

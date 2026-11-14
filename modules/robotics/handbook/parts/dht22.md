@@ -18,6 +18,9 @@ watch_out: Read at most once every 2 s. Needs a 10k pull-up on DATA.
 signals:
   DATA: climateData
 lib_dep: adafruit/DHT sensor library
+wokwi:
+  element: wokwi-dht22
+  pins: {DATA: SDA}
 ---
 # DHT22 temperature + humidity
 

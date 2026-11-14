@@ -17,6 +17,9 @@ good_for: Beeps for alarms, start-up and warnings.
 watch_out: Loud at 5V; add a resistor for quieter beeps.
 signals:
   SIG: buzzer
+wokwi:
+  element: wokwi-buzzer
+  pins: {SIG: '2'}
 ---
 # Active buzzer
 

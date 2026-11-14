@@ -241,3 +241,7 @@ pins:
   note: Input only, no pull-ups.
 good_for: 'The best all-rounder: Wi-Fi, Bluetooth, lots of PWM pins and plenty of speed for robots.'
 watch_out: "3.3V logic. GPIO 0, 2, 5, 12 and 15 are strapping pins; 34\u201339 are input-only."
+wokwi:
+  element: wokwi-esp32-devkit-v1
+  prefix: D
+  pins: {'36': VP, '39': VN, '1': TX0, '3': RX0, '16': RX2, '17': TX2}

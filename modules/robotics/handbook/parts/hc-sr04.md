@@ -29,6 +29,8 @@ specs:
 signals:
   TRIG: sonarTrig
   ECHO: sonarEcho
+wokwi:
+  element: wokwi-hc-sr04
 ---
 # HC-SR04 ultrasonic sensor
 
