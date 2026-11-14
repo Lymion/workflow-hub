@@ -293,26 +293,60 @@ main{min-width:0;height:100%;overflow:auto}
 .spend-pop .note{margin-top:12px;padding-top:10px;box-shadow:inset 0 1px 0 var(--sep);font-size:12px;color:var(--label-2);display:flex;gap:8px;align-items:center}
 
 /* ---------- new ---------- */
-.steps{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--label-2);margin-bottom:22px}
-.steps .s{display:flex;align-items:center;gap:6px}
-.steps .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--fill-strong);font-size:11px}
-.steps .s.on{color:var(--label)}
-.steps .s.on .n{background:var(--accent);color:#fff}
-.steps .line{width:28px;height:1.5px;background:var(--sep)}
-.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-.type{position:relative;display:flex;flex-direction:column;gap:12px;padding:20px;text-align:left;border:0;font:inherit;color:inherit;cursor:pointer;transition:transform 200ms var(--ease-out),box-shadow 200ms var(--ease-out)}
-.type:active{transform:scale(.98)}
-@media (hover:hover) and (pointer:fine){.type:hover{box-shadow:var(--hl),var(--shadow-2)}}
-.type[aria-checked="true"]{box-shadow:var(--hl),0 0 0 2px var(--accent),var(--shadow-2)}
-.type .tick{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;opacity:0;transform:scale(.9);transition:opacity 180ms var(--ease-out),transform 180ms var(--ease-out)}
-.type .tick svg.i{width:13px;height:13px;stroke-width:3}
-.type[aria-checked="true"] .tick{opacity:1;transform:scale(1)}
-.type h3{font-size:16px}
-.type .meta{display:flex;flex-wrap:wrap;gap:6px}
-.type.add{background:transparent;backdrop-filter:none;box-shadow:inset 0 0 0 1.5px var(--sep);border-radius:var(--r-l);cursor:default}
-.type.add .tile{background:var(--fill-strong);color:var(--label-2);box-shadow:none}
-.type.bad{cursor:default;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--red) 45%,transparent)}
-.name-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-top:22px}
+/* new project: one page — name, type toggle, tick tiles, checks, create */
+.np-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start}
+.np-top .field{max-width:none}
+.input.lg{height:46px;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.np-top .path{padding:2px 0 0}
+.lbl{font-size:12.5px;font-weight:600;color:var(--label-2)}
+.kind{position:relative;display:inline-flex;padding:4px;border-radius:12px;background:var(--fill)}
+.kind button{position:relative;z-index:1;display:inline-flex;align-items:center;gap:10px;width:200px;height:46px;padding:0 12px;border:0;background:none;border-radius:9px;font:600 14px var(--font);color:var(--label-2);cursor:pointer;transition:color 200ms ease}
+.kind button[aria-checked="true"]{color:var(--label)}
+.kind button[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.kind .kpill{position:absolute;top:4px;left:0;height:46px;border-radius:9px;background:var(--surface-solid);box-shadow:var(--hl),0 1px 3px rgba(0,0,0,.12);transition:transform 260ms var(--ease-drawer)}
+.kind.kb .kpill{transition:none}
+.tile.sm{width:28px;height:28px;border-radius:8px}
+.tile.sm svg.i{width:16px;height:16px}
+body[data-state="error"] .kind [data-kind="app"]{opacity:.45}
+.kind-err{font-size:12px;font-weight:500;color:var(--red-text);margin-top:6px}
+.presets{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:22px}
+.kgroup{margin-top:24px}
+.kgroup .gh{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.kgroup .gh span{font-size:12px;color:var(--label-2)}
+.ktiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.kt{position:relative;display:flex;align-items:center;gap:12px;padding:12px 34px 12px 12px;border:0;border-radius:12px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-1);
+  transition:box-shadow 180ms var(--ease-out),background-color 180ms ease,transform 160ms var(--ease-out),opacity 180ms ease}
+.kt:active{transform:scale(.98)}
+.kt[aria-checked="true"]{background:color-mix(in srgb,var(--accent) 7%,var(--surface-solid));box-shadow:var(--hl),0 0 0 2px var(--accent),var(--shadow-1)}
+.kt[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.kt .g{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;font:700 12px var(--font);color:#fff;letter-spacing:.02em;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px -2px rgba(0,0,0,.25)}
+.kt .tx{min-width:0}
+.kt b{display:block;font-weight:600;font-size:13.5px}
+.kt .s{display:block;font-size:12px;color:var(--label-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt .ck{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--label-3);display:grid;place-items:center;color:#fff;transition:background-color 160ms var(--ease-out),border-color 160ms var(--ease-out)}
+.kt .ck svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset 200ms var(--ease-out)}
+.kt[aria-checked="true"] .ck{background:var(--accent);border-color:var(--accent)}
+.kt[aria-checked="true"] .ck svg{stroke-dashoffset:0}
+#pickArea.swap{animation:rise 220ms var(--ease-out) both}
+.np-checks{margin-top:24px}
+.np-checks .checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.np-bar{position:sticky;bottom:16px;z-index:5;margin-top:24px;display:flex;align-items:center;gap:16px;padding:10px 10px 10px 18px;border-radius:16px;
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2)}
+.np-bar .sum{flex:1;min-width:0}
+.np-bar .sum b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-bar .sum .why{color:var(--red-text);font-weight:500}
+#tip{position:fixed;z-index:80;width:290px;padding:12px 14px;border-radius:12px;background:var(--surface-solid);box-shadow:var(--hl),var(--shadow-2);pointer-events:none;
+  opacity:0;transform:scale(.97) translateY(3px);transition:opacity 140ms var(--ease-out),transform 140ms var(--ease-out);font-size:12.5px;line-height:1.45}
+#tip.on{opacity:1;transform:none}
+#tip.instant{transition:none}
+#tip .h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
+#tip .h b{font-size:13.5px}
+#tip .h span{color:var(--label-2);font-weight:600;font-variant-numeric:tabular-nums}
+#tip p{margin:4px 0 0;color:var(--label)}
+#tip .k{display:block;font-size:11px;font-weight:700;color:var(--green-text)}
+#tip .w .k{color:var(--amber-text)}
+@media (max-width:760px){.np-top{grid-template-columns:minmax(0,1fr)}.kind{display:flex}.kind button{width:auto;flex:1}}
 .field{display:flex;flex-direction:column;gap:6px;flex:1;max-width:380px}
 .field label{font-size:12.5px;font-weight:600;color:var(--label-2)}
 .input{height:38px;padding:0 12px;border-radius:10px;border:0;background:var(--surface-solid);color:var(--label);font:14px var(--font);box-shadow:inset 0 0 0 1px var(--sep),var(--shadow-1)}
@@ -657,14 +691,7 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
       <a class="eyebrow" href="#home" data-s="new-back" style="display:inline-flex;align-items:center;gap:2px"><svg class="i" style="width:14px;height:14px"><use href="#i-left"/></svg>Home</a>
       <h1>New project</h1>
     </div>
-    <a class="btn primary" href="#handbook" id="continueBtn" data-s="new-continue" aria-disabled="true" data-when="full error">Continue to cart<svg class="i"><use href="#i-chev"/></svg></a>
   </header>
-
-  <div class="steps rise" style="--d:30ms" data-s="steps">
-    <div class="s on"><span class="n">1</span>Type</div><div class="line"></div>
-    <div class="s"><span class="n">2</span>Cart</div><div class="line"></div>
-    <div class="s"><span class="n">3</span>Set up</div>
-  </div>
 
   <div class="banner bad rise" data-when="error" data-s="new-error">
     <svg class="i"><use href="#i-x-c"/></svg>
@@ -681,41 +708,43 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
     </div>
   </div>
 
-  <div class="types" data-when="loading">
-    <div class="card pad"><div class="sk" style="width:48px;height:48px;border-radius:13px"></div><div class="sk" style="height:14px;width:40%;margin-top:16px"></div><div class="sk" style="height:12px;width:85%;margin-top:10px"></div></div>
-    <div class="card pad"><div class="sk" style="width:48px;height:48px;border-radius:13px"></div><div class="sk" style="height:14px;width:50%;margin-top:16px"></div><div class="sk" style="height:12px;width:75%;margin-top:10px"></div></div>
-  </div>
-  <p class="muted small" data-when="loading" style="margin-top:12px">Reading modules/…</p>
-
-  <div class="types" role="radiogroup" aria-label="Project type" data-when="full error" data-s="types">
-    <button class="card type rise" style="--d:60ms" role="radio" aria-checked="false" data-type="rob" data-s="type-robotics">
-      <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
-      <div class="tile rob lg"><svg class="i"><use href="#i-cpu"/></svg></div>
-      <div><h3>Robotics</h3><p class="muted" style="margin-top:4px">ESP32 and Arduino with PlatformIO. Wiring view writes pins.h for you.</p></div>
-      <div class="meta"><span class="chip rob">Board + parts</span><span class="chip">VS Code</span><span class="chip">Arduino IDE</span></div>
-    </button>
-    <button class="card type rise" style="--d:100ms" role="radio" aria-checked="false" data-type="app" data-s="type-appdev" data-when="full">
-      <span class="tick"><svg class="i"><use href="#i-check"/></svg></span>
-      <div class="tile app lg"><svg class="i"><use href="#i-phone"/></svg></div>
-      <div><h3>App development</h3><p class="muted" style="margin-top:4px">Expo, Next.js or Tauri. Theme, env and git set up in one go.</p></div>
-      <div class="meta"><span class="chip app">Stack</span><span class="chip">VS Code</span><span class="chip">GitHub</span></div>
-    </button>
-    <div class="card type bad rise" style="--d:100ms" data-when="error" data-s="type-appdev-bad">
-      <div class="tile app lg" style="opacity:.5"><svg class="i"><use href="#i-phone"/></svg></div>
-      <div><h3>App development</h3><p style="margin-top:4px;color:var(--red-text)">Can't load: module.yaml is missing <b>color</b>.</p></div>
-    </div>
-    <div class="type add rise" style="--d:130ms" data-s="type-add">
-      <div class="tile lg"><svg class="i"><use href="#i-package"/></svg></div>
-      <div><h3>More types later</h3><p class="muted" style="margin-top:4px">Copy a folder in <span class="mono">modules/</span> and edit its module.yaml. A new card appears here.</p></div>
-    </div>
+  <div data-when="loading">
+    <div class="np-top"><div><div class="sk" style="height:12px;width:90px"></div><div class="sk" style="height:46px;margin-top:8px;border-radius:10px"></div></div><div><div class="sk" style="height:12px;width:40px"></div><div class="sk" style="height:54px;width:408px;max-width:100%;margin-top:8px;border-radius:12px"></div></div></div>
+    <div class="sk" style="height:14px;width:80px;margin-top:30px"></div>
+    <div class="ktiles" style="margin-top:12px"><div class="sk" style="height:60px;border-radius:12px"></div><div class="sk" style="height:60px;border-radius:12px"></div><div class="sk" style="height:60px;border-radius:12px"></div><div class="sk" style="height:60px;border-radius:12px"></div></div>
+    <p class="muted small" style="margin-top:12px">Reading modules/…</p>
   </div>
 
-  <div class="name-row rise" style="--d:160ms" data-when="full error" data-s="name-row">
-    <div class="field">
-      <label for="pname">Project name</label>
-      <input class="input" id="pname" placeholder="e.g. Rover-02" value="Rover-02" data-s="name-input" autocomplete="off">
+  <div data-when="full error">
+    <div class="np-top rise" style="--d:30ms">
+      <div class="field" data-s="name-field">
+        <label for="pname">Project name</label>
+        <input class="input lg" id="pname" value="Rover-02" placeholder="e.g. Rover-02" autocomplete="off" data-s="name-input">
+        <div class="path" data-s="name-path"><span style="font-family:var(--font)">Saved to </span>~/projects/<span id="slug">rover-02</span></div>
+      </div>
+      <div class="field" style="flex:none">
+        <span class="lbl" id="kindLbl">Type</span>
+        <div class="kind" role="radiogroup" aria-labelledby="kindLbl" data-s="kind">
+          <span class="kpill" aria-hidden="true"></span>
+          <button role="radio" aria-checked="false" data-kind="app" data-s="kind-app"><span class="tile app sm"><svg class="i"><use href="#i-phone"/></svg></span>App development</button>
+          <button role="radio" aria-checked="true" data-kind="rob" data-s="kind-rob"><span class="tile rob sm"><svg class="i"><use href="#i-cpu"/></svg></span>Robotics</button>
+        </div>
+        <span class="kind-err" data-when="error">App development can't load until module.yaml is fixed.</span>
+      </div>
     </div>
-    <div class="path" data-s="name-path">~/projects/<span id="slug">rover-02</span></div>
+
+    <div class="presets rise" style="--d:60ms" role="group" aria-label="Presets" data-s="presets"></div>
+    <div id="pickArea" class="rise" style="--d:90ms" data-s="pick-area"></div>
+
+    <section class="np-checks" aria-label="Checks" data-s="np-checks">
+      <div class="gh"><h3>Checks</h3></div>
+      <div class="checks" id="npChecks" style="margin-top:10px"></div>
+    </section>
+
+    <div class="np-bar" data-s="np-bar">
+      <div class="sum"><b id="npSum">ESP32 DevKit V1 + 4 parts</b><span class="muted small" id="npMeta">RM40 estimated</span></div>
+      <button class="btn primary" id="npCreate" data-s="np-create">Create project</button>
+    </div>
   </div>
 </section>
 
@@ -723,7 +752,7 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
 <section class="route page" data-route="#handbook" data-s="handbook" aria-label="Handbook" style="max-width:1320px">
   <header class="toolbar rise" data-s="hb-toolbar">
     <div class="titles">
-      <div class="eyebrow">New robotics project · Step 2 of 3</div>
+      <div class="eyebrow">Parts, boards and stacks</div>
       <h1>Handbook</h1>
     </div>
   </header>
@@ -1060,7 +1089,7 @@ const route=()=>{const h=location.hash||'#home';
   if(!$$('.route').some(s=>s.dataset.route===h)){location.hash='#home';return}
   $$('.nav a').forEach(a=>a.toggleAttribute('aria-current',false));
   const cur=$(`.nav a[href="${h}"]`);if(cur)cur.setAttribute('aria-current','page');
-  $('#main').scrollTop=0;closeMenu();if(h==='#project')requestAnimationFrame(movePill);};
+  $('#main').scrollTop=0;closeMenu();if(h==='#project')requestAnimationFrame(movePill);if(h==='#new')requestAnimationFrame(moveKpill);};
 
 /* count-up for the spend figure, first time the breakdown opens (skipped under reduced motion) */
 const ms=document.querySelector('.mini-spend');['mouseenter','focus'].forEach(ev=>ms.addEventListener(ev,()=>{if(!countUp.done){countUp.done=1;setTimeout(countUp,90)}}));
@@ -1069,7 +1098,7 @@ const countUp=()=>{const el=$('#spendNum'),end=1.71;if(matchMedia('(prefers-redu
 addEventListener('hashchange',route);
 
 /* non-uniform stagger for list items inside the page entrance */
-const stagger=sec=>{$$('.task,.proj,.kcard',sec).forEach((el,i)=>{el.style.animation='none';void el.offsetWidth;
+const stagger=sec=>{$$('.task,.proj,.kcard,.kt',sec).forEach((el,i)=>{el.style.animation='none';void el.offsetWidth;
   el.style.animation=`rise 220ms var(--ease-out) both ${Math.round(50+30*Math.pow(i,.8))}ms`;el.addEventListener('animationend',()=>el.style.animation='',{once:true})})};
 
 /* library stub keeps toast */
@@ -1123,13 +1152,126 @@ updateBadges();
 $$('.fchip').forEach(f=>f.onclick=()=>{$$('.fchip').forEach(x=>x.setAttribute('aria-pressed',x===f));
   $$('.proj').forEach(p=>p.hidden=f.dataset.f!=='all'&&p.dataset.m!==f.dataset.f)});
 
-/* type picker */
-const cont=$('#continueBtn');
-cont.addEventListener('click',e=>{if(cont.getAttribute('aria-disabled')==='true'){e.preventDefault();toast('Pick a project type first.')}});
-cont.style.opacity='.45';
-$$('.type[role="radio"]').forEach(t=>t.onclick=()=>{$$('.type[role="radio"]').forEach(x=>x.setAttribute('aria-checked',x===t));
-  cont.setAttribute('aria-disabled','false');cont.style.opacity=''});
-$('#pname').addEventListener('input',e=>{$('#slug').textContent=(e.target.value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'untitled'});
+/* ---------- new project: kits, tiles, tooltip, checks ---------- */
+const KITS={
+ app:{groups:[
+  {id:'fw',title:'Framework',hint:'Pick one',one:true,items:[
+   {id:'expo',name:'Expo',sub:'React Native · Android + iOS',g:'EX',c:'#4F46E5',good:'Phone apps for Android and iOS from one codebase. Test instantly on your phone with Expo Go.',watch:'Custom native modules need a dev build.',meta:'Free'},
+   {id:'next',name:'Next.js',sub:'React · web apps and sites',g:'NX',c:'#1D1D1F',good:'Websites and web apps that need fast pages and SEO: dashboards, stores, landing pages.',watch:'Not for offline phone apps.',meta:'Free'},
+   {id:'tauri',name:'Tauri',sub:'Rust + web UI · desktop',g:'TA',c:'#E8A33D',good:'Small, fast desktop apps for Windows, macOS and Linux, with a web UI and a Rust core.',watch:'Needs the Rust toolchain installed.',meta:'Free'}]},
+  {id:'be',title:'Backend',hint:'Pick one, or none',one:true,optional:true,items:[
+   {id:'supabase',name:'Supabase',sub:'Postgres · auth · storage',g:'SB',c:'#249361',good:'Sign-in, a real Postgres database and file storage on a free tier. Realtime updates built in.',watch:'Needs internet; keys live in .env.',meta:'Free tier'},
+   {id:'firebase',name:'Firebase',sub:'Realtime sync · push',g:'FB',c:'#F57C00',good:'Quick auth, realtime sync between phones and push notifications.',watch:'NoSQL data is harder to query; Google lock-in.',meta:'Free tier'},
+   {id:'sqlite',name:'Local SQLite',sub:'On-device · offline',g:'SQ',c:'#0F80CC',good:'Offline-first apps with no account or server. Data stays on the device.',watch:'No sync between devices.',meta:'Free'}]},
+  {id:'ex',title:'Extras',hint:'Tick any',items:[
+   {id:'router',name:'Expo Router',sub:'File-based navigation',g:'ER',c:'#6366F1',only:'expo',good:'Screens from files in app/, with deep links and typed routes for free.',watch:'Expo only.',meta:'Free'},
+   {id:'nativewind',name:'NativeWind',sub:'Tailwind for React Native',g:'NW',c:'#0EA5E9',only:'expo',good:'Style with Tailwind classes; your design tokens map straight in.',watch:'Expo only. Some web-only classes do nothing.',meta:'Free'},
+   {id:'zustand',name:'Zustand',sub:'Tiny state store',g:'ZU',c:'#8B5A2B',good:'Shared app state in a few lines, without Redux boilerplate.',watch:'Not a data-fetching cache.',meta:'Free'},
+   {id:'eas',name:'EAS Build',sub:'Cloud APK / IPA builds',g:'EA',c:'#334155',only:'expo',good:'Build store-ready APKs and iOS apps in the cloud, no Mac needed.',watch:'Expo only. Free plan has a build queue.',meta:'Free plan'}]}],
+  presets:[{name:'Expo + Supabase app',ids:['expo','supabase','router','nativewind']},{name:'Desktop tool',ids:['tauri','sqlite','zustand']}]},
+ rob:{groups:[
+  {id:'board',title:'Board',hint:'Pick one',one:true,items:[
+   {id:'esp32',name:'ESP32 DevKit V1',sub:'Wi-Fi + BLE · 3.3V',g:'E32',c:'#1F3A5F',price:25,good:'The best all-rounder: Wi-Fi, Bluetooth, lots of PWM pins and plenty of speed for robots.',watch:'3.3V logic. GPIO 0, 2, 12 and 15 are strapping pins.'},
+   {id:'nano',name:'Arduino Nano',sub:'5V · breadboard size',g:'NA',c:'#00878A',price:18,good:'Small 5V board that plugs into a breadboard. Simple and beginner-friendly.',watch:'No wireless and only 2 KB of RAM.'},
+   {id:'uno',name:'Arduino Uno',sub:'5V · shields',g:'UNO',c:'#0E7C86',price:35,good:'Learning and prototyping with shields and 5V sensors.',watch:'Large, and no wireless.'},
+   {id:'c3',name:'ESP32-C3 Super Mini',sub:'Tiny · Wi-Fi + BLE',g:'C3',c:'#334155',price:15,good:'Tiny, cheap wireless sensor nodes that sip power.',watch:'Fewer pins than the DevKit.'}]},
+  {id:'motion',title:'Motion',hint:'Tick any',items:[
+   {id:'l298n',name:'L298N driver',sub:'2 DC motors · 2 A',g:'DRV',c:'#B91C1C',price:9,good:'Driving two DC motors forward and back with speed control.',watch:'Drops about 2V and runs warm.'},
+   {id:'tt',name:'TT gear motor ×2',sub:'With wheels · 3–6V',g:'TT',c:'#CA8A04',price:12,good:'Cheap wheels for small 2WD robots.',watch:'Stall current up to 1.5 A each. Needs a driver.'},
+   {id:'sg90',name:'SG90 servo',sub:'180° · 9 g',g:'SV',c:'#1D4ED8',price:7,good:'Turning a sensor head or a small arm to an exact angle.',watch:'Jitters on weak power. Avoid strapping pins.'}]},
+  {id:'sense',title:'Sensors',hint:'Tick any',items:[
+   {id:'hcsr04',name:'HC-SR04',sub:'Ultrasonic distance',g:'US',c:'#0E7490',price:6,good:'Measuring distance to obstacles in front of the robot.',watch:'ECHO is 5V. Use a divider on 3.3V boards.'},
+   {id:'ir',name:'IR line sensor',sub:'Line following',g:'IR',c:'#7C3AED',price:4,good:'Following a black line on the floor.',watch:'Strong sunlight confuses it.'},
+   {id:'mpu',name:'MPU6050',sub:'Gyro + accel · I2C',g:'IMU',c:'#DB2777',price:10,good:'Knowing tilt and heading so the robot drives straight.',watch:'Drifts over time; calibrate at start.'}]},
+  {id:'power',title:'Power and display',hint:'Tick any',items:[
+   {id:'batt',name:'18650 2S pack + BMS',sub:'7.4V rechargeable',g:'BAT',c:'#15803D',price:14,good:'Separate power for motors so the board doesn’t brown out.',watch:'Never short it. Always use the BMS.'},
+   {id:'oled',name:'SSD1306 OLED',sub:'0.96" · I2C',g:'OL',c:'#111827',price:12,good:'Showing distance, battery or status right on the robot.',watch:'Shares the I2C pins with other sensors.'}]}],
+  presets:[{name:'2WD obstacle robot',ids:['esp32','l298n','tt','hcsr04','sg90','batt']},{name:'Line follower',ids:['nano','l298n','tt','ir','batt']}]}};
+const ITEM={};Object.values(KITS).forEach(k=>k.groups.forEach(g=>g.items.forEach(it=>{it.group=g;ITEM[it.id]=it})));
+const npSel={app:new Set(['expo','supabase']),rob:new Set(['esp32','l298n','tt','hcsr04','sg90'])};
+let npKind='rob';
+const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fw=()=>[...npSel.app].find(id=>ITEM[id].group.id==='fw');
+const blocked=it=>it.only&&fw()!==it.only;
+
+function renderPresets(){const box=$('.presets');box.innerHTML='<span class="muted small">Start from</span>';
+  KITS[npKind].presets.forEach(pr=>{const b=document.createElement('button');b.className='fchip';b.textContent=pr.name;
+    const on=pr.ids.length===npSel[npKind].size&&pr.ids.every(i=>npSel[npKind].has(i));b.setAttribute('aria-pressed',on);
+    b.onclick=()=>{npSel[npKind]=new Set(pr.ids);renderTiles(false);npUpdate()};box.append(b)})}
+function renderTiles(animate){const area=$('#pickArea');area.innerHTML='';
+  KITS[npKind].groups.forEach(g=>{const sec=document.createElement('section');sec.className='kgroup';sec.dataset.s='group-'+g.id;sec.id='s-group-'+g.id;
+    sec.innerHTML=`<div class="gh"><h3>${g.title}</h3><span>${g.hint}</span></div>`;const grid=document.createElement('div');grid.className='ktiles';
+    grid.setAttribute('role',g.one?'radiogroup':'group');grid.setAttribute('aria-label',g.title);
+    g.items.forEach(it=>{const b=document.createElement('button');b.className='kt';b.dataset.id=it.id;b.dataset.s='tile-'+it.id;b.id='s-tile-'+it.id;
+      b.setAttribute('role',g.one?'radio':'checkbox');b.setAttribute('aria-describedby','tip');
+      b.innerHTML=`<span class="g" style="background:${it.c}">${it.g}</span><span class="tx"><b>${esc(it.name)}</b><span class="s">${esc(it.sub)}${it.price?' · RM'+it.price:''}</span></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`;
+      b.onclick=()=>{if(b.getAttribute('aria-disabled')==='true'){toast(`${it.name} works with Expo only.`);return}
+        const set=npSel[npKind];
+        if(g.one){const was=set.has(it.id);g.items.forEach(x=>set.delete(x.id));if(!was||!g.optional)set.add(it.id)}
+        else set.has(it.id)?set.delete(it.id):set.add(it.id);
+        if(npKind==='app')[...set].forEach(id=>{if(blocked(ITEM[id]))set.delete(id)});
+        npUpdate()};
+      grid.append(b)});
+    sec.append(grid);area.append(sec)});
+  if(animate){area.classList.remove('swap');void area.offsetWidth;area.classList.add('swap')}
+  bindTips();npUpdate()}
+function npChecks(){const S=npSel[npKind],has=id=>S.has(id),out=[];
+  if(npKind==='rob'){const board=['esp32','nano','uno','c3'].find(has);
+    if(!board)out.push(['bad','<b>Board</b> missing. Pick one to continue.']);
+    if(has('tt')&&!has('l298n'))out.push(['bad','<b>TT motors</b> can’t run from a GPIO pin. Add the L298N driver.']);
+    if((has('tt')||has('l298n'))&&!has('batt'))out.push(['warn','<b>Motors</b> need their own power. Add the 18650 2S pack.']);
+    if(has('hcsr04')&&(board==='esp32'||board==='c3'))out.push(['warn','<b>HC-SR04</b> ECHO is 5V; ESP32 pins are 3.3V. A 1k/2k divider goes on the parts list.']);
+    if(has('l298n')&&has('tt'))out.push(['ok','<b>L298N</b> 2 A covers TT motor stall 1.5 A.']);
+    if(has('mpu')&&has('oled'))out.push(['ok','<b>MPU6050</b> and <b>OLED</b> share I2C, no extra pins needed.'])}
+  else{const f=fw();
+    if(!f)out.push(['bad','<b>Framework</b> missing. Pick one to continue.']);
+    if(f==='tauri')out.push(['warn','<b>Tauri</b> needs Rust. Setup installs rustup if it’s missing.']);
+    if(f==='next'&&has('sqlite'))out.push(['warn','<b>SQLite</b> in Next.js runs on the server only, not in the browser.']);
+    if(f==='expo'&&has('supabase'))out.push(['ok','<b>Supabase</b> works in Expo. Keys go in .env, never in code.']);
+    if(f==='expo'&&!has('eas'))out.push(['ok','<b>Builds</b> run locally. Tick EAS Build for cloud APKs.'])}
+  if(!out.some(c=>c[0]!=='ok'))out.unshift(['ok','<b>Everything fits together.</b>']);return out}
+function npUpdate(){const S=npSel[npKind],name=$('#pname').value.trim();
+  $$('#pickArea .kt').forEach(b=>{const it=ITEM[b.dataset.id];b.setAttribute('aria-checked',S.has(it.id));b.setAttribute('aria-disabled',npKind==='app'&&!!blocked(it))});
+  const checks=npChecks(),ic={bad:'x-c',warn:'alert',ok:'check-c'};
+  $('#npChecks').innerHTML=checks.map(([l,h])=>`<div class="chk ${l}"><svg class="i"><use href="#i-${ic[l]}"/></svg><span>${h}</span></div>`).join('');
+  const picked=KITS[npKind].groups.flatMap(g=>g.items).filter(i=>S.has(i.id));let sum,meta;
+  if(npKind==='rob'){const b=picked.find(i=>i.group.id==='board'),parts=picked.filter(i=>i.group.id!=='board');
+    sum=(b?b.name:'No board')+(parts.length?` + ${parts.length} part${parts.length>1?'s':''}`:'');meta=`RM${picked.reduce((t,i)=>t+(i.price||0),0)} estimated`}
+  else{sum=picked.length?picked.map(i=>i.name).join(' + '):'No stack yet';meta=`${picked.length} package${picked.length===1?'':'s'} · free tiers`}
+  const bad=checks.find(c=>c[0]==='bad'),why=!name?'Add a project name.':bad?bad[1].replace(/<[^>]+>/g,''):'';
+  $('#npSum').textContent=sum;$('#npMeta').innerHTML=why?`<span class="why">${esc(why)}</span>`:esc(meta);
+  $('#npCreate').disabled=!!why;renderPresetsState()}
+function renderPresetsState(){$$('.presets .fchip').forEach((b,i)=>{const pr=KITS[npKind].presets[i];b.setAttribute('aria-pressed',pr.ids.length===npSel[npKind].size&&pr.ids.every(x=>npSel[npKind].has(x)))})}
+/* type toggle */
+const kpill=$('.kind .kpill');
+function moveKpill(){const a=$('.kind [aria-checked="true"]');if(!a||!a.offsetWidth)return;kpill.style.width=a.offsetWidth+'px';kpill.style.transform=`translateX(${a.offsetLeft}px)`}
+function setKind(k,animate=true){if(k==='app'&&document.body.dataset.state==='error'){toast('Fix modules/app-dev/module.yaml to use App development.');return}
+  npKind=k;$$('.kind [role="radio"]').forEach(b=>b.setAttribute('aria-checked',b.dataset.kind===k));moveKpill();renderPresets();renderTiles(animate);hideTip(true)}
+$$('.kind [role="radio"]').forEach(b=>b.onclick=()=>setKind(b.dataset.kind));
+$('.kind').addEventListener('keydown',e=>{if(!/Arrow(Left|Right)/.test(e.key))return;e.preventDefault();const k=$('.kind');k.classList.add('kb');
+  setKind(npKind==='rob'?'app':'rob',false);$(`.kind [data-kind="${npKind}"]`).focus();requestAnimationFrame(()=>requestAnimationFrame(()=>k.classList.remove('kb')))});
+addEventListener('resize',moveKpill);
+$('#pname').addEventListener('input',e=>{$('#slug').textContent=(e.target.value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'untitled';npUpdate()});
+$('#npCreate').onclick=()=>{const n=$('#pname').value.trim();
+  toast(npKind==='rob'?`Creating ${n}: pio project init, platformio.ini, pins.h, main.cpp, git init…`:`Creating ${n}: scaffold, theme file, .env.example, git init…`);
+  setTimeout(()=>location.hash='#project',900)};
+/* tooltip: first one waits 350 ms, neighbours open instantly (no animation) */
+const tip=document.createElement('div');tip.id='tip';tip.setAttribute('role','tooltip');document.body.append(tip);
+let tipT=0,tipLast=0;
+function showTip(el,instant){const it=ITEM[el.dataset.id];if(!it)return;
+  tip.innerHTML=`<div class="h"><b>${esc(it.name)}</b><span>${it.price?'RM'+it.price:esc(it.meta||'')}</span></div><p><span class="k">Good for</span>${esc(it.good)}</p><p class="w"><span class="k">Watch out</span>${esc(it.watch)}</p>`;
+  tip.classList.toggle('instant',instant);const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+  let x=Math.max(8,Math.min(r.left+r.width/2-w/2,innerWidth-w-8)),y=r.top-h-10,below=y<8;if(below)y=r.bottom+10;
+  tip.style.left=x+'px';tip.style.top=y+'px';tip.style.transformOrigin=`${r.left+r.width/2-x}px ${below?'0':'100%'}`;tip.classList.add('on')}
+function hideTip(now){clearTimeout(tipT);if(tip.classList.contains('on'))tipLast=Date.now();tip.classList.toggle('instant',!!now);tip.classList.remove('on')}
+function bindTips(){$$('#pickArea .kt').forEach(b=>{
+  b.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;clearTimeout(tipT);const warm=tip.classList.contains('on')||Date.now()-tipLast<500;
+    if(warm)showTip(b,true);else tipT=setTimeout(()=>showTip(b,calm()),350)});
+  b.addEventListener('pointerleave',()=>hideTip());
+  b.addEventListener('focus',()=>{if(b.matches(':focus-visible'))showTip(b,true)});b.addEventListener('blur',()=>hideTip(true))})}
+addEventListener('keydown',e=>{if(e.key==='Escape')hideTip(true)});
+document.getElementById('main').addEventListener('scroll',()=>hideTip(true),{passive:true});
+setKind('rob',false);
 
 /* cart */
 const prices={'cart-l298n':9,'cart-motor':6,'cart-servo':7,'cart-batt':14,'cart-sonar':6};

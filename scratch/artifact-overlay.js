@@ -20,6 +20,7 @@ document.head.append(mk('style',{textContent:STATES.map(s=>`body[data-state="${s
 #rv .msg{color:var(--label-2);font-weight:500;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rv-hl{outline:2px solid var(--accent)!important;outline-offset:3px!important;border-radius:6px}
 #rv-tag{position:fixed;z-index:61;pointer-events:none;padding:2px 7px;border-radius:6px;background:var(--accent);color:var(--on-accent);font:600 11px var(--mono);white-space:nowrap}
+.np-bar{bottom:68px!important}
 body.rv-picking *{cursor:crosshair!important}
 body.rv-picking #rv,body.rv-picking #rv *{cursor:pointer!important}
 @media (max-width:640px){#rv .msg{display:none}#rv .grp button{padding:0 7px}}

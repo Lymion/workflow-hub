@@ -11,7 +11,7 @@ Layout (every screen)
 Components
 - #home: greeting/date, primary "New project"; today-tasks (cross-project, checkable, completion celebration + progress bar); recent-projects (last 5, filter by module)
 - sidebar spend meter: segmented by feature; hover/focus shows breakdown (RM this month vs RM10 cap, per-feature, cache savings)
-- #new: steps (Type → Cart → Set up); type-cards from modules/ (Robotics, App development, "More types later" dashed card); name field + folder preview; primary "Continue to cart" (disabled until a type is picked)
+- #new (one page): project name + folder preview; type toggle (App development / Robotics, one per module); preset chips; tick tiles grouped per module (App: Framework, Backend, Extras — Expo-only extras disable for other frameworks; Robotics: Board, Motion, Sensors, Power and display); hover/focus tooltip per tile (Good for / Watch out / price); live checks; sticky bar with summary + RM estimate + primary "Create project" (disabled with a one-line reason)
 - #handbook: toc (App stacks / Electronics parts / My notes, search); chapter (HC-SR04: facts chips, 5V warning callout, pins table, "Add to project"); cart panel (preset, board slot, parts with qty, checks with one-line fixes, total RM, primary "Create project")
 - #project: header (icon, name, board, folder, git), primary "Open in VS Code", More menu (Arduino IDE, terminal, Claude Code); segmented tabs: Tasks (To do / Doing / Done board), Wiring (board diagram + pin table + AUTO-GENERATED pins.h preview), Parts (table, status, total RM)
 - global: Ctrl+K command bar, toasts
