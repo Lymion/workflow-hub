@@ -1,0 +1,3 @@
+preset: expo-supabase
+name: Expo + Supabase app
+stack: [expo, supabase, expo-router, nativewind]

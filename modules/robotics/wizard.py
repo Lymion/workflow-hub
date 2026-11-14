@@ -10,6 +10,8 @@ import re
 from datetime import date
 
 GPIO_MODES = {"OUTPUT", "PWM", "INPUT", "INPUT_PULLUP", "ANALOG", "I2C"}
+NEEDS_BOARD = True
+STATUS_FILES = ["platformio.ini", "include/pins.h", "wiring.json", "PARTS.md", "src/main.cpp"]
 
 
 # ---------- names ----------

@@ -167,7 +167,8 @@ def test_git_initialised(client):
 def test_app_project_has_no_robotics_files(client):
     p = client.post("/projects", json={"name": "Kedai", "module": "app-dev"}).json()
     assert not (Path(p["path"]) / "platformio.ini").exists()
-    assert client.get(f"/projects/{p['id']}/setup").json()["available"] is False
+    files = [f["file"] for f in client.get(f"/projects/{p['id']}/setup").json()["files"]]
+    assert "platformio.ini" not in files and "include/pins.h" not in files
 
 
 @pytest.mark.skipif(not shutil.which("pio"), reason="PlatformIO not installed")

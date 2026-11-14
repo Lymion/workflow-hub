@@ -10,7 +10,7 @@ import yaml
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
-from .. import generated
+from .. import generated, jobs
 from ..boards import load_boards, load_module_file
 from ..hub import Hub
 from ..modules import load_modules
@@ -174,13 +174,15 @@ def context(hub: Hub, project: dict, **flags) -> dict | None:
     board = board_for(hub, project)
     wizard = load_module_file(hub.paths.root, project["module"], "wizard.py")
     checks = load_module_file(hub.paths.root, project["module"], "checks.py")
-    if not board or not wizard:
+    if not wizard or (getattr(wizard, "NEEDS_BOARD", False) and not board):
         return None
     parts = [p for p in project_parts(hub, project["id"]) if p["section"] != "boards"]
+    hb = current(hub)
+    stack = [{"key": k, "title": hb.by_key(k).title, "meta": hb.by_key(k).meta} for k in project.get("stack", []) if hb.by_key(k)]
     return {
         "wizard": wizard, "checks": checks, "project": project, "board": board, "parts": parts,
-        "wiring": read_wiring(project), "root": hub.paths.root, "path": Path(project["path"]),
-        "suggest": checks.suggest if checks else (lambda b, m, u: None),
+        "wiring": read_wiring(project), "root": hub.paths.root, "path": Path(project["path"]), "stack": stack,
+        "suggest": getattr(checks, "suggest", None) or (lambda b, m, u: None),
         "write_owned": generated.write_owned, "write_once": generated.write_once,
         "which": shutil.which, "run": run_cmd, **flags,
     }
@@ -197,6 +199,8 @@ def refresh_files(hub: Hub, project: dict) -> dict | None:
 def findings_for(hub: Hub, ctx: dict) -> list[dict]:
     if not ctx["checks"]:
         return []
+    if hasattr(ctx["wizard"], "findings"):
+        return ctx["wizard"].findings(ctx)
     hb = current(hub)
     wiring = ctx["wizard"].sync_wiring(ctx["board"], ctx["parts"], ctx["wiring"], ctx["suggest"])
     assignments = []
@@ -208,18 +212,28 @@ def findings_for(hub: Hub, ctx: dict) -> list[dict]:
     return ctx["checks"].run(ctx["board"], assignments, ctx["parts"])
 
 
+# Tests set this to run background steps inline (and to skip slow tools).
+BACKGROUND_SYNC = False
+
+
 def after_create(hub: Hub, project: dict) -> None:
-    """New robotics project: add its board to the cart and write the starter files."""
+    """New project: board into the cart, starter files now, slow steps (scaffold, installs) in the background."""
     board = board_for(hub, project)
-    if not board or not load_module_file(hub.paths.root, project["module"], "wizard.py"):
-        return
-    if current(hub).by_key(board["board"]):
+    if board and current(hub).by_key(board["board"]):
         add_parts(hub, project["id"], [PartAdd(key=board["board"], qty=1)])
     ctx = context(hub, project, run_git=True)
     if not ctx:
         return
     ctx["wizard"].setup(ctx)
     add_checklist(hub, ctx)
+    start_background(hub, project, ctx)
+
+
+def start_background(hub: Hub, project: dict, ctx: dict, **flags) -> dict | None:
+    if not hasattr(ctx["wizard"], "background"):
+        return None
+    bg = context(hub, project, **{"run_git": True, **flags})
+    return jobs.start(f"setup:{project['id']}", lambda log: bg["wizard"].background({**bg, "log": log}), sync=BACKGROUND_SYNC)
 
 
 def add_checklist(hub: Hub, ctx: dict) -> list[str]:
@@ -253,15 +267,19 @@ def setup_status(request: Request, project_id: int) -> dict:
     if not ctx:
         return {"available": False, "items": [], "files": []}
     path = Path(project["path"])
-    names = ["platformio.ini", "include/pins.h", "wiring.json", "PARTS.md", "src/main.cpp"]
-    files = [{"file": n, "exists": (path / n).is_file(), "owned": generated.is_owned(path / n) and (path / n).is_file() and n != "src/main.cpp"} for n in names]
-    return {"available": True, "items": ctx["wizard"].setup_check(ctx), "files": files}
+    w = ctx["wizard"]
+    names = w.status_files(ctx) if hasattr(w, "status_files") else getattr(w, "STATUS_FILES", [])
+    files = [{"file": n, "exists": (path / n).is_file(), "owned": (path / n).is_file() and generated.is_owned(path / n)} for n in names]
+    return {"available": True, "items": ctx["wizard"].setup_check(ctx), "files": files, "job": jobs.get(f"setup:{project_id}")}
 
 
 class SetupIn(BaseModel):
     run_pio: bool = True
     run_git: bool = True
     add_tasks: bool = True
+    run_scaffold: bool = False
+    run_install: bool = False
+    run_github: bool = False
 
 
 @router.post("/projects/{project_id}/setup")
@@ -275,7 +293,8 @@ def run_setup(request: Request, project_id: int, body: SetupIn) -> dict:
         raise HTTPException(400, "This project has no board yet, or its type has no setup wizard. Pick a board first.")
     result = ctx["wizard"].setup(ctx)
     added = add_checklist(hub, context(hub, project)) if body.add_tasks else []
-    return {"files": result["files"], "steps": result["steps"], "tasks_added": added}
+    job = start_background(hub, project, ctx, run_git=body.run_git, run_scaffold=body.run_scaffold, run_install=body.run_install, run_github=body.run_github) if (body.run_scaffold or body.run_install or body.run_github) else None
+    return {"files": result["files"], "steps": result["steps"], "tasks_added": added, "job": job}
 
 
 @router.get("/projects/{project_id}/wiring")
