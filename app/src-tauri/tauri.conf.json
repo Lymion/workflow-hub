@@ -14,7 +14,7 @@
       { "label": "main", "title": "Workflow Hub", "width": 1280, "height": 820, "minWidth": 900, "minHeight": 600 }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' http://127.0.0.1:8765 ipc: http://ipc.localhost; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'"
+      "csp": "default-src 'self'; connect-src 'self' http://127.0.0.1:8765 ipc: http://ipc.localhost; img-src 'self' data: blob: http://127.0.0.1:8765; style-src 'self' 'unsafe-inline'"
     }
   },
   "bundle": {

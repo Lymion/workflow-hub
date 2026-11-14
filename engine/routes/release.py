@@ -9,6 +9,7 @@ import binascii
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from .. import generated, gitops
@@ -153,3 +154,12 @@ def release(request: Request, project_id: int, body: ReleaseIn) -> dict:
             raise HTTPException(409, str(exc)) from exc
     build = run_start(request, project_id, "build", StartIn()) if body.build else None
     return {"version": version, "versionCode": new["versionCode"], "files": files, "tag": tag, "build": build}
+
+
+@router.get("/projects/{project_id}/release/icon/{name}")
+def icon_file(request: Request, project_id: int, name: str) -> FileResponse:
+    hub, project, path, rel, ctx = _ctx(request, project_id)
+    f = path / "assets" / "hub" / name
+    if name not in rel.ICONS or not f.is_file():
+        raise HTTPException(404, f"No {name} yet. Choose an image in the Release tab.")
+    return FileResponse(f, media_type="image/png", headers={"Cache-Control": "no-store"})
