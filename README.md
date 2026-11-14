@@ -8,6 +8,23 @@ A token-light desktop project workshop for makers. Start a robot or app project 
 
 Spec: [`docs/spec.md`](docs/spec.md) · Screen designs: [`scratch/`](scratch/)
 
+## What it does
+
+| Where | What | Costs tokens? |
+| --- | --- | --- |
+| Home | Today's tasks across projects, recent projects, this week's review, Haiku spend in the sidebar | No |
+| New project | Name, type, then a board (robots) or a stack (apps); presets and live checks | No |
+| Project tabs | Tasks, Journal, Snippets used, **Parts** (cart, costs, checks), **Wiring** (drag wires, pin picker, `pins.h`), **Stack**, **Design tokens**, **Release** (apps), **Run** (build, upload, dev server, serial monitor + plotter), **Git** | Only the commit message |
+| Handbook | Parts, boards and stacks with comparison specs; **Guide me** question flow; your own notes | No |
+| Library | Snippets (quick capture: `Ctrl+Shift+S`) and the error log, one search for both | No |
+| Ask docs | Docs guide with cards and a hint ladder, from downloaded docs + the handbook | One small Haiku call, cached |
+| Automations | Weekly review, nightly hub health, your own workflows in `workflows/` | Weekly review: one Haiku call |
+| VS Code | Insert snippet, Ask hub, save selection, log error ([`vscode-extension/`](vscode-extension/)) | Ask hub only |
+
+Every Haiku call goes through one guard: the model is fixed (`engine/config.py`), the month is capped at RM10 (checked before sending), each call is logged and cached, and each feature has a free fallback when the cap is reached or no key is set.
+
+**The hub never edits your code.** It only writes files with an `AUTO-GENERATED` header at the top (`pins.h`, `platformio.ini`, `wiring.json`, `PARTS.md`, theme tokens, `.env.example`, `release.json`, `CHANGELOG.md`, icons in `assets/hub/`). Starter files (`main.cpp`, `CLAUDE.md`, `.gitignore`, `app.config.js`, new screens) are written once if missing and are yours from then on. If a file the hub wants to write exists without the header, it leaves it alone and tells you.
+
 ## Set up on Windows 11
 
 Install these once, in this order. Open a **new** PowerShell window after each install so `PATH` updates.
@@ -52,7 +69,20 @@ npm install
 cd ..
 ```
 
-Optional: copy `.env.example` to `.env` and paste your Anthropic API key (only needed for docs answers, commit messages and other Haiku features). Never commit `.env`.
+Optional: add your Anthropic API key in the app's **Settings** (it goes into the Windows Credential Manager), or copy `.env.example` to `.env` for development. It's only needed for docs answers, commit messages and the weekly review. Never commit `.env`.
+
+### 5. Tools for your projects (install what you use)
+
+| For | Install | Used by |
+| --- | --- | --- |
+| Robots | `pip install platformio` (or the PlatformIO VS Code extension), USB driver for your board (CP210x or CH340) | Build, Upload, Serial monitor |
+| Apps | Node.js (above); Expo Go on your phone; `npx eas-cli login` once for APK builds | Set up app, Dev server, Release |
+| Desktop apps | Rust (above) | Tauri dev and build |
+| Git | `winget install --id Git.Git -e`, then `git config --global user.name "Your Name"` and `user.email` | Git tab, Release |
+| GitHub | `winget install --id GitHub.cli -e`, then `gh auth login` | Push to GitHub on setup |
+| Editor | VS Code with `code` on PATH, plus the [hub extension](vscode-extension/README.md) | Open in VS Code, Insert snippet |
+
+The hub checks for each tool and shows a one-line fix when one is missing.
 
 ## Run it
 
@@ -81,8 +111,18 @@ The first run compiles the Rust shell and takes a few minutes. The app starts th
 .venv\Scripts\python -m pytest
 cd app
 npm run build
+cd ..\vscode-extension
+node --test test/lib.test.js
 ```
+
+The nightly **Hub health** automation runs the same tests; if one fails it saves the output to `data\health\last-failure.md` and opens Claude Code in the hub folder.
 
 ## Add a project type
 
 Copy `modules/robotics` to `modules/<new-type>`, then edit `module.yaml`'s `id` and `name`. A new card appears in **New project**, with no hub code changes. Add `enabled: false` to hide a type without deleting it.
+
+A module folder can hold: `module.yaml`, `handbook/` (markdown chapters with a YAML setup block), `boards/`, `presets/`, `checks.py`, `wizard.py`, `run.py` (run panel targets), `release.py`, `guide.yaml` (Guide me questions) and `docs.yaml` (docs to download).
+
+## Add an automation
+
+Add a YAML file to `workflows/`. Steps are tagged `code`, `small-llm` or `big-llm` and run on `schedule` (`daily 20:30`, `weekly sun 20:00`, `every 30m`), `file_change` (a glob in your project folders) or the **Run now** button. See `workflows/weekly-review.yaml`.

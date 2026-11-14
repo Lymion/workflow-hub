@@ -40,8 +40,10 @@ Tokens live in `app/tailwind.config.js` (names) and `app/src/styles.css` (values
 engine/            Python FastAPI engine on 127.0.0.1:8765 (python -m engine)
   routes/          one file per feature, registered in routes/__init__.py
   tests/           pytest; run before every commit
-modules/           one folder per project type (module.yaml, handbook/, templates/, checks.py, wizard.py, docs.yaml)
+modules/           one folder per project type (module.yaml, handbook/, boards/, presets/, checks.py, wizard.py, run.py, release.py, guide.yaml, docs.yaml)
 snippets/          snippet library, one folder per snippet
+workflows/         automations (YAML; steps tagged code / small-llm / big-llm)
+vscode-extension/  VS Code extension (plain JS; talks to the engine only)
 app/               Tauri 2 + React + Tailwind desktop shell
   src/pages/       one file per screen
   src-tauri/       Rust shell; starts the engine if it isn't running
