@@ -6,5 +6,5 @@ color: categorical-5
 cart_slots: [stack]
 project_tabs: [stack, design-tokens]
 launch: [vscode, terminal]
-run: [dev, build]
+run: [dev, emulator, build]
 handbook_part: App stacks

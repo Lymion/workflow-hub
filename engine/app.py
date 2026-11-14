@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import db
+from . import db, runner
 from .config import VERSION, HubPaths
 from .hub import Hub
 from .modules import load_modules
@@ -28,6 +28,7 @@ def create_app(paths: HubPaths | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         yield
+        runner.stop_all()  # never leave dev servers or serial ports behind
         hub.close()
 
     app = FastAPI(title="Workflow Hub engine", version=VERSION, lifespan=lifespan, docs_url="/api-docs", redoc_url=None)
