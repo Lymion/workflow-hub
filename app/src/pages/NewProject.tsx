@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { api, useLoad } from "../lib/api";
+import { api, notifyChanged, useLoad } from "../lib/api";
+import { go } from "../lib/router";
+
+/** Later sessions (board picker, stack tiles) add fields to the create request here. */
+const extraPayload = (): Record<string, unknown> => ({});
 import { Icon, ModuleTile } from "../components/Icon";
 import { Banner, Empty, PageHead, Sk, slugify } from "../components/ui";
 import { useToast } from "../components/Toast";
@@ -51,6 +55,21 @@ export function NewProject() {
     if (!kind && modules.length) setKind(modules.find((m) => m.id === "robotics")?.id ?? modules[0].id);
   }, [modules, kind]);
   const mod = modules.find((m) => m.id === kind);
+  const [creating, setCreating] = useState(false);
+  const create = async () => {
+    if (!name.trim() || !mod) return;
+    setCreating(true);
+    try {
+      const p = await api.post<{ id: number; name: string; path: string }>("/projects", { name, module: mod.id, ...extraPayload() });
+      toast(`${p.name} created in ${p.path}.`);
+      notifyChanged();
+      go(`#project/${p.id}`);
+    } catch (e) {
+      toast((e as Error).message, "bad");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   return (
     <>
@@ -105,8 +124,8 @@ export function NewProject() {
             <b className="block truncate">{name.trim() || "Name your project"}</b>
             <span className="text-xs text-label-2">{mod ? mod.name : ""}</span>
           </div>
-          <button className="btn btn-primary" disabled={!name.trim()} onClick={() => toast("Creating projects arrives in session 2.")}>
-            Create project
+          <button className="btn btn-primary" disabled={!name.trim() || creating} onClick={create}>
+            {creating ? "Creating…" : "Create project"}
           </button>
         </div>
       )}
