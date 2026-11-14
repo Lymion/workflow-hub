@@ -176,8 +176,9 @@ body[data-state="error"]:has(.route.on[data-route="#home"]) .engine .off{display
 .brand{display:flex;align-items:center;gap:10px;padding:2px 6px}
 .brand-mark{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 200deg,#FF9F0A,#FF375F,#5E5CE6,#0A84FF,#30D158,#FF9F0A);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 2px 6px -2px rgba(0,0,0,.3)}
 .brand b{font-size:14.5px;letter-spacing:-.01em}
-.search{display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:9px;border:0;width:100%;background:var(--fill);color:var(--label-2);font:13px var(--font);cursor:pointer;text-align:left}
-.search span{flex:1}
+.search{margin-left:auto;width:30px;height:30px;padding:0;border-radius:8px;border:0;display:grid;place-items:center;background:transparent;color:var(--label-2);cursor:pointer;transition:background-color 150ms ease,color 150ms ease,transform 160ms var(--ease-out)}
+.search:active{transform:scale(.94)}
+@media (hover:hover) and (pointer:fine){.search:hover{background:var(--fill);color:var(--label)}}
 .nav{display:flex;flex-direction:column;gap:2px}
 .nav-label{font-size:11.5px;font-weight:600;color:var(--label-2);padding:6px 10px 4px}
 .nav a{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border-radius:9px;color:var(--label);font-weight:500;transition:background-color 150ms ease}
@@ -595,8 +596,10 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
 }
 @media (max-width:980px){
   body{grid-template-columns:72px minmax(0,1fr)}
-  .sidebar .brand b,.sidebar .search span,.sidebar .search kbd,.nav a span,.nav a .meta,.nav-label,.mini-spend,.engine span{display:none}
-  .nav a,.search{justify-content:center;padding:0}
+  .sidebar .brand b,.nav a span,.nav a .meta,.nav-label,.mini-spend,.engine span{display:none}
+  .nav a{justify-content:center;padding:0}
+  .brand{flex-direction:column;gap:12px;padding:2px 0}
+  .search{margin-left:0}
   .home-grid,.wiring,.hb{grid-template-columns:minmax(0,1fr)}
   .toc{display:none}
   .board{grid-template-columns:minmax(0,1fr)}
@@ -658,8 +661,7 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
 
 <!-- ================= SIDEBAR ================= -->
 <aside class="sidebar" data-s="sidebar" aria-label="Main">
-  <div class="brand" data-s="brand"><div class="brand-mark" aria-hidden="true"></div><b>Workflow Hub</b></div>
-  <button class="search" data-s="search" data-cmdk><svg class="i"><use href="#i-search"/></svg><span>Search or jump to…</span><kbd>Ctrl K</kbd></button>
+  <div class="brand" data-s="brand"><div class="brand-mark" aria-hidden="true"></div><b>Workflow Hub</b><button class="search" data-s="search" data-cmdk aria-label="Search or jump to (Ctrl K)" title="Search · Ctrl K"><svg class="i"><use href="#i-search"/></svg></button></div>
   <nav class="nav" data-s="nav">
     <a href="#home" data-s="nav-home"><svg class="i"><use href="#i-home"/></svg><span>Home</span></a>
     <a href="#project" data-s="nav-projects"><svg class="i"><use href="#i-folder"/></svg><span>Projects</span><span class="meta" data-when="full">5</span></a>
