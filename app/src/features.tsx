@@ -19,6 +19,9 @@ import { RunTab } from "./pages/project/RunTab";
 import { GitTab } from "./pages/project/GitTab";
 import { WiringTab } from "./pages/project/WiringTab";
 import { ReleaseTab } from "./pages/project/ReleaseTab";
+import { Automations, HealthNote, ReviewCard } from "./pages/Automations";
+import { HOME_SECTIONS } from "./pages/Home";
+import { NAV } from "./components/Sidebar";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -73,3 +76,8 @@ MODULE_TABS.wiring = { id: "wiring", label: "Wiring", Component: WiringTab };
 
 // ---- session 12: release button (apps) ----
 MODULE_TABS.release = { id: "release", label: "Release", Component: ReleaseTab };
+
+// ---- session 12: automations, weekly review, hub health ----
+PAGES.automations = Automations;
+NAV.push({ href: "#automations", icon: "zap", label: "Automations" });
+HOME_SECTIONS.push(HealthNote, () => <ReviewCard />);

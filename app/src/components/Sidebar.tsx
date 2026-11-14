@@ -4,7 +4,8 @@ import type { EngineState } from "../App";
 
 export type SidebarProject = { id: number; name: string; module: string; open_tasks?: number; overdue?: number };
 
-const NAV = [
+/** Main navigation. Later sessions can add pages here (see features.tsx). */
+export const NAV = [
   { href: "#home", icon: "home", label: "Home" },
   { href: "#projects", icon: "folder", label: "Projects" },
   { href: "#handbook", icon: "book", label: "Handbook" },

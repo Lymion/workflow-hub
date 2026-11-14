@@ -136,7 +136,8 @@ def collect_week(hub: Hub, state: dict, args: dict) -> dict:
     errors = [dict(r) for r in hub.query("SELECT error_text, cause, fix, seen_count FROM errors WHERE created_at >= datetime('now', ?) ORDER BY created_at", (since,))]
     done = [dict(r) for r in hub.query("SELECT t.title, p.name AS project FROM tasks t JOIN projects p ON p.id = t.project_id WHERE t.status = 'done' AND t.done_at >= datetime('now', ?)", (since,))]
     state["week"] = {"journal": journal, "errors": errors, "done": done}
-    return {"summary": f"{len(journal)} journal notes, {len(errors)} errors, {len(done)} tasks done"}
+    n = lambda k, word: f"{k} {word}{'' if k == 1 else 's'}"  # noqa: E731
+    return {"summary": f"{n(len(journal), 'journal note')}, {n(len(errors), 'error')}, {n(len(done), 'task')} done"}
 
 
 REVIEW_SYSTEM = """You write a short, warm weekly review for a maker who builds robots (ESP32/Arduino) and apps (Expo/Next.js/Tauri).

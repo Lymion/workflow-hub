@@ -315,7 +315,7 @@ def test_weekly_review_without_key_uses_template(client, sync_runs, monkeypatch)
     w = client.post("/automations/weekly-review/run").json()
     run = w["last_run"]
     assert run["status"] == "ok" and [s["status"] for s in run["steps"]] == ["ok", "ok", "ok"]
-    assert "1 journal notes, 1 errors, 1 tasks done" in run["steps"][0]["summary"]
+    assert "1 journal note, 1 error, 1 task done" in run["steps"][0]["summary"]
     assert "template" in run["steps"][1]["summary"].lower()
     review = client.get("/reviews/latest").json()
     assert review["source"] == "template" and "Mount the sonar (Rover-02)" in review["body"]["wins"]

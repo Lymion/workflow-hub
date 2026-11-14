@@ -162,8 +162,12 @@ export function Home() {
               </div>
             )}
           </section>
+          {HOME_SECTIONS.map((S, i) => <S key={i} />)}
         </div>
       )}
     </>
   );
 }
+
+/** Extra Home sections registered by later sessions (e.g. the weekly review). */
+export const HOME_SECTIONS: (() => JSX.Element | null)[] = [];
