@@ -262,7 +262,7 @@ def setup(ctx: dict) -> dict:
     if ctx.get("run_git"):
         git = ctx["which"]("git")
         if git and not (path / ".git").exists():
-            ok = ctx["run"]([git, "init"], cwd=path) is not None
+            ok = ctx["run"]([git, "init", "-b", "main"], cwd=path) is not None
             committed = ok and ctx["run"]([git, "add", "-A"], cwd=path) is not None and ctx["run"]([git, "commit", "-m", "Set up with Workflow Hub"], cwd=path) is not None
             steps.append({"step": "git init", "ok": ok, "note": "" if committed else "Repository created; first commit skipped (set git user.name and user.email)."})
     return {"files": report, "steps": steps, "wiring": wiring}

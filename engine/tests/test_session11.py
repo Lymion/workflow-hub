@@ -18,7 +18,7 @@ pytestmark = pytest.mark.skipif(not shutil.which("git"), reason="git not install
 @pytest.fixture(autouse=True)
 def git_env(tmp_path, monkeypatch):
     cfg = tmp_path / "gitconfig"
-    cfg.write_text("[init]\n\tdefaultBranch = main\n")
+    cfg.write_text("[init]\n\tdefaultBranch = master\n")  # the hub must pick main itself
     monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(cfg))
     monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
     for k in ("GIT_AUTHOR_NAME", "GIT_COMMITTER_NAME"):

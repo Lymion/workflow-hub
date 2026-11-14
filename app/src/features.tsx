@@ -16,6 +16,7 @@ import { ADD_TO_PROJECT, Handbook } from "./pages/Handbook";
 import { PICKERS } from "./pages/NewProject";
 import { STACK_PICKER, StackTab, TokensTab } from "./pages/project/AppTabs";
 import { RunTab } from "./pages/project/RunTab";
+import { GitTab } from "./pages/project/GitTab";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -61,3 +62,6 @@ MODULE_TABS["design-tokens"] = { id: "design-tokens", label: "Design tokens", Co
 
 // ---- session 10: run panel + serial monitor/plotter ----
 TRAILING_TABS.unshift({ id: "run", label: "Run", Component: RunTab });
+
+// ---- session 11: git helper ----
+TRAILING_TABS.splice(1, 0, { id: "git", label: "Git", Component: GitTab });

@@ -268,7 +268,7 @@ def background(ctx: dict) -> dict:
     # the theme file again, in case the scaffold created src/ after setup()
     setup(ctx)
     if ctx.get("run_git") and which("git") and not (path / ".git").exists():
-        ok = run([which("git"), "init"], cwd=path) is not None
+        ok = run([which("git"), "init", "-b", "main"], cwd=path) is not None
         run([which("git"), "add", "-A"], cwd=path)
         run([which("git"), "commit", "-m", "Set up with Workflow Hub"], cwd=path)
         steps.append({"step": "git init", "ok": ok})

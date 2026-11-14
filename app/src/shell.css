@@ -303,3 +303,24 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .plot-legend b { color: #fff; margin-left: 4px; }
 @media (max-width: 900px) { .run-grid { grid-template-columns: minmax(0, 1fr); } .run-list { position: static; } }
 @media (prefers-reduced-motion: reduce) { .run-dot.on { animation: none; } }
+
+/* ---------- session 11: git helper ---------- */
+.git-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+.git-files { list-style: none; margin: 0; padding: 0; border-radius: 12px; background: var(--fill); overflow: hidden; }
+.git-files li { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 0 12px; transition: background-color 150ms ease; }
+.git-files li + li { box-shadow: inset 0 1px 0 var(--sep); }
+.git-files li.on { background: var(--accent-tint); }
+.git-files li.git-all label { display: flex; align-items: center; gap: 10px; }
+.git-files input { accent-color: var(--accent); width: 15px; height: 15px; flex: none; }
+.git-name { flex: 1; min-width: 0; text-align: left; border: 0; background: none; padding: 8px 0; color: var(--label); font: 12.5px theme("fontFamily.mono"); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) { .git-name:hover { color: var(--accent-text); } }
+.g-letter { width: 20px; height: 20px; flex: none; display: grid; place-items: center; border-radius: 6px; font: 700 11px theme("fontFamily.mono"); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+.g-add { background: var(--green); } .g-mod { background: var(--amber); } .g-del { background: var(--red); }
+.code.diff span.add { display: block; background: var(--green-tint); color: var(--green-text); }
+.code.diff span.del { display: block; background: var(--red-tint); color: var(--red-text); }
+.code.diff span.hunk { display: block; color: var(--accent-text); }
+.git-log { position: sticky; top: 16px; }
+.git-log ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.git-log li { position: relative; padding-left: 16px; }
+.git-log li::before { content: ""; position: absolute; left: 2px; top: 6px; width: 7px; height: 7px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+@media (max-width: 1000px) { .git-grid { grid-template-columns: minmax(0, 1fr); } .git-log { position: static; } }
