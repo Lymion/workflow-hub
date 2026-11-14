@@ -118,3 +118,149 @@ def test_every_guide_boost_points_at_a_real_chapter(client, hub):
                 assert isinstance(o["label"], str) and set(o) <= {"label", "boost"}, f"{g['module']}/{q['id']}: quote labels that contain commas"
                 for key in (o.get("boost") or {}):
                     assert hb.by_key(key), f"{g['module']}/{q['id']}: no chapter '{key}'"
+
+
+# ---------- release ----------
+
+import base64
+import io
+import shutil
+import stat
+import subprocess
+import time
+
+from engine import runner
+
+
+@pytest.fixture()
+def gitenv(tmp_path, monkeypatch):
+    cfg = tmp_path / "gitconfig"
+    cfg.write_text("")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(cfg))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    for k, v in (("GIT_AUTHOR_NAME", "Maker"), ("GIT_COMMITTER_NAME", "Maker"), ("GIT_AUTHOR_EMAIL", "m@example.com"), ("GIT_COMMITTER_EMAIL", "m@example.com")):
+        monkeypatch.setenv(k, v)
+
+
+def expo_app(client, stack=("expo", "eas")):
+    p = client.post("/projects", json={"name": "Budget Buddy", "module": "app-dev", "stack": list(stack)}).json()
+    root = Path(p["path"])
+    (root / "package.json").write_text('{"name": "budget-buddy", "version": "1.2.3"}\n')
+    commit(root, "Add package.json")
+    return p, root
+
+
+def commit(root, msg, file=None):
+    if file:
+        (root / file).write_text(msg + "\n")
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "-qm", msg], cwd=root, check=True)
+
+
+pytestmark_git = pytest.mark.skipif(not shutil.which("git"), reason="git not installed")
+
+
+@pytestmark_git
+def test_release_plan_reads_version_and_drafts_changelog(client, gitenv):
+    p, root = expo_app(client)
+    commit(root, "Add budget screen", "a.txt")
+    commit(root, "Fix crash on empty list", "b.txt")
+    commit(root, "Tweak colours", "c.txt")
+    plan = client.get(f"/projects/{p['id']}/release").json()
+    assert plan["version"] == "1.2.3" and plan["next"] == {"patch": "1.2.4", "minor": "1.3.0", "major": "2.0.0"}
+    assert "### Added\n- Add budget screen" in plan["changelog"] and "### Fixed\n- Fix crash on empty list" in plan["changelog"]
+    assert "### Changed\n- Tweak colours" in plan["changelog"]
+    assert any("app.config.js" in c["problem"] for c in plan["checks"])
+    assert plan["build"]["id"] == "build" and plan["build"]["label"] == "Build APK"
+
+
+@pytestmark_git
+def test_release_writes_hub_files_commits_and_tags(client, gitenv):
+    p, root = expo_app(client)
+    commit(root, "Add budget screen", "a.txt")
+    r = client.post(f"/projects/{p['id']}/release", json={"bump": "minor", "notes": "### Added\n- Budget screen"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["version"] == "1.3.0" and body["versionCode"] == 1 and body["tag"] == "v1.3.0"
+    rel = json.loads((root / "release.json").read_text())
+    assert rel["version"] == "1.3.0" and "AUTO-GENERATED" in rel["_comment"]
+    log = (root / "CHANGELOG.md").read_text()
+    assert log.startswith("<!-- AUTO-GENERATED") and "## 1.3.0" in log and "- Budget screen" in log
+    cfg = (root / "app.config.js").read_text()
+    assert "release.json" in cfg and "assets/hub" in cfg
+    assert json.loads((root / "package.json").read_text())["version"] == "1.2.3"  # the user's file is untouched
+    tags = subprocess.run(["git", "tag"], cwd=root, capture_output=True, text=True).stdout.split()
+    assert tags == ["v1.3.0"]
+    last = subprocess.run(["git", "log", "-1", "--pretty=%s"], cwd=root, capture_output=True, text=True).stdout.strip()
+    assert last == "Release v1.3.0"
+    # second release: versionCode goes up, changelog keeps history, app.config.js stays the user's
+    (root / "app.config.js").write_text("// mine now\nmodule.exports = ({ config }) => config;\n")
+    commit(root, "Customise app config")
+    r2 = client.post(f"/projects/{p['id']}/release", json={"bump": "patch", "notes": ""}).json()
+    assert r2["version"] == "1.3.1" and r2["versionCode"] == 2
+    log = (root / "CHANGELOG.md").read_text()
+    assert log.index("## 1.3.1") < log.index("## 1.3.0")
+    assert (root / "app.config.js").read_text().startswith("// mine now")
+
+
+@pytestmark_git
+def test_release_refuses_uncommitted_changes(client, gitenv):
+    p, root = expo_app(client)
+    (root / "app.tsx").write_text("changed\n")
+    r = client.post(f"/projects/{p['id']}/release", json={"bump": "patch"})
+    assert r.status_code == 409 and "Git tab" in r.json()["detail"]
+    assert not (root / "release.json").exists()
+
+
+def _png(w=800, h=600):
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGB", (w, h), "#FF2D55").save(buf, "PNG")
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+
+
+@pytestmark_git
+def test_icons_from_one_image(client, gitenv):
+    from PIL import Image
+    p, root = expo_app(client)
+    r = client.post(f"/projects/{p['id']}/release/icons", json={"image_base64": _png(), "background": "#101010"})
+    assert r.status_code == 200, r.text
+    assert {f["status"] for f in r.json()["files"]} == {"wrote"}
+    with Image.open(root / "assets/hub/icon.png") as im:
+        assert im.size == (1024, 1024) and "AUTO-GENERATED" in im.info["Comment"]
+    with Image.open(root / "assets/hub/favicon.png") as im:
+        assert im.size == (48, 48)
+    assert json.loads((root / "release.json").read_text())["background"] == "#101010"
+    # a user's own icon in that folder is left alone
+    Image.new("RGB", (10, 10)).save(root / "assets/hub/favicon.png")
+    again = {f["file"]: f["status"] for f in client.post(f"/projects/{p['id']}/release/icons", json={"image_base64": _png()}).json()["files"]}
+    assert again["assets/hub/favicon.png"] == "skipped" and again["assets/hub/icon.png"] == "wrote"
+    bad = client.post(f"/projects/{p['id']}/release/icons", json={"image_base64": base64.b64encode(b"not an image").decode()})
+    assert bad.status_code == 422 and "PNG or JPG" in bad.json()["detail"]
+
+
+@pytestmark_git
+def test_release_starts_the_eas_build(client, gitenv, tmp_path, monkeypatch):
+    d = tmp_path / "bin"
+    d.mkdir()
+    for name, script in (("npm", "#!/bin/sh\n"), ("npx", "#!/bin/sh\necho \"eas build $*\"\necho 'Build queued'\n"), ("git", None)):
+        if script is None:
+            continue
+        f = d / name
+        f.write_text(script)
+        f.chmod(f.stat().st_mode | stat.S_IEXEC)
+    real = shutil.which
+    monkeypatch.setattr(shutil, "which", lambda n, *a, **k: real(n, path=str(d)) or (real(n, *a, **k) if n == "git" else None))
+    p, root = expo_app(client)
+    r = client.post(f"/projects/{p['id']}/release", json={"bump": "patch", "build": True}).json()
+    assert r["build"]["label"] == "Build APK"
+    end = time.time() + 10
+    while time.time() < end and runner.get(f"{p['id']}:build").running:
+        time.sleep(0.05)
+    log = client.get(f"/projects/{p['id']}/run/build/log").json()
+    assert any("eas-cli build -p android --profile preview" in l["text"] for l in log["lines"])
+
+
+def test_robotics_has_no_release(client):
+    p = client.post("/projects", json={"name": "Rover", "module": "robotics", "board": "esp32-devkit"}).json()
+    assert client.get(f"/projects/{p['id']}/release").status_code == 404

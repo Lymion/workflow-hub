@@ -4,7 +4,7 @@ tagline: Expo, Next.js or Tauri. Theme, env and git set up in one go.
 icon: smartphone
 color: categorical-5
 cart_slots: [stack]
-project_tabs: [stack, design-tokens]
+project_tabs: [stack, design-tokens, release]
 launch: [vscode, terminal]
 run: [dev, emulator, build]
 handbook_part: App stacks
