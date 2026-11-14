@@ -30,7 +30,7 @@ def create_app(paths: HubPaths | None = None) -> FastAPI:
         yield
         hub.close()
 
-    app = FastAPI(title="Workflow Hub engine", version=VERSION, lifespan=lifespan)
+    app = FastAPI(title="Workflow Hub engine", version=VERSION, lifespan=lifespan, docs_url="/api-docs", redoc_url=None)
     app.state.hub = hub
     app.add_middleware(
         CORSMiddleware,

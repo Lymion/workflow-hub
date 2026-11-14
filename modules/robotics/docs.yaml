@@ -1,0 +1,13 @@
+# Docs the hub downloads for the docs guide. Only these pages are fetched (no crawling).
+docs:
+  - { id: arduino-pulsein, title: "Arduino · pulseIn()", url: "https://docs.arduino.cc/language-reference/en/functions/advanced-io/pulseIn/" }
+  - { id: arduino-millis, title: "Arduino · millis()", url: "https://docs.arduino.cc/language-reference/en/functions/time/millis/" }
+  - { id: arduino-digitalwrite, title: "Arduino · digitalWrite()", url: "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/" }
+  - { id: arduino-analogread, title: "Arduino · analogRead()", url: "https://docs.arduino.cc/language-reference/en/functions/analog-io/analogRead/" }
+  - { id: arduino-interrupts, title: "Arduino · attachInterrupt()", url: "https://docs.arduino.cc/language-reference/en/functions/external-interrupts/attachInterrupt/" }
+  - { id: esp32-gpio, title: "ESP32 Arduino core · GPIO", url: "https://docs.espressif.com/projects/arduino-esp32/en/latest/api/gpio.html" }
+  - { id: esp32-ledc, title: "ESP32 Arduino core · LEDC (PWM)", url: "https://docs.espressif.com/projects/arduino-esp32/en/latest/api/ledc.html" }
+  - { id: esp32-i2c, title: "ESP32 Arduino core · I2C", url: "https://docs.espressif.com/projects/arduino-esp32/en/latest/api/i2c.html" }
+  - { id: esp32-adc, title: "ESP32 Arduino core · ADC", url: "https://docs.espressif.com/projects/arduino-esp32/en/latest/api/adc.html" }
+  - { id: pio-lib-deps, title: "PlatformIO · lib_deps", url: "https://docs.platformio.org/en/latest/projectconf/sections/env/options/library/lib_deps.html" }
+  - { id: pio-monitor-speed, title: "PlatformIO · monitor_speed", url: "https://docs.platformio.org/en/latest/projectconf/sections/env/options/monitor/monitor_speed.html" }

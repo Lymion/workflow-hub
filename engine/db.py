@@ -70,7 +70,8 @@ CREATE TABLE IF NOT EXISTS doc_chunks (
     heading     TEXT NOT NULL DEFAULT '',
     url         TEXT NOT NULL DEFAULT '',
     body        TEXT NOT NULL,
-    embedding   BLOB
+    embedding   BLOB,
+    module      TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS llm_calls (
@@ -132,8 +133,15 @@ def connect(path: Path) -> sqlite3.Connection:
     return conn
 
 
+def _add_column(conn: sqlite3.Connection, table: str, column: str, ddl: str) -> None:
+    cols = {r[1] for r in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+    if column not in cols:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {ddl}")
+
+
 def init_db(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
+    _add_column(conn, "doc_chunks", "module", "module TEXT NOT NULL DEFAULT ''")
     conn.execute(
         "INSERT INTO settings(key, value) VALUES ('schema_version', ?) "
         "ON CONFLICT(key) DO UPDATE SET value = excluded.value",

@@ -1,0 +1,9 @@
+# Docs the hub downloads for the docs guide. Only these pages are fetched (no crawling).
+docs:
+  - { id: expo-env, title: "Expo · Environment variables", url: "https://docs.expo.dev/guides/environment-variables/" }
+  - { id: expo-router, title: "Expo Router · Introduction", url: "https://docs.expo.dev/router/introduction/" }
+  - { id: eas-build, title: "EAS Build · Setup", url: "https://docs.expo.dev/build/setup/" }
+  - { id: rn-pressable, title: "React Native · Pressable", url: "https://reactnative.dev/docs/pressable" }
+  - { id: supabase-auth, title: "Supabase JS · signInWithPassword", url: "https://supabase.com/docs/reference/javascript/auth-signinwithpassword" }
+  - { id: nextjs-routing, title: "Next.js · App Router", url: "https://nextjs.org/docs/app/building-your-application/routing" }
+  - { id: tauri-start, title: "Tauri · Create a project", url: "https://v2.tauri.app/start/create-project/" }

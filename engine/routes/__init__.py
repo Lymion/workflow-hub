@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 
 def register(app: FastAPI) -> None:
-    from . import boards, cart, errors, handbook, launch, projects, snippets
+    from . import boards, cart, errors, guide, handbook, launch, projects, snippets
 
     app.include_router(projects.router)  # session 2
     app.include_router(launch.router)  # session 2
@@ -19,5 +19,6 @@ def register(app: FastAPI) -> None:
     handbook.current(app.state.hub)
     app.include_router(boards.router)  # session 6
     app.include_router(cart.router)  # session 7
+    app.include_router(guide.router)  # session 8
     if cart.after_create not in projects.AFTER_CREATE:
         projects.AFTER_CREATE.append(cart.after_create)
