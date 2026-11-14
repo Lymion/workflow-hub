@@ -8,6 +8,7 @@ import { Library, LIBRARY_SECTIONS } from "./pages/Library";
 import { ErrorLog } from "./pages/ErrorLog";
 import { SEARCH_LINKS } from "./lib/links";
 import { SnippetsTab } from "./pages/project/SnippetsTab";
+import { Handbook } from "./pages/Handbook";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -26,3 +27,7 @@ COMMAND_SOURCES.push(async (q) =>
     run: () => go(SEARCH_LINKS[h.kind]?.(h.ref) ?? "#library"),
   })),
 );
+
+// ---- session 5: handbook ----
+PAGES.handbook = Handbook;
+SEARCH_LINKS.handbook = (ref) => `#handbook/${ref}`;

@@ -160,3 +160,36 @@ main { min-width: 0; height: 100%; overflow: auto; }
 .md td { padding: 9px 10px; box-shadow: inset 0 -1px 0 var(--sep); }
 .md blockquote { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--amber-tint); color: var(--amber-text); }
 @media (max-width: 1100px) { .lib { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- session 5: handbook ---------- */
+.hb { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 20px; align-items: start; }
+.toc { position: sticky; top: 0; padding: 10px; max-height: calc(100vh - 140px); overflow: auto; }
+.toc h4 { margin: 14px 0 4px; padding: 14px 8px 0; border-top: 1px solid var(--sep); font-size: 11.5px; font-weight: 600; color: var(--label-2); }
+.toc .toc-part:first-of-type h4 { margin-top: 6px; padding-top: 6px; border-top: 0; }
+.toc .toc-sec { font-size: 11px; font-weight: 600; color: var(--label-3); padding: 8px 8px 2px; text-transform: uppercase; letter-spacing: .04em; }
+.toc a { display: flex; align-items: center; min-height: 30px; padding: 4px 8px; border-radius: 6px; font-size: 13px; }
+.toc a.on { background: var(--accent-tint); color: var(--accent-text); font-weight: 600; }
+@media (hover: hover) and (pointer: fine) { .toc a:not(.on):hover { background: var(--fill); } }
+.chapter { padding: 28px 32px 36px; }
+.ch-grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 36px; align-items: start; }
+.ch-rail { position: sticky; top: 20px; display: grid; gap: 12px; }
+.ch-rail h3 { font-size: 12px; font-weight: 600; color: var(--label-2); margin-bottom: 10px; }
+.crumb { font-size: 12.5px; color: var(--label-2); display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.crumb .i { width: 12px; height: 12px; }
+.callout { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: var(--amber-tint); color: var(--amber-text); font-weight: 500; margin-bottom: 18px; }
+.callout .i { margin-top: 2px; }
+.spec { display: grid; grid-template-columns: auto 1fr; gap: 7px 12px; margin: 0; font-size: 13px; }
+.spec dt { color: var(--label-2); } .spec dd { margin: 0; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.used { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; padding: 4px 0; }
+.doc { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 0; font-size: 13px; font-weight: 500; color: var(--accent-text); }
+.doc + .doc { box-shadow: inset 0 1px 0 var(--sep); }
+.rel { display: block; padding: 6px 0; } .rel + .rel { box-shadow: inset 0 1px 0 var(--sep); }
+.rel b { display: block; font-size: 13px; font-weight: 600; } .rel small { display: block; font-size: 12px; color: var(--label-2); }
+@media (max-width: 1180px) { .ch-grid { grid-template-columns: minmax(0, 1fr); } .ch-rail { position: static; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
+@media (max-width: 980px) { .hb { grid-template-columns: minmax(0, 1fr); } .toc { position: static; max-height: none; } }
+@media print {
+  .sidebar, .no-print, .toasts, .toc { display: none !important; }
+  .shell { display: block; } main { overflow: visible; height: auto; } .page { padding: 0; max-width: none; }
+  .hb, .ch-grid { display: block; } .card { box-shadow: none; background: #fff; backdrop-filter: none; }
+  body { background: #fff; color: #000; }
+}
