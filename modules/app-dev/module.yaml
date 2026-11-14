@@ -1,0 +1,9 @@
+id: app-dev
+name: App development
+tagline: Expo, Next.js or Tauri. Theme, env and git set up in one go.
+icon: smartphone
+color: categorical-5
+cart_slots: [stack]
+project_tabs: [stack, design-tokens]
+launch: [vscode, terminal]
+run: [dev, build]

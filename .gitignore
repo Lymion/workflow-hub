@@ -1,5 +1,15 @@
-scratch/notes.txt
+# secrets
+.env
+# local state
+data/
+.venv/
 __pycache__/
 *.pyc
-.env
+.pytest_cache/
+# scratch prototype notes
+scratch/notes.txt
+# app
 node_modules/
+app/dist/
+app/src-tauri/target/
+app/src-tauri/gen/
