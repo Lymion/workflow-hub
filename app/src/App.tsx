@@ -4,6 +4,7 @@ import { useRoute } from "./lib/router";
 import type { Project } from "./lib/types";
 import { Sidebar } from "./components/Sidebar";
 import { CommandBar } from "./components/CommandBar";
+import { Capture } from "./components/Capture";
 import { Banner } from "./components/ui";
 import { Home } from "./pages/Home";
 import { NewProject } from "./pages/NewProject";
@@ -72,6 +73,7 @@ export default function App() {
         </div>
       </main>
       <CommandBar projects={list} />
+      <Capture />
     </div>
   );
 }

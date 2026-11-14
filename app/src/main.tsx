@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./features";
 import App from "./App";
 import { ToastProvider } from "./components/Toast";
 import "./styles.css";

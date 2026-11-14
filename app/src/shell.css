@@ -130,3 +130,33 @@ main { min-width: 0; height: 100%; overflow: auto; }
 .cmdk li.sel .hint, .cmdk li.sel .i { color: #fff; }
 .cmdk li.grp { height: auto; padding: 8px 12px 4px; font-size: 11.5px; color: var(--label-2); font-weight: 600; cursor: default; background: none; }
 @media (max-width: 980px) { .board { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- session 3: library, markdown, code ---------- */
+.seg button.on { background: var(--surface-solid); color: var(--label); box-shadow: var(--hl), 0 1px 3px rgba(0,0,0,.12); }
+.lib { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; }
+.snip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; transition: background-color 150ms ease; }
+.snip + .snip { box-shadow: inset 0 1px 0 var(--sep); }
+.snip.on { background: var(--accent-tint); box-shadow: none; }
+.snip.on + .snip { box-shadow: none; }
+@media (hover: hover) and (pointer: fine) { .snip:not(.on):hover { background: var(--fill); } }
+.snip b { font-weight: 600; font-size: 13.5px; }
+.snip .lang { width: 40px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 6px; background: var(--fill); font: 700 10.5px theme("fontFamily.mono"); color: var(--label-2); }
+.code-card { border-radius: 12px; background: var(--surface-solid); box-shadow: inset 0 0 0 1px var(--sep); overflow: hidden; }
+.code-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; box-shadow: inset 0 -1px 0 var(--sep); }
+.code .ln { display: block; margin: 0 -14px; padding: 0 14px; }
+.code .ln .no { display: inline-block; width: 2.4em; color: var(--label-3); user-select: none; }
+.code .ln.chg { background: var(--amber-tint); }
+.code .ln.flash { animation: flash 1100ms var(--ease-out); }
+.md { line-height: 1.6; color: var(--label); max-width: 680px; }
+.md h1 { font-size: 22px; margin: 0 0 10px; } .md h2 { margin: 22px 0 8px; } .md h3 { margin: 16px 0 6px; }
+.md p { margin: 0 0 10px; } .md ul, .md ol { margin: 0 0 10px; padding-left: 20px; } .md li { margin: 3px 0; }
+.md ul { list-style: disc; } .md ol { list-style: decimal; }
+.md code { font-family: theme("fontFamily.mono"); font-size: 12.5px; background: var(--fill); padding: 1px 5px; border-radius: 5px; }
+.md pre { background: var(--surface-solid); box-shadow: inset 0 0 0 1px var(--sep); border-radius: 10px; padding: 12px 14px; overflow: auto; margin: 0 0 12px; }
+.md pre code { background: none; padding: 0; }
+.md a { color: var(--accent-text); }
+.md table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 0 0 12px; }
+.md th { text-align: left; font-size: 12px; color: var(--label-2); padding: 8px 10px; box-shadow: inset 0 -1px 0 var(--sep); }
+.md td { padding: 9px 10px; box-shadow: inset 0 -1px 0 var(--sep); }
+.md blockquote { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--amber-tint); color: var(--amber-text); }
+@media (max-width: 1100px) { .lib { grid-template-columns: minmax(0, 1fr); } }
