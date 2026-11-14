@@ -1,0 +1,38 @@
+{
+  "name": "workflow-hub",
+  "displayName": "Workflow Hub",
+  "description": "Insert snippets from your Workflow Hub library and ask the hub's docs guide without leaving VS Code.",
+  "version": "0.1.0",
+  "publisher": "workflow-hub",
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Snippets", "Other"],
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      { "command": "workflowHub.insertSnippet", "title": "Insert snippet", "category": "Workflow Hub" },
+      { "command": "workflowHub.askHub", "title": "Ask hub", "category": "Workflow Hub" },
+      { "command": "workflowHub.saveSelection", "title": "Save selection to library", "category": "Workflow Hub" },
+      { "command": "workflowHub.logError", "title": "Log selection as an error", "category": "Workflow Hub" }
+    ],
+    "keybindings": [
+      { "command": "workflowHub.insertSnippet", "key": "ctrl+alt+i", "mac": "cmd+alt+i", "when": "editorTextFocus" },
+      { "command": "workflowHub.askHub", "key": "ctrl+alt+h", "mac": "cmd+alt+h" }
+    ],
+    "menus": {
+      "editor/context": [
+        { "command": "workflowHub.askHub", "group": "workflowHub@1" },
+        { "command": "workflowHub.saveSelection", "when": "editorHasSelection", "group": "workflowHub@2" },
+        { "command": "workflowHub.logError", "when": "editorHasSelection", "group": "workflowHub@3" }
+      ]
+    },
+    "configuration": {
+      "title": "Workflow Hub",
+      "properties": {
+        "workflowHub.engineUrl": { "type": "string", "default": "http://127.0.0.1:8765", "description": "Where the hub's engine runs. It only listens on your own machine." }
+      }
+    }
+  },
+  "scripts": { "test": "node --test test/lib.test.js", "package": "npx @vscode/vsce package --no-dependencies" }
+}

@@ -404,3 +404,23 @@ def test_file_change_trigger_and_bad_workflow_files(client, hub):
     assert any("not big-llm" in e for e in broken["errors"]) and any("launch_rockets" in e for e in broken["errors"])
     r = client.post("/automations/broken/run")
     assert r.status_code == 422
+
+
+# ---------- VS Code extension contract ----------
+
+def test_endpoints_the_vscode_extension_uses(client):
+    snippets = client.get("/snippets?inbox=false").json()
+    assert snippets and {"slug", "title", "tags"} <= set(snippets[0])
+    one = client.get(f"/snippets/{snippets[0]['slug']}").json()
+    assert one["code"] and "change_points" in one
+    p = rover(client, parts=())
+    assert client.post(f"/projects/{p['id']}/snippets", json={"slug": snippets[0]["slug"]}).status_code == 201
+    assert client.post("/snippets/capture", json={"code": "int x = 1;", "note": "from VS Code", "source": "src/main.cpp"}).status_code == 201
+    client.post("/errors", json={"error_text": "Brownout detector was triggered", "fix": "Power the motors from their own battery."})
+    match = client.post("/errors/match", json={"error_text": "Brownout detector was triggered"}).json()
+    assert match[0]["similarity"] >= 0.5 and match[0]["fix"]
+    ask = client.post("/guide/ask", json={"question": "How do I read the sonar?", "level": 1, "project_id": p["id"], "file_text": "void loop(){}", "error_text": ""})
+    assert ask.status_code == 200 and {"status", "cards", "past_errors"} <= set(ask.json())
+    assert any(x["path"] == p["path"] for x in client.get("/projects").json())
+    ext = json.loads((Path(__file__).resolve().parents[2] / "vscode-extension" / "package.json").read_text())
+    assert {c["command"] for c in ext["contributes"]["commands"]} == {"workflowHub.insertSnippet", "workflowHub.askHub", "workflowHub.saveSelection", "workflowHub.logError"}
