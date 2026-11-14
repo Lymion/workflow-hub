@@ -264,3 +264,42 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .phone-notch { position: absolute; top: 12px; left: 50%; width: 96px; height: 26px; margin-left: -48px; border-radius: 999px; background: #000; }
 @media (max-width: 1100px) { .tok-grid { grid-template-columns: minmax(0, 1fr); } .tok-side { position: static; max-width: 360px; } }
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+/* ---------- session 10: run panel ---------- */
+.run-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; align-items: start; }
+.run-list { padding: 8px; display: grid; gap: 2px; position: sticky; top: 16px; }
+.run-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 0; background: none; color: var(--label); cursor: pointer;
+  transition: background-color 150ms ease, transform 160ms var(--ease-out); }
+.run-item:active { transform: scale(.98); }
+.run-item.on { background: var(--accent-tint); }
+@media (hover: hover) and (pointer: fine) { .run-item:not(.on):hover { background: var(--fill); } }
+.ri-ic { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 8px; color: #fff;
+  background: linear-gradient(180deg, #5E5CE6, #3634A3); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 1px 2px rgba(0,0,0,.2); }
+.run-item:nth-child(3n+2) .ri-ic { background: linear-gradient(180deg, #34C759, #1E8E3E); }
+.run-item:nth-child(3n) .ri-ic { background: linear-gradient(180deg, #FF9F0A, #D9760B); }
+.ri-ic svg { width: 16px; height: 16px; }
+.run-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--label-3); flex: none; }
+.run-dot.on { background: var(--green); box-shadow: 0 0 0 0 var(--green); animation: pulse 1.6s var(--ease-out) infinite; }
+.run-dot.ok { background: var(--green); }
+.run-dot.bad { background: var(--red); }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52,199,89,.5); } 100% { box-shadow: 0 0 0 7px rgba(52,199,89,0); } }
+.run-main { display: flex; flex-direction: column; min-height: 520px; overflow: hidden; }
+.run-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 16px; }
+.console { flex: 1; margin: 0 12px; min-height: 340px; max-height: 60vh; overflow: auto; padding: 12px 14px; border-radius: 12px; background: #0B0B0F; color: #D7D7DE;
+  font: 12.5px/1.6 theme("fontFamily.mono"); white-space: pre-wrap; word-break: break-word;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 0 0 1px rgba(255,255,255,.04), inset 0 8px 24px -12px rgba(0,0,0,.6); }
+.console:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.console .cl.hub { color: #8E8E99; }
+.console .cl.cmd { color: #64D2FF; }
+.console .cl.err { color: #FF7B73; }
+.console .cl.warn { color: #FFC266; }
+.console .cl.ok { color: #4ADE80; }
+.run-send { display: flex; gap: 8px; padding: 12px; }
+.plot { position: relative; flex: 1; margin: 0 12px; min-height: 340px; border-radius: 12px; background: #0B0B0F; overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 0 0 1px rgba(255,255,255,.04); }
+.plot canvas { position: absolute; inset: 36px 0 0 0; width: 100%; height: calc(100% - 36px); }
+.plot-legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 10px 14px; font: 12px theme("fontFamily.mono"); color: #D7D7DE; }
+.plot-legend i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.plot-legend b { color: #fff; margin-left: 4px; }
+@media (max-width: 900px) { .run-grid { grid-template-columns: minmax(0, 1fr); } .run-list { position: static; } }
+@media (prefers-reduced-motion: reduce) { .run-dot.on { animation: none; } }

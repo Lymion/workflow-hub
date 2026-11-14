@@ -73,7 +73,7 @@ class Proc:
 
     # ---- process ----
     def spawn(self, cmd: list[str], cwd: str, env: dict | None = None) -> None:
-        self.add(f"$ {' '.join(cmd)}")
+        self.add("$ " + " ".join([os.path.basename(cmd[0]), *cmd[1:]]))
         kwargs: dict = {"cwd": cwd, "stdout": subprocess.PIPE, "stderr": subprocess.STDOUT, "stdin": subprocess.PIPE,
                         "env": {**os.environ, "PYTHONUNBUFFERED": "1", "FORCE_COLOR": "0", "NO_COLOR": "1", **(env or {})}}
         if platform.system() == "Windows":

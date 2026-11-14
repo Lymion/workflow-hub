@@ -15,6 +15,7 @@ import { SnippetsTab } from "./pages/project/SnippetsTab";
 import { ADD_TO_PROJECT, Handbook } from "./pages/Handbook";
 import { PICKERS } from "./pages/NewProject";
 import { STACK_PICKER, StackTab, TokensTab } from "./pages/project/AppTabs";
+import { RunTab } from "./pages/project/RunTab";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -57,3 +58,6 @@ SEARCH_LINKS.doc = () => "#guide";
 PICKERS.stack = STACK_PICKER;
 MODULE_TABS.stack = { id: "stack", label: "Stack", Component: StackTab };
 MODULE_TABS["design-tokens"] = { id: "design-tokens", label: "Design tokens", Component: TokensTab };
+
+// ---- session 10: run panel + serial monitor/plotter ----
+TRAILING_TABS.unshift({ id: "run", label: "Run", Component: RunTab });

@@ -36,6 +36,8 @@ def list_ports(hub: Hub) -> list[dict]:
         return []
     out = []
     for p in lp.comports():
+        if (p.hwid or "n/a") == "n/a":
+            continue  # legacy/virtual ports (ttyS0…), never a USB board
         desc = f"{p.description or ''} {p.manufacturer or ''}".strip()
         out.append({"device": p.device, "description": desc or p.device, "likely": any(k in desc.lower() for k in LIKELY)})
     return sorted(out, key=lambda p: (not p["likely"], p["device"]))
