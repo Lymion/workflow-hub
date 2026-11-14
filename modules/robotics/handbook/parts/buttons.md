@@ -15,6 +15,8 @@ power:
   current_ma: 0
 good_for: Start, stop and mode buttons.
 watch_out: Use INPUT_PULLUP and debounce in code.
+signals:
+  BTN: button
 ---
 # Push buttons (6 mm)
 

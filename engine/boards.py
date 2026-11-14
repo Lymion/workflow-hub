@@ -25,15 +25,19 @@ def load_boards(root: Path) -> dict[str, dict]:
 
 
 def load_checks(root: Path, module_id: str) -> ModuleType | None:
-    """Import modules/<folder>/checks.py for the module, fresh each time (edits apply without restart)."""
+    return load_module_file(root, module_id, "checks.py")
+
+
+def load_module_file(root: Path, module_id: str, filename: str) -> ModuleType | None:
+    """Import modules/<folder>/<filename> for the module, fresh each time (edits apply without restart)."""
     modules, _ = load_modules(root / "modules")
     mod = next((m for m in modules if m.id == module_id), None)
     if not mod:
         return None
-    path = root / "modules" / mod.folder / "checks.py"
+    path = root / "modules" / mod.folder / filename
     if not path.is_file():
         return None
-    spec = importlib.util.spec_from_file_location(f"hub_checks_{mod.folder.replace('-', '_')}", path)
+    spec = importlib.util.spec_from_file_location(f"hub_{mod.folder.replace('-', '_')}_{path.stem}", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)  # type: ignore[union-attr]
     return module

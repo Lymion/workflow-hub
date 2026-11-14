@@ -15,6 +15,9 @@ power:
   current_ma: 2
 good_for: Room or greenhouse climate readings.
 watch_out: Read at most once every 2 s. Needs a 10k pull-up on DATA.
+signals:
+  DATA: climateData
+lib_dep: adafruit/DHT sensor library
 ---
 # DHT22 temperature + humidity
 

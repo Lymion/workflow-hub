@@ -26,6 +26,9 @@ specs:
   Beam angle: 15°
   Frequency: 40 kHz
   Max rate: ~16 reads/s
+signals:
+  TRIG: sonarTrig
+  ECHO: sonarEcho
 ---
 # HC-SR04 ultrasonic sensor
 

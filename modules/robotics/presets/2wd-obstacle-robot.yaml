@@ -1,0 +1,10 @@
+preset: 2wd-obstacle-robot
+name: 2WD obstacle robot
+board: esp32-devkit
+parts:
+  - { key: l298n, qty: 1 }
+  - { key: tt-motor, qty: 2 }
+  - { key: hc-sr04, qty: 1 }
+  - { key: sg90, qty: 1 }
+  - { key: 18650-2s-bms, qty: 1 }
+  - { key: resistor-kit, qty: 1 }

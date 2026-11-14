@@ -104,6 +104,16 @@ CREATE TABLE IF NOT EXISTS snippet_uses (
     UNIQUE(project_id, slug)
 );
 
+CREATE TABLE IF NOT EXISTS project_parts (
+    id          INTEGER PRIMARY KEY,
+    project_id  INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    part_key    TEXT NOT NULL,
+    qty         INTEGER NOT NULL DEFAULT 1 CHECK (qty > 0),
+    status      TEXT NOT NULL DEFAULT 'need' CHECK (status IN ('need', 'ordered', 'have')),
+    added_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(project_id, part_key)
+);
+
 CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id, status);
 CREATE INDEX IF NOT EXISTS idx_journal_project ON journal(project_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_llm_calls_date ON llm_calls(created_at);

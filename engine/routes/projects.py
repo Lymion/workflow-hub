@@ -14,6 +14,9 @@ from ..modules import load_modules
 
 router = APIRouter()
 
+# Called after a project is created: (hub, project) -> None. Wizards register here.
+AFTER_CREATE: list = []
+
 
 def hub_of(request: Request) -> Hub:
     return request.app.state.hub
@@ -101,6 +104,9 @@ def create_project(request: Request, body: ProjectIn) -> dict:
             (name, slug, body.module, str(path), body.board, json.dumps(body.stack)),
         )
         pid = cur.lastrowid
+    project = get_project(hub, pid)
+    for hook in AFTER_CREATE:
+        hook(hub, project)
     return get_project(hub, pid)
 
 

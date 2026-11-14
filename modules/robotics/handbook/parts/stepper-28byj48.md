@@ -21,6 +21,12 @@ power:
   current_ma: 240
 good_for: Slow, exact positioning like dials, blinds or turntables.
 watch_out: Slow and weak; not for driving wheels.
+signals:
+  IN1: stepperIn1
+  IN2: stepperIn2
+  IN3: stepperIn3
+  IN4: stepperIn4
+lib_dep: waspinator/AccelStepper
 ---
 # 28BYJ-48 stepper + ULN2003
 

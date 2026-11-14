@@ -12,11 +12,14 @@ pins:
   mode: INPUT
 - name: AO
   mode: ANALOG
+  optional: true
 power:
   voltage: 3.3-5V
   current_ma: 20
 good_for: Following a black line on the floor.
 watch_out: Strong sunlight confuses it. Mount 3–8 mm above the floor.
+signals:
+  DO: lineSensor
 ---
 # IR line sensor (TCRT5000)
 

@@ -1,0 +1,8 @@
+preset: line-follower
+name: Line follower
+board: arduino-nano
+parts:
+  - { key: l298n, qty: 1 }
+  - { key: tt-motor, qty: 2 }
+  - { key: ir-tcrt5000, qty: 2 }
+  - { key: 18650-2s-bms, qty: 1 }

@@ -19,6 +19,7 @@ power:
   current_ma: 19
 good_for: Precise distance up to 2 m, works on soft surfaces.
 watch_out: Narrow beam; misses thin objects to the side.
+lib_dep: adafruit/Adafruit_VL53L0X
 ---
 # VL53L0X laser distance
 
