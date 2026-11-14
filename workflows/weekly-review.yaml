@@ -1,0 +1,9 @@
+id: weekly-review
+name: Weekly review
+description: Collects your week from the journal, error log and finished tasks; one Haiku call writes a short review for Home.
+trigger:
+  schedule: weekly sun 20:00
+steps:
+  - { id: collect, kind: code, run: collect_week }
+  - { id: write, kind: small-llm, run: weekly_summary }
+  - { id: save, kind: code, run: save_review }

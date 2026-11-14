@@ -264,3 +264,143 @@ def test_release_starts_the_eas_build(client, gitenv, tmp_path, monkeypatch):
 def test_robotics_has_no_release(client):
     p = client.post("/projects", json={"name": "Rover", "module": "robotics", "board": "esp32-devkit"}).json()
     assert client.get(f"/projects/{p['id']}/release").status_code == 404
+
+
+# ---------- automations, weekly review, hub health ----------
+
+from datetime import datetime as _dt
+from types import SimpleNamespace
+
+from engine import automations as au, llm
+from engine.routes import automations as au_routes
+
+
+@pytest.fixture()
+def sync_runs(monkeypatch):
+    monkeypatch.setattr(au_routes, "SYNC", True)
+
+
+def test_workflows_listed_with_triggers_and_step_kinds(client):
+    wfs = {w["id"]: w for w in client.get("/automations").json()}
+    wr = wfs["weekly-review"]
+    assert wr["trigger_text"] == "Every Sunday at 20:00" and wr["enabled"] and not wr["errors"]
+    assert [s["kind"] for s in wr["steps"]] == ["code", "small-llm", "code"]
+    assert wfs["hub-health"]["steps"][1]["kind"] == "big-llm" and wr["next_run"]
+
+
+def test_schedules():
+    sun = _dt(2026, 11, 15, 20, 5)  # a Sunday
+    assert au.is_due("weekly sun 20:00", None, sun)
+    assert not au.is_due("weekly sun 20:00", _dt(2026, 11, 15, 20, 1), sun)
+    assert au.is_due("weekly sun 20:00", _dt(2026, 11, 8, 20, 0), sun)
+    assert not au.is_due("daily 03:30", _dt(2026, 11, 15, 3, 31), _dt(2026, 11, 15, 12, 0))
+    assert au.is_due("daily 03:30", _dt(2026, 11, 14, 3, 31), _dt(2026, 11, 15, 3, 31))
+    assert au.is_due("every 30m", _dt(2026, 11, 15, 12, 0), _dt(2026, 11, 15, 12, 31))
+    assert not au.is_due("every 30m", _dt(2026, 11, 15, 12, 0), _dt(2026, 11, 15, 12, 10))
+    assert au.parse_schedule("fortnightly") is None
+
+
+def _week(client):
+    p = rover(client, parts=())
+    t = client.post(f"/projects/{p['id']}/tasks", json={"title": "Mount the sonar"}).json()
+    client.patch(f"/tasks/{t['id']}", json={"status": "done"})
+    client.post(f"/projects/{p['id']}/journal", json={"body": "Sonar reads 0 when the motors run."})
+    client.post("/errors", json={"error_text": "Brownout detector was triggered", "cause": "", "fix": ""})
+    return p
+
+
+def test_weekly_review_without_key_uses_template(client, sync_runs, monkeypatch):
+    monkeypatch.setattr(llm, "get_api_key", lambda: None)
+    _week(client)
+    w = client.post("/automations/weekly-review/run").json()
+    run = w["last_run"]
+    assert run["status"] == "ok" and [s["status"] for s in run["steps"]] == ["ok", "ok", "ok"]
+    assert "1 journal notes, 1 errors, 1 tasks done" in run["steps"][0]["summary"]
+    assert "template" in run["steps"][1]["summary"].lower()
+    review = client.get("/reviews/latest").json()
+    assert review["source"] == "template" and "Mount the sonar (Rover-02)" in review["body"]["wins"]
+    assert "Brownout" in review["body"]["stuck"][0]
+
+
+class _FakeHaiku:
+    def __init__(self):
+        self.calls = []
+        self.messages = SimpleNamespace(create=self._create, count_tokens=lambda **kw: SimpleNamespace(input_tokens=700))
+
+    def _create(self, **kw):
+        self.calls.append(kw)
+        answer = {"summary": "Sonar is mounted; brownouts are next.", "wins": ["Mounted the sonar"], "stuck": ["Brownouts: add a capacitor"], "next": ["Power the motors separately"]}
+        usage = SimpleNamespace(input_tokens=700, output_tokens=120, cache_read_input_tokens=0, cache_creation_input_tokens=0)
+        return SimpleNamespace(content=[SimpleNamespace(type="text", text=json.dumps(answer))], usage=usage, stop_reason="end_turn")
+
+
+def test_weekly_review_is_one_haiku_call(client, hub, sync_runs, monkeypatch):
+    monkeypatch.setattr(llm, "get_api_key", lambda: "sk-ant-test")
+    fake = _FakeHaiku()
+    hub.llm_factory = lambda key: fake
+    _week(client)
+    client.post("/automations/weekly-review/run")
+    assert len(fake.calls) == 1 and fake.calls[0]["model"] == "claude-haiku-5-5"
+    assert "Sonar reads 0" in fake.calls[0]["messages"][0]["content"]
+    review = client.get("/reviews/latest").json()
+    assert review["source"] == "sent" and review["body"]["summary"].startswith("Sonar is mounted")
+    row = hub.query_one("SELECT feature, status FROM llm_calls ORDER BY id DESC LIMIT 1")
+    assert dict(row) == {"feature": "weekly_review", "status": "sent"}
+
+
+def test_quiet_week_makes_no_call(client, hub, sync_runs, monkeypatch):
+    monkeypatch.setattr(llm, "get_api_key", lambda: "sk-ant-test")
+    fake = _FakeHaiku()
+    hub.llm_factory = lambda key: fake
+    client.post("/automations/weekly-review/run")
+    assert fake.calls == [] and client.get("/reviews/latest").json()["source"] == "template"
+
+
+def test_hub_health_opens_claude_code_only_when_tests_fail(client, hub, sync_runs):
+    opened = []
+    hub.claude_opener = lambda folder, prompt: (opened.append((folder, prompt)) or True, "Opened Claude Code")
+    hub.test_runner = lambda: (0, "120 passed in 9.1s")
+    run = client.post("/automations/hub-health/run").json()["last_run"]
+    assert run["status"] == "ok" and run["steps"][1]["status"] == "skipped" and opened == []
+    assert client.get("/health/hub").json()["ok"] is True
+    hub.test_runner = lambda: (1, "FAILED engine/tests/test_session7.py::test_pins - AssertionError\n1 failed, 119 passed")
+    run = client.post("/automations/hub-health/run").json()["last_run"]
+    assert run["status"] == "alert" and [s["status"] for s in run["steps"]] == ["alert", "ok"]
+    assert opened and "last-failure.md" in opened[0][1] and opened[0][0] == str(hub.paths.root)
+    log = (hub.paths.data / "health" / "last-failure.md").read_text()
+    assert "test_session7.py::test_pins" in log
+    assert client.get("/health/hub").json()["ok"] is False
+
+
+def test_scheduler_runs_due_workflow_once(client, hub, monkeypatch):
+    monkeypatch.setattr(llm, "get_api_key", lambda: None)
+    hub.test_runner = lambda: (0, "ok")
+    assert au.tick(hub, _dt(2026, 11, 14, 12, 0)) == []  # first look: nothing is due yet
+    sun = _dt(2026, 11, 15, 20, 5)
+    ran = au.tick(hub, sun)
+    assert {r["workflow"] for r in ran} == {"weekly-review", "hub-health"}
+    assert au.tick(hub, sun) == []
+    client.put("/automations/hub-health", json={"enabled": False})
+    assert au.tick(hub, _dt(2026, 11, 16, 3, 31)) == []
+
+
+def test_file_change_trigger_and_bad_workflow_files(client, hub):
+    hub.test_runner = lambda: (0, "ok")
+    p = rover(client, parts=())
+    (hub.paths.root / "workflows" / "on-save.yaml").write_text(
+        "id: on-save\nname: On save\ntrigger: { file_change: { glob: 'src/*.cpp' } }\n"
+        f"steps:\n  - {{ id: note, kind: code, run: journal_note, args: {{ project_id: {p['id']}, text: 'Firmware changed: {{changed}}' }} }}\n")
+    (hub.paths.root / "workflows" / "broken.yaml").write_text("id: broken\nsteps:\n  - { kind: big-llm, run: collect_week }\n  - { kind: code, run: launch_rockets }\n")
+    assert au.tick(hub) == []  # first look only remembers
+    main = Path(p["path"]) / "src" / "main.cpp"
+    main.write_text(main.read_text() + "\n// tweak\n")
+    import os, time as _t
+    os.utime(main, (_t.time() + 5, _t.time() + 5))
+    ran = au.tick(hub)
+    assert [r["workflow"] for r in ran] == ["on-save"]
+    notes = client.get(f"/projects/{p['id']}/journal").json()
+    assert notes[0]["body"].startswith("Firmware changed: rover-02/src/main.cpp")
+    broken = next(w for w in client.get("/automations").json() if w["id"] == "broken")
+    assert any("not big-llm" in e for e in broken["errors"]) and any("launch_rockets" in e for e in broken["errors"])
+    r = client.post("/automations/broken/run")
+    assert r.status_code == 422

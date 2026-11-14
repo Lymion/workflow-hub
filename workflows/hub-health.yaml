@@ -1,0 +1,8 @@
+id: hub-health
+name: Hub health
+description: Runs the hub's own tests every night. If one fails, it opens Claude Code in the hub folder with the error and saves the log.
+trigger:
+  schedule: daily 03:30
+steps:
+  - { id: tests, kind: code, run: run_hub_tests }
+  - { id: fix, kind: big-llm, run: open_claude_code, args: { only_if_failed: true } }

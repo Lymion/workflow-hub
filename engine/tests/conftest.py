@@ -18,7 +18,7 @@ def hub_root(tmp_path: Path) -> Path:
     root = tmp_path / "hub"
     root.mkdir()
     shutil.copytree(REPO / "modules", root / "modules")
-    for folder in ("snippets", "handbook"):
+    for folder in ("snippets", "handbook", "workflows"):
         if (REPO / folder).is_dir():
             shutil.copytree(REPO / folder, root / folder)
     return root
@@ -27,7 +27,8 @@ def hub_root(tmp_path: Path) -> Path:
 @pytest.fixture()
 def paths(hub_root: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> HubPaths:
     monkeypatch.setenv("WORKFLOW_HUB_PROJECTS", str(tmp_path / "projects"))
-    monkeypatch.setenv("WORKFLOW_HUB_EMBED", "0")  # keyword search in tests; hybrid is tested with a fake embedder
+    monkeypatch.setenv("WORKFLOW_HUB_EMBED", "0")
+    monkeypatch.setenv("WORKFLOW_HUB_SCHEDULER", "0")  # tests call automations.tick() themselves  # keyword search in tests; hybrid is tested with a fake embedder
     return HubPaths(root=hub_root, data=tmp_path / "data")
 
 

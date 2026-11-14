@@ -115,6 +115,25 @@ CREATE TABLE IF NOT EXISTS project_parts (
     UNIQUE(project_id, part_key)
 );
 
+CREATE TABLE IF NOT EXISTS workflow_runs (
+    id          INTEGER PRIMARY KEY,
+    workflow    TEXT NOT NULL,
+    trigger     TEXT NOT NULL,
+    status      TEXT NOT NULL DEFAULT 'running' CHECK (status IN ('running', 'ok', 'alert', 'failed')),
+    steps       TEXT NOT NULL DEFAULT '[]',
+    started_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+    ended_at    TEXT
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+    id          INTEGER PRIMARY KEY,
+    week        TEXT NOT NULL,
+    body        TEXT NOT NULL,
+    source      TEXT NOT NULL,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_runs_workflow ON workflow_runs(workflow, started_at);
 CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id, status);
 CREATE INDEX IF NOT EXISTS idx_journal_project ON journal(project_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_llm_calls_date ON llm_calls(created_at);
