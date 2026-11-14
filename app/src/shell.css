@@ -193,3 +193,15 @@ main { min-width: 0; height: 100%; overflow: auto; }
   .hb, .ch-grid { display: block; } .card { box-shadow: none; background: #fff; backdrop-filter: none; }
   body { background: #fff; color: #000; }
 }
+
+/* ---------- session 6: tooltips, board picker ---------- */
+.tip { position: fixed; z-index: 90; width: 290px; padding: 12px 14px; border-radius: 12px; background: var(--surface-solid); box-shadow: var(--hl), var(--shadow-2); pointer-events: none;
+  opacity: 0; transform: scale(.97) translateY(3px); transition: opacity 140ms var(--ease-out), transform 140ms var(--ease-out); font-size: 12.5px; line-height: 1.45; }
+.tip.on { opacity: 1; transform: none; }
+.tip .h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.tip .h b { font-size: 13.5px; } .tip .h span { color: var(--label-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tip p { margin: 4px 0 0; } .tip .k { display: block; font-size: 11px; font-weight: 700; color: var(--green-text); } .tip .w .k { color: var(--amber-text); }
+.kgroup { margin-top: 24px; }
+.kgroup .gh { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.kgroup .gh span { font-size: 12px; color: var(--label-2); }
+@media (prefers-reduced-motion: reduce) { .tip { transform: none; transition-duration: 1ms; } }

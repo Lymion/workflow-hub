@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 
 def register(app: FastAPI) -> None:
-    from . import errors, handbook, launch, projects, snippets
+    from . import boards, errors, handbook, launch, projects, snippets
 
     app.include_router(projects.router)  # session 2
     app.include_router(launch.router)  # session 2
@@ -16,3 +16,4 @@ def register(app: FastAPI) -> None:
     errors.reindex_errors(app.state.hub)
     app.include_router(handbook.router)  # session 5
     handbook.current(app.state.hub)
+    app.include_router(boards.router)  # session 6

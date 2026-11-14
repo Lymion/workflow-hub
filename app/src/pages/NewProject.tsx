@@ -2,8 +2,33 @@ import { useEffect, useRef, useState } from "react";
 import { api, notifyChanged, useLoad } from "../lib/api";
 import { go } from "../lib/router";
 
-/** Later sessions (board picker, stack tiles) add fields to the create request here. */
-const extraPayload = (): Record<string, unknown> => ({});
+import { TileGrid, type TileItem } from "../components/Tiles";
+import { Check } from "../components/ui";
+
+export type Board = { board: string; name: string; glyph: string; color: string; price_rm: number; logic_voltage: number; wireless: string[]; good_for: string; watch_out: string; module: string; pio_board: string };
+export const boardTile = (b: Board): TileItem => ({ id: b.board, name: b.name, sub: `${b.wireless.length ? "Wi-Fi + BLE" : "No wireless"} · ${b.logic_voltage}V · RM${b.price_rm}`, glyph: b.glyph, color: b.color, good: b.good_for, watch: b.watch_out, price: `RM${b.price_rm}` });
+
+/** Module-specific pickers below the type toggle. Session 9 adds the app stack picker. */
+export type PickerProps = { module: Module; value: Record<string, unknown>; onChange: (v: Record<string, unknown>) => void };
+export const PICKERS: Record<string, { Picker: (p: PickerProps) => JSX.Element | null; ready: (v: Record<string, unknown>) => string; summary: (v: Record<string, unknown>) => [string, string] }> = {};
+
+function BoardPicker({ module, value, onChange }: PickerProps) {
+  const boards = useLoad(() => api.get<Board[]>("/boards"), [], { live: false });
+  const list = (boards.data ?? []).filter((b) => b.module === module.id);
+  if (boards.loading) return <div className="ktiles mt-6"><Sk h={60} r={12} /><Sk h={60} r={12} /></div>;
+  if (!list.length) return null;
+  return (
+    <section className="kgroup rise">
+      <div className="gh"><h3>Board</h3><span>Pick one. Add motors, sensors and power later in the project's Parts tab.</span></div>
+      <TileGrid label="Board" single items={list.map(boardTile)} selected={new Set(value.board ? [String(value.board)] : [])} onToggle={(id) => onChange({ ...value, board: id, boardInfo: list.find((b) => b.board === id) })} />
+    </section>
+  );
+}
+PICKERS.board = {
+  Picker: BoardPicker,
+  ready: (v) => (v.board ? "" : "Pick a board to continue."),
+  summary: (v) => { const b = v.boardInfo as Board | undefined; return [b ? b.name : "No board", b ? `RM${b.price_rm} board · add parts after creating` : ""]; },
+};
 import { Icon, ModuleTile } from "../components/Icon";
 import { Banner, Empty, PageHead, Sk, slugify } from "../components/ui";
 import { useToast } from "../components/Toast";
@@ -56,6 +81,12 @@ export function NewProject() {
   }, [modules, kind]);
   const mod = modules.find((m) => m.id === kind);
   const [creating, setCreating] = useState(false);
+  const [picks, setPicks] = useState<Record<string, unknown>>({});
+  useEffect(() => setPicks({}), [kind]);
+  const slots = (mod?.cart_slots ?? []).filter((s) => PICKERS[s]);
+  const why = !name.trim() ? "Add a project name." : slots.map((s) => PICKERS[s].ready(picks)).find(Boolean) ?? "";
+  const summary = slots.length ? PICKERS[slots[0]].summary(picks) : [mod?.name ?? "", ""];
+  const extraPayload = () => ({ board: picks.board ?? null, stack: (picks.stack as string[]) ?? [] });
   const create = async () => {
     if (!name.trim() || !mod) return;
     setCreating(true);
@@ -118,13 +149,17 @@ export function NewProject() {
           </div>
         </div>
       )}
+      {mod && slots.map((s) => { const P = PICKERS[s].Picker; return <P key={s + mod.id} module={mod} value={picks} onChange={setPicks} />; })}
+      {mod && slots.includes("board") && picks.board ? (
+        <div className="mt-6 max-w-[640px]"><Check level="ok"><b>Parts</b> come next: add motors, sensors and power in the project's Parts tab, with checks and costs.</Check></div>
+      ) : null}
       {modules.length > 0 && (
         <div className="np-bar mt-8">
           <div className="flex-1 min-w-0">
-            <b className="block truncate">{name.trim() || "Name your project"}</b>
-            <span className="text-xs text-label-2">{mod ? mod.name : ""}</span>
+            <b className="block truncate">{name.trim() ? `${name.trim()} · ${summary[0]}` : "Name your project"}</b>
+            <span className={`text-xs ${why ? "text-bad-text font-medium" : "text-label-2"}`}>{why || summary[1]}</span>
           </div>
-          <button className="btn btn-primary" disabled={!name.trim() || creating} onClick={create}>
+          <button className="btn btn-primary" disabled={!!why || creating} onClick={create}>
             {creating ? "Creating…" : "Create project"}
           </button>
         </div>

@@ -1,0 +1,138 @@
+board: esp32-c3-mini
+order: 2
+name: ESP32-C3 Super Mini
+pio_board: esp32-c3-devkitm-1
+platform: espressif32
+framework: arduino
+monitor_speed: 115200
+logic_voltage: 3.3
+max_pin_ma: 40
+glyph: C3
+color: '#334155'
+price_rm: 15
+wireless:
+- wifi
+- ble
+i2c:
+  sda: '8'
+  scl: '9'
+spi:
+  mosi: '6'
+  miso: '5'
+  sck: '4'
+  ss: '7'
+led: '8'
+build_flags:
+- -DARDUINO_USB_MODE=1
+- -DARDUINO_USB_CDC_ON_BOOT=1
+header:
+  left:
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  - '9'
+  - '10'
+  - '20'
+  - '21'
+  right:
+  - '4'
+  - '3'
+  - '2'
+  - '1'
+  - '0'
+pins:
+- id: '0'
+  label: GPIO 0
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc1
+- id: '1'
+  label: GPIO 1
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc1
+- id: '2'
+  label: GPIO 2
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc1
+  strapping: warn
+  note: Strapping pin; keep it free at boot.
+- id: '3'
+  label: GPIO 3
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc1
+- id: '4'
+  label: GPIO 4
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc1
+- id: '5'
+  label: GPIO 5
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+- id: '6'
+  label: GPIO 6
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '7'
+  label: GPIO 7
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '8'
+  label: GPIO 8
+  caps:
+  - digital
+  - output
+  - pwm
+  strapping: warn
+  note: Onboard LED and strapping pin; must be high at boot.
+- id: '9'
+  label: GPIO 9
+  caps:
+  - digital
+  - output
+  - pwm
+  strapping: warn
+  note: BOOT button and strapping pin.
+- id: '10'
+  label: GPIO 10
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '20'
+  label: GPIO 20
+  caps:
+  - digital
+  - output
+  - pwm
+  note: UART0 RX/TX (free when using USB CDC).
+- id: '21'
+  label: GPIO 21
+  caps:
+  - digital
+  - output
+  - pwm
+  note: UART0 RX/TX (free when using USB CDC).
+good_for: Tiny, cheap wireless sensor nodes that sip power.
+watch_out: Fewer pins than the DevKit; GPIO 2, 8 and 9 are strapping pins.

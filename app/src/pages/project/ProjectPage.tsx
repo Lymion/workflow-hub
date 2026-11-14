@@ -13,6 +13,7 @@ export function ProjectPage({ id, tab }: { id: number; tab?: string }) {
   const toast = useToast();
   const proj = useLoad(() => api.get<Project>(`/projects/${id}`), [id]);
   const mods = useLoad(() => api.get<ModulesResponse>("/modules"), [], { live: false });
+  const boards = useLoad(() => api.get<{ board: string; name: string }[]>("/boards"), [], { live: false });
   const launchers = useLoad(() => api.get<Launcher[]>(`/projects/${id}/launchers`), [id], { live: false });
   const [confirmRemove, setConfirmRemove] = useState(false);
   const p = proj.data;
@@ -81,7 +82,7 @@ export function ProjectPage({ id, tab }: { id: number; tab?: string }) {
           <h1 className="truncate">{p.name}</h1>
           <div className="flex flex-wrap gap-1.5 mt-1.5">
             <span className={`chip ${p.module === "robotics" ? "chip-rob" : p.module === "app-dev" ? "chip-app" : ""}`}>{mod?.name ?? p.module}</span>
-            {p.board && <span className="chip">{p.board}</span>}
+            {p.board && <span className="chip">{boards.data?.find((b) => b.board === p.board)?.name ?? p.board}</span>}
             <span className="chip font-mono !font-medium" title={p.path}>{p.path.replace(/^.*[\\/](?=[^\\/]+[\\/][^\\/]+$)/, "…/")}</span>
             {p.archived && <span className="chip chip-warn">Archived</span>}
           </div>
