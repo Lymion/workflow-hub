@@ -18,8 +18,9 @@ def hub_root(tmp_path: Path) -> Path:
     root = tmp_path / "hub"
     root.mkdir()
     shutil.copytree(REPO / "modules", root / "modules")
-    if (REPO / "snippets").is_dir():
-        shutil.copytree(REPO / "snippets", root / "snippets")
+    for folder in ("snippets", "handbook"):
+        if (REPO / folder).is_dir():
+            shutil.copytree(REPO / folder, root / folder)
     return root
 
 

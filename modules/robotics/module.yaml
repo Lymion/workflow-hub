@@ -7,3 +7,4 @@ cart_slots: [board, parts]
 project_tabs: [wiring, parts]
 launch: [vscode, arduino-ide]
 run: [build, upload, serial]
+handbook_part: Electronics parts

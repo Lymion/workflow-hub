@@ -73,7 +73,7 @@ def test_search_spans_kinds(client):
 
 
 def test_search_falls_back_to_any_word(client):
-    res = client.get("/search", params={"q": "supabase zzzzunknown"}).json()["results"]
+    res = client.get("/search", params={"q": "supabase zzzzunknown", "kind": "snippet"}).json()["results"]
     assert res and res[0]["ref"] == "data/supabase-client"
 
 
