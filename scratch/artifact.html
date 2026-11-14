@@ -353,7 +353,7 @@ body[data-state="error"] .kind [data-kind="app"]{opacity:.45}
 .path{font-family:var(--mono);font-size:12.5px;color:var(--label-2);padding-bottom:10px}
 
 /* ---------- handbook ---------- */
-.hb{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start;max-width:1080px}
+.hb{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start}
 .toc{position:sticky;top:0;padding:10px}
 .toc .input{height:32px;width:100%;font-size:13px;margin-bottom:8px}
 .toc h4{margin:14px 0 4px;padding:14px 8px 0;border-top:1px solid var(--sep);font-size:11.5px;font-weight:600;color:var(--label-2)}
@@ -361,7 +361,47 @@ body[data-state="error"] .kind [data-kind="app"]{opacity:.45}
 .toc a{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:6px;font-size:13px}
 .toc a.on{background:var(--accent-tint);color:var(--accent-text);font-weight:600}
 @media (hover:hover) and (pointer:fine){.toc a:not(.on):hover{background:var(--fill)}}
-.chapter{padding:28px 32px}
+.chapter{padding:28px 32px 36px}
+.ch-grid{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:36px;align-items:start}
+.ch-main{min-width:0}
+.ch-main h2{margin:30px 0 10px}
+.tbl-wrap{overflow-x:auto}
+.timing{margin:14px 0 4px;padding:14px 16px;border-radius:12px;background:var(--fill)}
+.timing svg{width:100%;height:auto;display:block}
+.timing .t-lbl{font:600 12px var(--mono);fill:var(--label)}
+.timing .t-note{font:500 11px var(--font);fill:var(--label-2)}
+.timing .t-low{fill:none;stroke:var(--accent);stroke-width:2}
+.timing .t-sig{fill:none;stroke:var(--robotics);stroke-width:2}
+.timing .t-burst path{fill:none;stroke:var(--label-3);stroke-width:1.2}
+.timing .t-dim{fill:none;stroke:var(--label-3);stroke-width:1}
+.wsteps{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.wsteps li{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:var(--fill);line-height:1.5}
+.wsteps .n{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--robotics);color:#fff;font:700 12px var(--font)}
+.code-card{margin-top:16px;border-radius:12px;background:var(--surface-solid);box-shadow:inset 0 0 0 1px var(--sep);overflow:hidden}
+.code-card .code-head{gap:6px}
+.code-card .code-head b{font-weight:600}
+.faq{display:grid;gap:8px}
+.faq div{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;padding:12px 14px;border-radius:10px;background:var(--fill)}
+.faq b{font-weight:600}
+.faq span{color:var(--label-2);line-height:1.5}
+.ch-rail{position:sticky;top:20px;display:grid;gap:12px}
+.rbox{padding:14px 16px;border-radius:12px;background:var(--fill)}
+.rbox h3{font-size:12px;font-weight:600;color:var(--label-2);margin-bottom:10px}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;margin:0;font-size:13px}
+.spec dt{color:var(--label-2)}
+.spec dd{margin:0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.used{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px}
+.used .muted{margin-left:auto;font-weight:500}
+.doc{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;font-size:13px;font-weight:500;color:var(--accent-text)}
+.doc + .doc{box-shadow:inset 0 1px 0 var(--sep)}
+.doc svg.i{width:13px;height:13px;flex:none}
+.rel{display:flex;align-items:center;gap:10px;padding:6px 0}
+.rel + .rel{box-shadow:inset 0 1px 0 var(--sep)}
+.rel .g{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:#fff;font:700 10px var(--font)}
+.rel b{display:block;font-size:13px;font-weight:600}
+.rel small{display:block;font-size:12px;color:var(--label-2)}
+@media (max-width:1180px){.ch-grid{grid-template-columns:minmax(0,1fr)}.ch-rail{position:static;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}}
+@media (max-width:640px){.faq div{grid-template-columns:minmax(0,1fr);gap:4px}}
 .crumb{font-size:12.5px;color:var(--label-2);display:flex;gap:6px;align-items:center;margin-bottom:8px}
 .crumb svg.i{width:12px;height:12px}
 .chapter .lead{font-size:16px;color:var(--label-2);margin:10px 0 16px;max-width:560px}
@@ -373,7 +413,7 @@ th{text-align:left;font-size:12px;font-weight:600;color:var(--label-2);padding:8
 td{padding:10px;box-shadow:inset 0 -1px 0 var(--sep);vertical-align:middle}
 tr:last-child td{box-shadow:none}
 .chapter h2{margin:24px 0 8px}
-.chapter p.body{max-width:600px;color:var(--label);line-height:1.6}
+.chapter p.body{max-width:680px;color:var(--label);line-height:1.6}
 .chapter .acts{display:flex;gap:8px;margin-top:24px}
 
 .cart{position:sticky;top:0;display:flex;flex-direction:column;max-height:calc(100vh - 140px);background:var(--surface);box-shadow:var(--hl),var(--shadow-2)}
@@ -802,27 +842,115 @@ pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--r
         <div class="sk" style="height:120px;margin-top:26px;border-radius:12px"></div>
       </div>
       <div data-when="error" class="empty"><p class="muted">This chapter can't be shown until its YAML block is fixed.</p></div>
-      <div data-when="full empty">
-        <div class="crumb">Electronics parts <svg class="i"><use href="#i-chev"/></svg> Sensors</div>
-        <h1 data-s="ch-title">HC-SR04 ultrasonic sensor</h1>
-        <p class="lead" data-s="ch-lead">Measures 2–400 cm with a sound ping. Cheap and reliable indoors; blind under 2 cm and on soft surfaces.</p>
-        <div class="facts" data-s="ch-facts"><span class="chip">Sensor</span><span class="chip">5V · 15 mA</span><span class="chip">No library</span><span class="chip ok">RM5–10</span></div>
-        <div class="callout" data-s="ch-warn"><svg class="i"><use href="#i-alert"/></svg><span>ECHO outputs 5V. On ESP32, put a 1k/2k voltage divider between ECHO and the GPIO.</span></div>
-        <table data-s="ch-pins">
-          <thead><tr><th>Pin</th><th>Mode</th><th>Voltage</th><th>Note</th></tr></thead>
-          <tbody>
-            <tr><td class="mono">VCC</td><td>Power</td><td>5V</td><td class="muted">From VIN, not 3V3</td></tr>
-            <tr><td class="mono">TRIG</td><td>Output</td><td>3.3V ok</td><td class="muted">10 µs pulse starts a ping</td></tr>
-            <tr><td class="mono">ECHO</td><td>Input</td><td><span class="chip warn">5V</span></td><td class="muted">Needs divider on 3.3V boards</td></tr>
-            <tr><td class="mono">GND</td><td>Ground</td><td>—</td><td class="muted">Share ground with the board</td></tr>
-          </tbody>
-        </table>
-        <h2>Reading it without blocking</h2>
-        <p class="body">Trigger every 60 ms and time ECHO with <span class="mono">pulseIn</span> and a 25 ms timeout, so a missed echo can't freeze the motor loop. Distance in cm is the echo time in µs divided by 58.</p>
-        <div class="acts">
-          <button class="btn tinted" id="addBtn" data-s="ch-add"><svg class="i"><use href="#i-plus"/></svg>Add to Rover-01</button>
-          <button class="btn ghost" data-toast="Comparison opens in session 5." data-s="ch-compare">Compare sensors</button>
+      <div data-when="full empty" class="ch-grid">
+        <div class="ch-main">
+          <div class="crumb">Electronics parts <svg class="i"><use href="#i-chev"/></svg> Sensors</div>
+          <h1 data-s="ch-title">HC-SR04 ultrasonic sensor</h1>
+          <p class="lead" data-s="ch-lead">Measures 2–400 cm with a sound ping. Cheap and reliable indoors; blind under 2 cm and on soft surfaces.</p>
+          <div class="facts" data-s="ch-facts"><span class="chip">Sensor</span><span class="chip">5V · 15 mA</span><span class="chip">No library</span><span class="chip ok">RM5–10</span></div>
+          <div class="callout" data-s="ch-warn"><svg class="i"><use href="#i-alert"/></svg><span>ECHO outputs 5V. On ESP32, put a 1k/2k voltage divider between ECHO and the GPIO.</span></div>
+          <div class="acts" style="margin:0 0 6px">
+            <button class="btn tinted" id="addBtn" data-s="ch-add"><svg class="i"><use href="#i-plus"/></svg>Add to Rover-01</button>
+            <button class="btn ghost" data-toast="Comparison opens in session 5." data-s="ch-compare">Compare sensors</button>
+          </div>
+
+          <h2 data-s="ch-how-h">How it works</h2>
+          <p class="body">A 10 µs pulse on TRIG fires eight 40 kHz pings. ECHO then goes HIGH until the sound bounces back, so the HIGH time is the round trip. Divide the microseconds by 58 to get centimetres.</p>
+          <figure class="timing" data-s="ch-timing" aria-label="Timing: TRIG pulses for 10 microseconds, then ECHO stays high for the echo time">
+            <svg viewBox="0 0 560 140" role="img">
+              <text x="0" y="34" class="t-lbl">TRIG</text><text x="0" y="94" class="t-lbl">ECHO</text>
+              <path class="t-low" d="M56 40 H96 V18 H124 V40 H540"/>
+              <path class="t-sig" d="M56 100 H200 V78 H420 V100 H540"/>
+              <g class="t-burst"><path d="M140 40 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8"/></g>
+              <text x="110" y="12" text-anchor="middle" class="t-note">10 µs</text>
+              <text x="160" y="56" class="t-note">8 × 40 kHz pings</text>
+              <path class="t-dim" d="M200 114 H420 M200 109 V119 M420 109 V119"/>
+              <text x="310" y="134" text-anchor="middle" class="t-note">echo time (µs) ÷ 58 = cm</text>
+            </svg>
+          </figure>
+
+          <h2>Pins</h2>
+          <div class="tbl-wrap">
+          <table data-s="ch-pins">
+            <thead><tr><th>Pin</th><th>Mode</th><th>Voltage</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">VCC</td><td>Power</td><td>5V</td><td class="muted">From VIN, not 3V3</td></tr>
+              <tr><td class="mono">TRIG</td><td>Output</td><td>3.3V ok</td><td class="muted">10 µs pulse starts a ping</td></tr>
+              <tr><td class="mono">ECHO</td><td>Input</td><td><span class="chip warn">5V</span></td><td class="muted">Needs divider on 3.3V boards</td></tr>
+              <tr><td class="mono">GND</td><td>Ground</td><td>—</td><td class="muted">Share ground with the board</td></tr>
+            </tbody>
+          </table>
+          </div>
+
+          <h2>Wiring on ESP32</h2>
+          <ol class="wsteps" data-s="ch-wiring">
+            <li><span class="n">1</span><span><b>VCC → VIN</b> (5V from USB) and <b>GND → GND</b>.</span></li>
+            <li><span class="n">2</span><span><b>TRIG → GPIO 19</b>. 3.3V is enough to trigger it.</span></li>
+            <li><span class="n">3</span><span><b>ECHO → 1 kΩ → GPIO 18</b>, then <b>GPIO 18 → 2 kΩ → GND</b>. That turns 5V into a safe 3.3V.</span></li>
+          </ol>
+
+          <div class="code-card" data-s="ch-code">
+            <div class="code-head"><svg class="i" style="color:var(--label-2)"><use href="#i-code"/></svg><b>snippets/sensors/hc-sr04-read</b><button class="btn ghost sm" data-toast="Snippet copied."><svg class="i"><use href="#i-copy"/></svg>Copy</button><button class="btn sm" data-toast="Inserted at the cursor in VS Code (extension arrives in session 12).">Insert in VS Code</button></div>
+<pre><span class="k">#include</span> <span class="n">"pins.h"</span>
+
+<span class="k">const unsigned long</span> PING_EVERY_MS = <span class="n">60</span>;
+<span class="k">unsigned long</span> lastPing = <span class="n">0</span>;
+<span class="k">float</span> distanceCm = <span class="n">-1</span>;            <span class="c">// -1 = no echo yet</span>
+
+<span class="k">void</span> setupSonar() {
+  pinMode(SONAR_TRIG, OUTPUT);
+  pinMode(SONAR_ECHO, INPUT);         <span class="c">// through the 1k/2k divider</span>
+}
+
+<span class="k">void</span> updateSonar() {                <span class="c">// call every loop(), never blocks long</span>
+  <span class="k">if</span> (millis() - lastPing &lt; PING_EVERY_MS) <span class="k">return</span>;
+  lastPing = millis();
+  digitalWrite(SONAR_TRIG, HIGH);
+  delayMicroseconds(<span class="n">10</span>);
+  digitalWrite(SONAR_TRIG, LOW);
+  <span class="k">unsigned long</span> us = pulseIn(SONAR_ECHO, HIGH, <span class="n">25000</span>);  <span class="c">// 25 ms timeout</span>
+  distanceCm = us ? us / <span class="n">58.0</span> : <span class="n">-1</span>;
+}</pre>
+          </div>
+
+          <h2>Common problems</h2>
+          <div class="faq" data-s="ch-faq">
+            <div><b>Always reads -1 or 0</b><span>ECHO isn't reaching the pin. Check the divider and that GND is shared, then raise the timeout to 30 ms.</span></div>
+            <div><b>Numbers jump around</b><span>Take three readings and use the middle one. Keep it 5 cm or more from the chassis edge.</span></div>
+            <div><b>Misses soft or angled objects</b><span>Sound gets absorbed or bounces away. Aim it straight, or add an IR sensor for close range.</span></div>
+          </div>
         </div>
+
+        <aside class="ch-rail" data-s="ch-rail" aria-label="At a glance">
+          <div class="rbox">
+            <h3>At a glance</h3>
+            <dl class="spec">
+              <dt>Range</dt><dd>2–400 cm</dd>
+              <dt>Accuracy</dt><dd>±3 mm</dd>
+              <dt>Beam angle</dt><dd>15°</dd>
+              <dt>Frequency</dt><dd>40 kHz</dd>
+              <dt>Supply</dt><dd>5V · 15 mA</dd>
+              <dt>Max rate</dt><dd>~16 reads/s</dd>
+              <dt>Price</dt><dd>RM5–10</dd>
+            </dl>
+          </div>
+          <div class="rbox">
+            <h3>Used in</h3>
+            <a class="used" href="#project"><span class="dot rob"></span>Rover-01<span class="muted small">ECHO on GPIO 18</span></a>
+          </div>
+          <div class="rbox">
+            <h3>Docs</h3>
+            <a class="doc" href="https://www.arduino.cc/reference/en/language/functions/advanced-io/pulsein/" target="_blank" rel="noopener">Arduino · pulseIn()<svg class="i"><use href="#i-chev"/></svg></a>
+            <a class="doc" href="https://randomnerdtutorials.com/esp32-hc-sr04-ultrasonic-arduino/" target="_blank" rel="noopener">Random Nerd Tutorials · ESP32 + HC-SR04<svg class="i"><use href="#i-chev"/></svg></a>
+            <a class="doc" href="https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf" target="_blank" rel="noopener">Datasheet (PDF)<svg class="i"><use href="#i-chev"/></svg></a>
+          </div>
+          <div class="rbox">
+            <h3>Related parts</h3>
+            <div class="rel"><span class="g" style="background:#1F6F8B">ToF</span><span><b>VL53L0X</b><small>Laser, 3.3V, 2 m · RM15</small></span></div>
+            <div class="rel"><span class="g" style="background:#0E7490">WP</span><span><b>JSN-SR04T</b><small>Waterproof ultrasonic · RM22</small></span></div>
+            <div class="rel"><span class="g" style="background:#7C3AED">IR</span><span><b>Sharp GP2Y0A21</b><small>IR, 10–80 cm · RM18</small></span></div>
+          </div>
+        </aside>
       </div>
     </article>
 
