@@ -5,5 +5,7 @@ from fastapi import FastAPI
 
 
 def register(app: FastAPI) -> None:
-    # Feature routers are added here session by session.
-    pass
+    from . import launch, projects
+
+    app.include_router(projects.router)  # session 2
+    app.include_router(launch.router)  # session 2
