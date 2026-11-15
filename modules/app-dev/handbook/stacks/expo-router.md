@@ -10,6 +10,9 @@ env: []
 conflicts: []
 good_for: Screens from files in app/, with deep links and typed routes for free.
 watch_out: Expo only.
+docs:
+- title: "Expo Router · Introduction"
+  url: https://docs.expo.dev/router/introduction/
 ---
 # Expo Router
 

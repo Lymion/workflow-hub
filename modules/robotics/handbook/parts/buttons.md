@@ -20,6 +20,13 @@ signals:
 wokwi:
   element: wokwi-pushbutton
   pins: {BTN: 1.l}
+docs:
+- title: "Arduino · digitalRead()"
+  url: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalread/
+- title: "Arduino · pinMode()"
+  url: https://docs.arduino.cc/language-reference/en/functions/digital-io/pinMode/
+- title: "Arduino · attachInterrupt()"
+  url: https://docs.arduino.cc/language-reference/en/functions/external-interrupts/attachInterrupt/
 ---
 # Push buttons (6 mm)
 

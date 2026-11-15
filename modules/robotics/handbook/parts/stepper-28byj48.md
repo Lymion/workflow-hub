@@ -27,6 +27,11 @@ signals:
   IN3: stepperIn3
   IN4: stepperIn4
 lib_dep: waspinator/AccelStepper
+docs:
+- title: AccelStepper reference
+  url: https://www.airspayce.com/mikem/arduino/AccelStepper/
+- title: "Arduino · Stepper library"
+  url: https://docs.arduino.cc/libraries/stepper/
 ---
 # 28BYJ-48 stepper + ULN2003
 

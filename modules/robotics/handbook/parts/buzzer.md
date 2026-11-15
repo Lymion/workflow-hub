@@ -20,6 +20,9 @@ signals:
 wokwi:
   element: wokwi-buzzer
   pins: {SIG: '2'}
+docs:
+- title: "Arduino · tone()"
+  url: https://docs.arduino.cc/language-reference/en/functions/advanced-io/tone/
 ---
 # Active buzzer
 

@@ -16,6 +16,11 @@ specs:
   PlatformIO: nanoatmega328new
   Serial: 9600 baud
   Wireless: none
+docs:
+- title: "Arduino · Nano"
+  url: https://docs.arduino.cc/hardware/nano/
+- title: "PlatformIO · Arduino Nano board"
+  url: https://docs.platformio.org/en/latest/boards/atmelavr/nanoatmega328new.html
 ---
 # Arduino Nano
 

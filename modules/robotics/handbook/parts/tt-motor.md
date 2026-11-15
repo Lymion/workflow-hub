@@ -18,6 +18,11 @@ power:
 stall_ma: 1500
 good_for: Cheap wheels for small 2WD robots.
 watch_out: Stall current up to 1.5 A each. Needs a driver, never a GPIO pin.
+docs:
+- title: "Arduino · analogWrite()"
+  url: https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/
+- title: "ESP32 Arduino core · LEDC (PWM)"
+  url: https://docs.espressif.com/projects/arduino-esp32/en/latest/api/ledc.html
 ---
 # TT gear motor
 

@@ -12,6 +12,9 @@ conflicts:
 - supabase
 good_for: Quick auth, realtime sync between phones and push notifications.
 watch_out: NoSQL data is harder to query; Google lock-in.
+docs:
+- title: "Firebase · Add Firebase to a JavaScript project"
+  url: https://firebase.google.com/docs/web/setup
 ---
 # Firebase
 

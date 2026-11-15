@@ -11,3 +11,22 @@ docs:
   - { id: esp32-adc, title: "ESP32 Arduino core · ADC", url: "https://docs.espressif.com/projects/arduino-esp32/en/latest/api/adc.html" }
   - { id: pio-lib-deps, title: "PlatformIO · lib_deps", url: "https://docs.platformio.org/en/latest/projectconf/sections/env/options/library/lib_deps.html" }
   - { id: pio-monitor-speed, title: "PlatformIO · monitor_speed", url: "https://docs.platformio.org/en/latest/projectconf/sections/env/options/monitor/monitor_speed.html" }
+
+# Official doc sites. Read online inside the hub (nothing downloaded); the online Ask
+# searches their page lists (search.url: tried in order, first that works).
+sites:
+  - id: arduino
+    title: Arduino docs
+    about: Language reference (every function), libraries, boards
+    home: https://docs.arduino.cc/language-reference/
+    search: { type: sitemap, url: [https://docs.arduino.cc/sitemap-index.xml, https://docs.arduino.cc/sitemap.xml], prefix: "https://docs.arduino.cc/" }
+  - id: esp32
+    title: ESP32 Arduino core
+    about: Wi-Fi, BLE, PWM (LEDC), ADC, I2C and other ESP32 APIs
+    home: https://docs.espressif.com/projects/arduino-esp32/en/latest/
+    search: { type: sphinx, url: https://docs.espressif.com/projects/arduino-esp32/en/latest/searchindex.js }
+  - id: platformio
+    title: PlatformIO
+    about: platformio.ini options, boards, libraries, build and upload
+    home: https://docs.platformio.org/en/latest/
+    search: { type: sphinx, url: https://docs.platformio.org/en/latest/searchindex.js }

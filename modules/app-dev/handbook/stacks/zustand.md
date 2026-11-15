@@ -9,6 +9,9 @@ env: []
 conflicts: []
 good_for: Shared app state in a few lines, without Redux boilerplate.
 watch_out: Not a data-fetching cache.
+docs:
+- title: Zustand (README and guides)
+  url: https://github.com/pmndrs/zustand
 ---
 # Zustand
 

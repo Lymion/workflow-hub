@@ -14,6 +14,11 @@ conflicts:
 good_for: Phone apps for Android and iOS from one codebase. Test instantly on your phone with Expo Go.
 watch_out: Custom native modules need a dev build.
 scaffold: npx create-expo-app@latest {name} --template default
+docs:
+- title: Expo docs
+  url: https://docs.expo.dev/
+- title: "Expo · Tutorial"
+  url: https://docs.expo.dev/tutorial/introduction/
 ---
 # Expo (React Native)
 

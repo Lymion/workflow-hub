@@ -21,6 +21,9 @@ lib_dep: adafruit/DHT sensor library
 wokwi:
   element: wokwi-dht22
   pins: {DATA: SDA}
+docs:
+- title: Adafruit DHT sensor library
+  url: https://github.com/adafruit/DHT-sensor-library
 ---
 # DHT22 temperature + humidity
 

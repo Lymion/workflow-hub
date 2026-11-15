@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 
 def register(app: FastAPI) -> None:
-    from . import automations, boards, cart, design, errors, githelper, guide, guidemode, handbook, launch, projects, release, run, snippets
+    from . import automations, boards, cart, design, errors, githelper, guide, guidemode, handbook, launch, onlinedocs, projects, release, run, snippets
 
     app.include_router(projects.router)  # session 2
     app.include_router(launch.router)  # session 2
@@ -30,3 +30,4 @@ def register(app: FastAPI) -> None:
     app.include_router(guidemode.router)  # session 12
     app.include_router(release.router)  # session 12
     app.include_router(automations.router)  # session 12
+    app.include_router(onlinedocs.router)  # docs page: online docs, docs per part

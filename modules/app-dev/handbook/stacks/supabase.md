@@ -12,6 +12,11 @@ conflicts:
 - firebase
 good_for: Sign-in, a real Postgres database and file storage on a free tier. Realtime updates built in.
 watch_out: Needs internet; keys live in .env.
+docs:
+- title: Supabase JavaScript client
+  url: https://supabase.com/docs/reference/javascript/introduction
+- title: Supabase docs
+  url: https://supabase.com/docs
 ---
 # Supabase
 

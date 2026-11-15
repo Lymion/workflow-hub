@@ -16,6 +16,15 @@ specs:
   PlatformIO: esp32dev
   Serial: 115200 baud
   Wireless: wifi, ble
+docs:
+- title: ESP32 Arduino core
+  url: https://docs.espressif.com/projects/arduino-esp32/en/latest/
+- title: "ESP32 Arduino core · GPIO"
+  url: https://docs.espressif.com/projects/arduino-esp32/en/latest/api/gpio.html
+- title: ESP32 datasheet (PDF)
+  url: https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf
+- title: "PlatformIO · ESP32 DevKit board"
+  url: https://docs.platformio.org/en/latest/boards/espressif32/esp32dev.html
 ---
 # ESP32 DevKit V1
 

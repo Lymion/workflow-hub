@@ -20,6 +20,11 @@ good_for: Following a black line on the floor.
 watch_out: Strong sunlight confuses it. Mount 3–8 mm above the floor.
 signals:
   DO: lineSensor
+docs:
+- title: "Arduino · analogRead()"
+  url: https://docs.arduino.cc/language-reference/en/functions/analog-io/analogRead/
+- title: "Arduino · digitalRead()"
+  url: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalread/
 ---
 # IR line sensor (TCRT5000)
 

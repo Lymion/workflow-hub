@@ -20,6 +20,11 @@ power:
 good_for: Precise distance up to 2 m, works on soft surfaces.
 watch_out: Narrow beam; misses thin objects to the side.
 lib_dep: adafruit/Adafruit_VL53L0X
+docs:
+- title: Adafruit VL53L0X library
+  url: https://github.com/adafruit/Adafruit_VL53L0X
+- title: "Arduino · Wire (I2C)"
+  url: https://docs.arduino.cc/language-reference/en/functions/communication/wire/
 ---
 # VL53L0X laser distance
 

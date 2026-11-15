@@ -15,6 +15,9 @@ conflicts:
 good_for: 'Websites and web apps that need fast pages and SEO: dashboards, stores, landing pages.'
 watch_out: Not for offline phone apps.
 scaffold: npx create-next-app@latest {name} --ts --eslint --app --src-dir --use-npm --yes
+docs:
+- title: Next.js docs
+  url: https://nextjs.org/docs
 ---
 # Next.js
 

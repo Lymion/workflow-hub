@@ -1,0 +1,21 @@
+# Checks every official doc link and doc-site page list the hub uses, online.
+name: Docs links
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "claude/**"]
+    paths: ["modules/**", "engine/onlinedocs.py", "engine/docs.py", "packaging/check_docs_links.py", ".github/workflows/docs-links.yml"]
+  schedule:
+    - cron: "17 3 * * 1"   # weekly: sites move pages now and then
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r engine/requirements.txt
+      - run: python packaging/check_docs_links.py

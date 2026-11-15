@@ -16,6 +16,11 @@ specs:
   PlatformIO: uno
   Serial: 9600 baud
   Wireless: none
+docs:
+- title: "Arduino · UNO R3"
+  url: https://docs.arduino.cc/hardware/uno-rev3/
+- title: "PlatformIO · Arduino Uno board"
+  url: https://docs.platformio.org/en/latest/boards/atmelavr/uno.html
 ---
 # Arduino Uno
 

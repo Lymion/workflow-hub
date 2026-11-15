@@ -31,6 +31,11 @@ signals:
   ECHO: sonarEcho
 wokwi:
   element: wokwi-hc-sr04
+docs:
+- title: "Arduino · pulseIn()"
+  url: https://docs.arduino.cc/language-reference/en/functions/advanced-io/pulseIn/
+- title: "Arduino · digitalWrite()"
+  url: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/
 ---
 # HC-SR04 ultrasonic sensor
 

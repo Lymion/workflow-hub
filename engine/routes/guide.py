@@ -30,12 +30,22 @@ def haiku(hub: Hub) -> llm.Haiku:
 
 # ---------- docs library ----------
 
+USER_SOURCES = "docs_user_sources"
+
+
+def library_sources(hub: Hub) -> list[docsmod.Source]:
+    """Pages listed in the modules' docs.yaml, plus pages you saved from the Docs page."""
+    import json
+
+    saved = json.loads(db.get_setting(hub.conn, USER_SOURCES) or "[]")
+    return docsmod.sources(hub.paths.root) + [docsmod.Source(id=s["id"], title=s["title"], url=s["url"], module=s.get("module", "")) for s in saved]
+
 @router.get("/docs")
 def list_docs(request: Request) -> list[dict]:
     hub = hub_of(request)
     counts = {r["source"]: r["n"] for r in hub.query("SELECT source, COUNT(*) AS n FROM doc_chunks GROUP BY source")}
     stamps = {r["key"][5:]: r["value"] for r in hub.query("SELECT key, value FROM settings WHERE key LIKE 'docs:%'")}
-    return [{"id": s.id, "title": s.title, "url": s.url, "module": s.module, "chunks": counts.get(s.id, 0), "downloaded_at": stamps.get(s.id)} for s in docsmod.sources(hub.paths.root)]
+    return [{"id": s.id, "title": s.title, "url": s.url, "module": s.module, "chunks": counts.get(s.id, 0), "downloaded_at": stamps.get(s.id)} for s in library_sources(hub)]
 
 
 class DownloadIn(BaseModel):
@@ -63,7 +73,7 @@ def store_chunks(hub: Hub, source: docsmod.Source, chunks: list[dict]) -> int:
 def download(request: Request, body: DownloadIn) -> dict:
     """Fetch the listed pages and re-chunk them. Plain code, no tokens."""
     hub = hub_of(request)
-    srcs = [s for s in docsmod.sources(hub.paths.root) if body.source in (None, s.id)]
+    srcs = [s for s in library_sources(hub) if body.source in (None, s.id)]
     if body.source and not srcs:
         raise HTTPException(404, f"Docs source '{body.source}' isn't listed in any module's docs.yaml.")
     done, failed = [], []
