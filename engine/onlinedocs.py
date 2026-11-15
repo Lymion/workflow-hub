@@ -94,6 +94,23 @@ def _cache_file(data_dir: Path, site: Site) -> Path:
     return data_dir / "docs-index" / f"{site.module}-{site.id}.json"
 
 
+LANGS = set("ar bn cs da de el es fa fi fr he hi hu id it ja ko ms nl no pl pt pt-br ro ru sv th tr uk vi zh zh-cn zh-hans zh-hant zh-tw".split())
+VERSION_SEG = re.compile(r"^(v?\d+(\.\d+)*(\.x)?|next|canary|unstable|nightly)$")
+
+
+def keep(url: str, prefix: str = "") -> bool:
+    """Skip translated copies (/de/...) and old or preview versions (/docs/0.77/..., /docs/15/...)."""
+    if prefix and not url.startswith(prefix):
+        return False
+    path = urlparse(url).path
+    rest = path[len(urlparse(prefix).path):] if prefix and path.startswith(urlparse(prefix).path) else path
+    segs = [x for x in rest.split("/") if x]
+    all_segs = [x for x in path.split("/") if x]
+    if all_segs and all_segs[0].lower() in LANGS:
+        return False
+    return not any(VERSION_SEG.match(x) for x in segs[:2])
+
+
 def parse_sitemap(xml: str) -> tuple[list[str], list[str]]:
     """Returns (page urls, child sitemap urls)."""
     try:
@@ -142,7 +159,7 @@ def fetch_pages(site: Site, url: str, client) -> list[dict]:
         seen += 1
         locs, children = parse_sitemap(r.text)
         queue += [c for c in children if not prefix or _same_site(c, prefix)]
-        pages += [{"title": title_from_url(u, prefix), "url": u} for u in locs if not prefix or u.startswith(prefix)]
+        pages += [{"title": title_from_url(u, prefix), "url": u} for u in locs if keep(u, prefix)]
     return pages
 
 
@@ -203,7 +220,8 @@ def rank(question: str, pages: list[dict], limit: int = 30, boost: list[str] | N
         hits = q & (nw | cw | tw)
         if not hits:
             continue
-        score = 3 * len(q & nw) + 1.5 * len(q & cw) + len(q & tw) + 0.5 * len(b & (nw | cw)) - 0.002 * len(p["url"])
+        exact = 2 if nw and nw <= q else 0  # the page is named exactly after words you asked about
+        score = 3 * len(q & nw) + exact + 1.5 * len(q & cw) + len(q & tw) + 0.5 * len(b & (nw | cw)) - 0.002 * len(p["url"])
         scored.append((score, p))
     scored.sort(key=lambda x: -x[0])
     out, seen = [], set()

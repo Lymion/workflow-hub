@@ -19,6 +19,9 @@ import httpx  # noqa: E402
 from engine import docs as docsmod, handbook, onlinedocs as od  # noqa: E402
 from engine.routes.guide import USER_AGENT  # noqa: E402
 
+# Sites that refuse automated requests but open fine in a browser: listed, not failed.
+BLOCKS_BOTS = ("www.npmjs.com",)
+
 SAMPLE = {"arduino": "servo", "esp32": "ledc pwm", "platformio": "lib_deps", "expo": "environment variables", "react-native": "pressable",
           "supabase": "sign in password", "nextjs": "app router", "tauri": "window"}
 
@@ -49,6 +52,9 @@ def main() -> int:
     for src in docsmod.sources(ROOT):
         urls.setdefault(src.url, f"docs.yaml:{src.id}")
     for url, where in sorted(urls.items()):
+        if any(f"//{h}/" in url for h in BLOCKS_BOTS):
+            print(f"SKIP {url}  ({where}) site blocks automated checks; opens in a browser")
+            continue
         ok, note = check(client, url)
         bad += not ok
         print(f"{'OK ' if ok else 'BAD'} {url}  ({where}) {note}")

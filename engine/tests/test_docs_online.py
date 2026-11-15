@@ -174,3 +174,20 @@ def test_open_in_browser_only_takes_web_links(client, hub):
     assert client.post("/open-url", json={"url": "https://docs.arduino.cc/libraries/servo/"}).json() == {"opened": True}
     assert client.post("/open-url", json={"url": "file:///C:/Windows/system32/calc.exe"}).status_code == 400
     assert opened == ["https://docs.arduino.cc/libraries/servo/"]
+
+
+def test_translations_and_old_versions_are_skipped():
+    assert od.keep("https://docs.arduino.cc/learn/electronics/servo-motors/", "https://docs.arduino.cc/")
+    assert not od.keep("https://docs.arduino.cc/de/learn/electronics/servo-motors/", "https://docs.arduino.cc/")
+    assert not od.keep("https://v2.tauri.app/zh-cn/start/", "https://v2.tauri.app/")
+    assert not od.keep("https://reactnative.dev/docs/0.77/pressable", "https://reactnative.dev/docs/")
+    assert not od.keep("https://reactnative.dev/docs/next/pressable", "https://reactnative.dev/docs/")
+    assert not od.keep("https://nextjs.org/docs/15/app/guides/migrating/app-router-migration", "https://nextjs.org/docs")
+    assert od.keep("https://nextjs.org/docs/app/guides/migrating/app-router-migration", "https://nextjs.org/docs")
+    assert od.keep("https://docs.platformio.org/en/latest/boards/espressif32/esp32dev.html")
+
+
+def test_exact_page_name_ranks_first():
+    pages = [{"title": "Servo motors · learn electronics", "url": "https://docs.arduino.cc/learn/electronics/servo-motors/"},
+             {"title": "Servo · libraries", "url": "https://docs.arduino.cc/libraries/servo/"}]
+    assert od.rank("servo", pages)[0]["url"] == "https://docs.arduino.cc/libraries/servo/"
