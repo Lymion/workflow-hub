@@ -24,7 +24,10 @@ DEFAULT_RM_PER_USD = 4.4
 
 
 def _default_root() -> Path:
-    return Path(__file__).resolve().parent.parent
+    from .bundle import frozen, user_hub_dir
+
+    # The installed app keeps its hub folder in local app data (the program folder is read-only).
+    return user_hub_dir() if frozen() else Path(__file__).resolve().parent.parent
 
 
 @dataclass(frozen=True)

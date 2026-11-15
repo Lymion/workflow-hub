@@ -25,6 +25,7 @@ from typing import Any, Callable
 import yaml
 
 from . import launchers, llm
+from .bundle import frozen
 from .hub import Hub
 
 KINDS = ("code", "small-llm", "big-llm")
@@ -206,6 +207,8 @@ def save_review(hub: Hub, state: dict, args: dict) -> dict:
 @action("run_hub_tests", "code", "Runs the hub's own tests (python -m pytest).")
 def run_hub_tests(hub: Hub, state: dict, args: dict) -> dict:
     runner = getattr(hub, "test_runner", None)
+    if not runner and frozen():
+        return {"summary": "The installed app doesn't ship the hub's tests; run python -m pytest in the source folder instead", "skip": True}
     if runner:
         code, out = runner()
     else:

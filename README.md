@@ -25,9 +25,19 @@ Every Haiku call goes through one guard: the model is fixed (`engine/config.py`)
 
 **The hub never edits your code.** It only writes files with an `AUTO-GENERATED` header at the top (`pins.h`, `platformio.ini`, `wiring.json`, `PARTS.md`, theme tokens, `.env.example`, `release.json`, `CHANGELOG.md`, icons in `assets/hub/`). Starter files (`main.cpp`, `CLAUDE.md`, `.gitignore`, `app.config.js`, new screens) are written once if missing and are yours from then on. If a file the hub wants to write exists without the header, it leaves it alone and tells you.
 
-## Set up on Windows 11
+## Install on Windows 11 (no coding tools needed)
 
-Install these once, in this order. Open a **new** PowerShell window after each install so `PATH` updates.
+1. Open the repository on GitHub → **Actions** → **Windows installer** → the latest green run. Under **Artifacts**, download **Workflow-Hub-Windows-installer** and unzip it. (When a version is tagged, the installer is also on the **Releases** page.)
+2. Run `Workflow Hub_0.1.0_x64-setup.exe`. It installs for your user only, so it doesn't need admin rights. Windows SmartScreen may say "Windows protected your PC" because the installer isn't signed: click **More info** → **Run anyway**.
+3. Open **Workflow Hub** from the Start menu. It starts its own engine; nothing else to run.
+
+Your data lives in `%LOCALAPPDATA%\Workflow Hub` (database, your snippets, handbook notes, `data\engine.log`). Uninstalling the app keeps it. To update, run a newer installer over the old one.
+
+Install the tools for your projects (table in step 5 below) so Build, Upload, Git and app setup work. The engine runs while the app window is open, so scheduled automations run only then.
+
+## Set up for development on Windows 11
+
+Only needed to change the hub itself. Install these once, in this order. Open a **new** PowerShell window after each install so `PATH` updates.
 
 ### 1. Rust
 
@@ -103,7 +113,16 @@ npm run tauri dev
 
 The first run compiles the Rust shell and takes a few minutes. The app starts the engine by itself if it isn't already running. If the sidebar says **Engine offline**, start it as above and press **Retry**.
 
-**Build an installer:** `cd app` then `npm run tauri build`. The `.msi` and `.exe` land in `app\src-tauri\target\release\bundle\`.
+**Build an installer yourself:** the GitHub workflow `.github/workflows/windows-installer.yml` does this on every push. Locally:
+
+```powershell
+.venv\Scripts\pip install pyinstaller
+.venv\Scripts\python packaging\build_engine.py
+cd app
+npx tauri build --bundles nsis
+```
+
+The first command packs the engine into `app\src-tauri\engine-dist\` (so the installed app needs no Python); the setup `.exe` lands in `app\src-tauri\target\release\bundle\nsis\`.
 
 ## Tests
 

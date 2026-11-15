@@ -44,6 +44,7 @@ modules/           one folder per project type (module.yaml, handbook/, boards/,
 snippets/          snippet library, one folder per snippet
 workflows/         automations (YAML; steps tagged code / small-llm / big-llm)
 vscode-extension/  VS Code extension (plain JS; talks to the engine only)
+packaging/         builds engine.exe for the Windows installer (PyInstaller)
 app/               Tauri 2 + React + Tailwind desktop shell
   src/pages/       one file per screen
   src-tauri/       Rust shell; starts the engine if it isn't running

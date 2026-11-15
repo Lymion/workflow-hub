@@ -14,3 +14,7 @@ app/dist/
 app/src-tauri/target/
 app/src-tauri/gen/
 vscode-extension/*.vsix
+# desktop installer build
+build/
+app/src-tauri/engine-dist/
+app/src-tauri/engine-build/
