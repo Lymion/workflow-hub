@@ -13,10 +13,11 @@ Spec: [`docs/spec.md`](docs/spec.md) · Screen designs: [`scratch/`](scratch/)
 | Where | What | Costs tokens? |
 | --- | --- | --- |
 | Home | Today's tasks across projects, recent projects, this week's review, Haiku spend in the sidebar | No |
-| New project | Name, type, then a board (robots) or a stack (apps); presets and live checks | No |
-| Project tabs | Tasks, Journal, Snippets used, **Parts** (cart, costs, checks), **Wiring** (drag wires, pin picker, `pins.h`), **Stack**, **Design tokens**, **Release** (apps), **Run** (build, upload, dev server, serial monitor + plotter), **Git** | Only the commit message |
+| New project | Name, type, then a board (robots) or a stack (apps); presets, live checks, and the docs for what you picked | No |
+| Project | A collapsible **Docs** bar with the docs for its board, parts and stack (updates as you add parts). Tabs: Tasks, Journal, Snippets used, **Parts** (cart, costs, checks), **Wiring** (drag wires, pin picker, `pins.h`), **Stack**, **Design tokens**, **Release** (apps), **Run** (build, upload, dev server, serial monitor + plotter), **Git** | Only the commit message |
 | Handbook | Parts, boards and stacks with comparison specs; **Guide me** question flow; your own notes | No |
 | Library | Snippets (quick capture: `Ctrl+Shift+S`) and the error log, one search for both | No |
+| Docs | Official doc sites (Arduino, ESP32, PlatformIO, Expo, React Native, Supabase, Next.js, Tauri) read live in a hub window; **Find pages** searches them online and Haiku picks the best 3-5; save any page for Ask docs | Find pages: one small Haiku call (about RM0.003), cached |
 | Ask docs | Docs guide with cards and a hint ladder, from downloaded docs + the handbook | One small Haiku call, cached |
 | Automations | Weekly review, nightly hub health, your own workflows in `workflows/` | Weekly review: one Haiku call |
 | VS Code | Insert snippet, Ask hub, save selection, log error ([`vscode-extension/`](vscode-extension/)) | Ask hub only |
@@ -135,6 +136,18 @@ node --test test/lib.test.js
 ```
 
 The nightly **Hub health** automation runs the same tests; if one fails it saves the output to `data\health\last-failure.md` and opens Claude Code in the hub folder.
+
+## Add doc links
+
+Each handbook chapter (part, board or stack) can list official pages in its setup block:
+
+```yaml
+docs:
+- title: "Arduino · Servo library"
+  url: https://docs.arduino.cc/libraries/servo/
+```
+
+Library (`lib_dep`) and npm (`packages`) pages are added automatically. Doc sites for the Docs page live in each module's `docs.yaml` under `sites:`. The **Docs links** GitHub workflow checks every link weekly.
 
 ## Add a project type
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { openDoc } from "../lib/opendoc";
 import { api, notifyChanged, useLoad } from "../lib/api";
 import type { Project } from "../lib/types";
 import { copyText } from "../lib/snippets";
@@ -48,11 +49,12 @@ export function Guide() {
     }
   };
 
-  const open = (url: string) => (url.startsWith("#") ? (location.hash = url) : window.open(url, "_blank", "noopener"));
+  const open = (url: string, title?: string) => openDoc(url, title);
 
   return (
     <>
-      <PageHead eyebrow="Docs, handbook and your error log" title="Ask docs" />
+      <PageHead eyebrow="Saved docs, handbook and your error log" title="Ask docs" />
+      <p className="text-[13px] text-label-2 -mt-3 mb-4 max-w-[640px]">Answers from pages saved on your laptop, with snippets. To find any page in the official docs online, use <a className="text-accent-text font-medium" href="#docs">Docs</a>.</p>
       <div className="card p-4 grid gap-3 rise max-w-[880px]">
         <textarea
           className="input text-[15px]"

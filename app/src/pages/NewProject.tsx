@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { DocsBar, type ProjectDocs } from "../components/DocsList";
 import { api, notifyChanged, useLoad } from "../lib/api";
 import { go } from "../lib/router";
 
@@ -66,6 +67,16 @@ export function TypeToggle({ modules, value, onChange }: { modules: Module[]; va
           {m.name}
         </button>
       ))}
+    </div>
+  );
+}
+
+/** Docs picked for the board and stack chosen so far, before the project exists. */
+function NewProjectDocs({ module, board, stack }: { module: string; board: string | null; stack: string[] }) {
+  const docs = useLoad(() => api.post<ProjectDocs>("/docs/for", { module, board, stack }), [module, board, stack.join(",")], { live: false });
+  return (
+    <div className="mt-6 max-w-[880px] rise">
+      <DocsBar data={docs.data} title="Docs for this project" defaultOpen footer={<p className="text-xs text-label-2 mt-2">Parts you add later get their docs too: see the Docs bar at the top of the project.</p>} />
     </div>
   );
 }
@@ -150,6 +161,7 @@ export function NewProject() {
         </div>
       )}
       {mod && slots.map((s) => { const P = PICKERS[s].Picker; return <P key={s + mod.id} module={mod} value={picks} onChange={setPicks} />; })}
+      {mod && (picks.board || (picks.stack as string[] | undefined)?.length) ? <NewProjectDocs module={mod.id} board={(picks.board as string) ?? null} stack={(picks.stack as string[]) ?? []} /> : null}
       {mod && slots.includes("board") && picks.board ? (
         <div className="mt-6 max-w-[640px]"><Check level="ok"><b>Parts</b> come next: add motors, sensors and power in the project's Parts tab, with checks and costs.</Check></div>
       ) : null}

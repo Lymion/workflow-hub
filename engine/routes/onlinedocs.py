@@ -7,6 +7,7 @@ says why. Haiku only sees page titles and links, so the prompt stays small.
 from __future__ import annotations
 
 import hashlib
+from concurrent.futures import ThreadPoolExecutor
 import json
 import re
 
@@ -108,18 +109,19 @@ def online_ask(request: Request, body: AskIn) -> dict:
     boost = []
     if project:
         boost = [it["title"] for it in od.item_docs(current(hub), project_keys(hub, project))]
-    pages, errors = [], []
-    with http_client(hub) as client:
-        for s in sites:
-            got, err = od.load_index(s, hub.paths.data, client)
+    pages, errors, unreachable = [], [], []
+    with http_client(hub) as client, ThreadPoolExecutor(max_workers=min(8, len(sites))) as pool:
+        # all sites at once: the first search of the week fetches several page lists
+        for s, (got, err) in zip(sites, pool.map(lambda s: od.load_index(s, hub.paths.data, client), sites)):
             if err:
                 errors.append(err)
+                unreachable.append(s.title)
             pages += [{**p, "site": s.id} for p in got]
     site_titles = {s.id: s.title for s in sites}
     ranked = od.rank(body.question, pages, MAX_CANDIDATES, boost)
     site_of = {p["url"]: p["site"] for p in pages}
     candidates = [{**c, "site": site_of.get(c["url"], ""), "site_title": site_titles.get(site_of.get(c["url"], ""), "")} for c in ranked]
-    base = {"candidates": candidates[:10], "errors": errors, "sites": [site_info(s) for s in sites]}
+    base = {"candidates": candidates[:10], "errors": errors, "unreachable": unreachable, "sites": [site_info(s) for s in sites]}
     if not candidates:
         msg = errors[0] if errors and not pages else "No page names match those words. Try the function or part name (for example pulseIn, Servo, LEDC), or search on the site itself."
         return {**base, "status": "no_matches", "picks": [], "message": msg}
@@ -189,3 +191,20 @@ def remove_page(request: Request, source_id: str) -> None:
         idx.delete("doc", str(r["id"]))
     with hub.tx() as c:
         c.execute("DELETE FROM doc_chunks WHERE source = ?", (source_id,))
+
+
+class OpenIn(BaseModel):
+    url: str = Field(min_length=8, max_length=2000)
+
+
+@router.post("/open-url")
+def open_url(request: Request, body: OpenIn) -> dict:
+    """Open a web page in your default browser (the desktop window can't do it by itself)."""
+    import webbrowser
+
+    if not re.match(r"https?://", body.url):
+        raise HTTPException(400, "Only web links (http or https) open in the browser.")
+    opener = getattr(hub_of(request), "browser_opener", None) or webbrowser.open
+    if not opener(body.url):
+        raise HTTPException(424, "No default browser found. Copy the link and open it yourself.")
+    return {"opened": True}

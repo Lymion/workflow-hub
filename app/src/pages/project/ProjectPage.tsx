@@ -8,6 +8,18 @@ import { Banner, Empty, Sk } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import type { ModulesResponse } from "../NewProject";
 import { tabsFor } from "./tabs";
+import { DocsBar, type ProjectDocs } from "../../components/DocsList";
+
+/** Collapsible docs for this project's board, parts and stack. Refreshes when parts change. */
+function ProjectDocsBar({ id }: { id: number }) {
+  const docs = useLoad(() => api.get<ProjectDocs>(`/projects/${id}/docs`), [id]);
+  return (
+    <div className="mb-4 rise" style={{ ["--d" as string]: "30ms" }}>
+      <DocsBar data={docs.data} footer={<a className="btn btn-ghost btn-sm mt-2" href={`#docs/project/${id}`}><Icon name="search" />Ask the official docs about this project</a>} />
+    </div>
+  );
+}
+
 
 export function ProjectPage({ id, tab }: { id: number; tab?: string }) {
   const toast = useToast();
@@ -105,6 +117,7 @@ export function ProjectPage({ id, tab }: { id: number; tab?: string }) {
       {launchers.data && primary && !primary.available && (
         <div className="mb-4"><Banner tone="warn">{primary.fix}</Banner></div>
       )}
+      <ProjectDocsBar id={id} />
       <div className="seg mb-[18px] rise" style={{ ["--d" as string]: "40ms" }} role="tablist" aria-label="Project sections" ref={segRef}
         onKeyDown={(e) => {
           if (!/Arrow(Left|Right)/.test(e.key)) return;

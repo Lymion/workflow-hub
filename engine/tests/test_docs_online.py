@@ -50,6 +50,7 @@ def online(hub):
 def test_words_split_camel_case_and_stem():
     assert od.words("Why does pulseIn return 0 on servos?") == ["pulse", "return", "servo"]
     assert od.title_from_url("https://docs.arduino.cc/language-reference/en/functions/advanced-io/pulseIn/") == "pulseIn · functions advanced io"
+    assert od.title_from_url("https://docs.arduino.cc/libraries/servo/") == "Servo · libraries"
 
 
 def test_sitemap_index_and_sphinx_are_parsed(hub, online):
@@ -109,6 +110,8 @@ def test_no_matches_and_offline(client, hub, online):
     hub.http_factory = lambda: httpx.Client(transport=httpx.MockTransport(lambda req: httpx.Response(503)))
     r = client.post("/docs/online/ask", json={"question": "tauri window", "module": "app-dev"}).json()
     assert r["status"] == "no_matches" and "couldn't load its page list" in r["message"]
+    again = client.post("/docs/online/ask", json={"question": "tauri window", "module": "app-dev"}).json()
+    assert "a moment ago" in again["message"] and again["unreachable"] == ["Expo", "React Native", "Supabase", "Next.js", "Tauri"]  # offline: don't wait on every site again for a few minutes
 
 
 def test_sites_listed_per_module(client):
@@ -163,3 +166,11 @@ def test_every_part_doc_link_is_well_formed(hub):
     for ch in hb.chapters.values():
         for d in ch.meta.get("docs") or []:
             assert d["url"].startswith("https://") and d.get("title"), ch.path
+
+
+def test_open_in_browser_only_takes_web_links(client, hub):
+    opened = []
+    hub.browser_opener = lambda url: opened.append(url) or True
+    assert client.post("/open-url", json={"url": "https://docs.arduino.cc/libraries/servo/"}).json() == {"opened": True}
+    assert client.post("/open-url", json={"url": "file:///C:/Windows/system32/calc.exe"}).status_code == 400
+    assert opened == ["https://docs.arduino.cc/libraries/servo/"]

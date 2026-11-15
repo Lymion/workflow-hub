@@ -466,3 +466,42 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .rv-h.g { color: var(--green-text); } .rv-h.a { color: var(--amber-text); } .rv-h.b { color: var(--accent-text); }
 @media (max-width: 800px) { .rv-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .switch span, .switch span::after { transition: none; } }
+
+/* ---- docs: docs bar, docs lists, Docs page ---- */
+.docs-bar { padding: 0; overflow: hidden; }
+.docs-bar-head { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; text-align: left; border-radius: 16px; transition: background-color 150ms ease; }
+@media (hover: hover) and (pointer: fine) { .docs-bar-head:hover { background: var(--fill); } }
+.docs-bar-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.docs-tile { background: linear-gradient(160deg, #34C3FF, #0A84FF 55%, #5E5CE6); }
+.docs-chev { color: var(--label-3); transition: transform 220ms cubic-bezier(.32,.72,0,1); }
+.docs-bar.open .docs-chev { transform: rotate(180deg); }
+.docs-bar-body { padding: 0 14px 14px; animation: docs-in 220ms cubic-bezier(.32,.72,0,1); }
+@keyframes docs-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .docs-bar-body { animation: none; } .docs-chev { transition: none; } }
+.docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.docs-group { background: var(--fill); border-radius: 12px; padding: 8px 6px 6px; }
+.docs-group h4 { font-size: 11.5px; font-weight: 700; color: var(--label-2); padding: 0 8px 4px; letter-spacing: .01em; }
+.doc-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 9px; transition: background-color 150ms ease; }
+@media (hover: hover) and (pointer: fine) { .doc-row:hover { background: var(--surface-solid); } }
+.doc-row > button:first-of-type:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.doc-ic { width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 7px; }
+.doc-ic .i { width: 15px; height: 15px; }
+.doc-ic.k-handbook { background: var(--robotics-tint); color: var(--robotics-text); }
+.doc-ic.k-official { background: var(--accent-tint); color: var(--accent-text); }
+.doc-ic.k-library { background: var(--appdev-tint); color: var(--appdev-text); }
+.doc-pick .doc-ic { width: 34px; height: 34px; border-radius: 9px; }
+.site-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.site-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 16px; text-align: left; overflow: hidden;
+  transition: transform 160ms cubic-bezier(.32,.72,0,1), box-shadow 160ms ease; }
+.site-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--site-c, var(--accent)); opacity: .9; }
+.site-card.m-robotics { --site-c: linear-gradient(90deg, #FF9F0A, #F56300); }
+.site-card.m-app-dev { --site-c: linear-gradient(90deg, #7D7AFF, #5E5CE6); }
+.site-card b { font-size: 14.5px; }
+.site-card > span:not(.site-ic) { font-size: 12.5px; color: var(--label-2); }
+.site-card .site-host { font: 500 11px theme("fontFamily.mono"); color: var(--label-3) !important; margin-top: 4px; }
+.site-ic { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 9px; margin-bottom: 6px; color: #fff; background: var(--site-c, var(--accent)); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 1px 2px rgba(0,0,0,.18); }
+.site-ic .i { width: 17px; height: 17px; }
+@media (hover: hover) and (pointer: fine) { .site-card:hover { transform: translateY(-2px); box-shadow: var(--hl), var(--shadow-2); } }
+.site-card:active { transform: scale(.98); }
+.site-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .site-card { transition: none; } .site-card:hover { transform: none; } }

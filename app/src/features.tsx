@@ -22,6 +22,7 @@ import { ReleaseTab } from "./pages/project/ReleaseTab";
 import { Automations, HealthNote, ReviewCard } from "./pages/Automations";
 import { HOME_SECTIONS } from "./pages/Home";
 import { NAV } from "./components/Sidebar";
+import { Docs } from "./pages/Docs";
 
 // ---- session 3: snippet library ----
 PAGES.library = Library;
@@ -81,3 +82,7 @@ MODULE_TABS.release = { id: "release", label: "Release", Component: ReleaseTab }
 PAGES.automations = Automations;
 NAV.push({ href: "#automations", icon: "zap", label: "Automations" });
 HOME_SECTIONS.push(HealthNote, () => <ReviewCard />);
+
+// ---- docs page: official docs online, online Ask, docs per part ----
+PAGES.docs = Docs;
+NAV.splice(NAV.findIndex((n) => n.href === "#guide"), 0, { href: "#docs", icon: "globe", label: "Docs" });

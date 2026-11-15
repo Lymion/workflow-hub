@@ -82,6 +82,8 @@ def title_from_url(url: str, prefix: str = "") -> str:
     if not parts:
         return urlparse(url).netloc
     name = parts[-1].replace("-", " ").replace("_", " ")
+    if name.islower():
+        name = name[:1].upper() + name[1:]
     context = " ".join(x.replace("-", " ") for x in parts[-3:-1])
     return f"{name} · {context}" if context else name
 
@@ -148,6 +150,10 @@ def _same_site(url: str, prefix: str) -> bool:
     return urlparse(url).netloc == urlparse(prefix).netloc
 
 
+_FAILED: dict[str, float] = {}   # site file -> when its page list last failed (skip retries for a few minutes)
+RETRY_AFTER = 300
+
+
 def load_index(site: Site, data_dir: Path, client, refresh: bool = False) -> tuple[list[dict], str]:
     """The site's page list, from the week-old cache or live. Returns (pages, error)."""
     f = _cache_file(data_dir, site)
@@ -162,6 +168,8 @@ def load_index(site: Site, data_dir: Path, client, refresh: bool = False) -> tup
     urls = [urls] if isinstance(urls, str) else list(urls)
     if not urls:
         return [], ""
+    if not refresh and time.time() - _FAILED.get(str(f), 0) < RETRY_AFTER:
+        return [], f"{site.title}: its page list didn't load a moment ago. Check your connection; the site itself still opens."
     pages, error = [], ""
     for url in urls:  # first one that works wins (sites move their sitemaps now and then)
         try:
@@ -172,9 +180,11 @@ def load_index(site: Site, data_dir: Path, client, refresh: bool = False) -> tup
         if pages:
             break
     if not pages:
+        _FAILED[str(f)] = time.time()
         if f.is_file():  # stale is better than nothing
             return json.loads(f.read_text(encoding="utf-8")).get("pages", []), ""
         return [], f"{site.title}: couldn't load its page list ({error or 'empty'}). Check your connection; the site itself still opens."
+    _FAILED.pop(str(f), None)
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps({"at": time.time(), "pages": pages}), encoding="utf-8")
     return pages, ""
