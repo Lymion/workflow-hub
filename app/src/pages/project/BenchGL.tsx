@@ -104,8 +104,13 @@ export default function BenchGL(p: BenchProps) {
       g.raf = requestAnimationFrame(loop);
     };
     g.raf = requestAnimationFrame(loop);
+    const main = el.closest("main"), layout = el.closest(".wire-layout");
     const ro = new ResizeObserver(() => {
-      const w = el.clientWidth, h = Math.round(Math.max(420, Math.min(720, w * 0.64)));
+      // fill the window: from the top of the Wiring layout down to the bottom of the page area
+      const w = el.clientWidth;
+      let h = w * 0.64;
+      if (main && layout) h = main.clientHeight - (layout.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop) - 24;
+      h = Math.round(Math.max(440, Math.min(h, w * 1.2)));
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
@@ -113,6 +118,7 @@ export default function BenchGL(p: BenchProps) {
       g.dirty = true;
     });
     ro.observe(el);
+    if (main) ro.observe(main);
     const mo = new MutationObserver(() => setTheme(document.documentElement.dataset.theme ?? "light"));
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     setReady(true);
@@ -227,7 +233,7 @@ export default function BenchGL(p: BenchProps) {
   useEffect(() => {
     const g = gl.current;
     if (!g || focus) return;
-    frame(g, VIEWS.iso, false, null, mode === "board" ? 0.5 : 0.8); // Board view leaves room for the callouts
+    frame(g, VIEWS.iso, false, null, mode === "board" ? 0.58 : 0.88); // Board view leaves room for the callouts
     g.saved = null;
   }, [ready, frameKey]);
 
@@ -307,7 +313,7 @@ export default function BenchGL(p: BenchProps) {
   // ---------- camera buttons ----------
   const turn = (deg: number) => { const g = gl.current; if (!g) return; const off = g.camera.position.clone().sub(g.controls.target); off.applyAxisAngle(new THREE.Vector3(0, 1, 0), deg * DEG); fly(g, g.controls.target.clone(), g.controls.target.clone().add(off)); };
   const zoom = (k: number) => { const g = gl.current; if (!g) return; const off = g.camera.position.clone().sub(g.controls.target).multiplyScalar(k); fly(g, g.controls.target.clone(), g.controls.target.clone().add(off)); };
-  const view = (v: ViewName) => { const g = gl.current; if (g) frame(g, VIEWS[v], true, focus ? g.parts.get(focus.id) ?? null : null, focus ? undefined : mode === "board" ? 0.5 : 0.8); };
+  const view = (v: ViewName) => { const g = gl.current; if (g) frame(g, VIEWS[v], true, focus ? g.parts.get(focus.id) ?? null : null, focus ? undefined : mode === "board" ? 0.58 : 0.88); };
 
   // ---------- overlay: everything projected from 3D ----------
   const g = gl.current;
@@ -467,7 +473,7 @@ export default function BenchGL(p: BenchProps) {
         <button type="button" className="txt" aria-label="Angled view" title="Angled view" onClick={() => view("iso")}>3D</button>
         <button type="button" className="txt" aria-label="Top view" title="Top view" onClick={() => view("top")}>Top</button>
         <button type="button" className="txt" aria-label="Front view" title="Front view" onClick={() => view("front")}>Front</button>
-        <button type="button" aria-label="Reset view" title="Reset view" onClick={() => { p.setSelPart(null); p.setTraced(null); const gg = gl.current; if (gg) { gg.saved = null; frame(gg, VIEWS.iso, true, null, mode === "board" ? 0.5 : 0.8); } }}><Icon name="fit" /></button>
+        <button type="button" aria-label="Reset view" title="Reset view" onClick={() => { p.setSelPart(null); p.setTraced(null); const gg = gl.current; if (gg) { gg.saved = null; frame(gg, VIEWS.iso, true, null, mode === "board" ? 0.58 : 0.88); } }}><Icon name="fit" /></button>
         <span className="sep" aria-hidden="true" />
         <button type="button" aria-pressed={labels} aria-label="Labels" title="Labels" onClick={() => setLabels(!labels)}><Icon name="tag" /></button>
         <button type="button" aria-pressed={flow} aria-label="Show current flow" title="Show current flow" onClick={() => setFlow(!flow)}><Icon name="pulse" /></button>
@@ -490,7 +496,7 @@ function frame(g: GL, v: { az: number; polar: number }, animate: boolean, only: 
   const box = new THREE.Box3().setFromObject(only ?? g.content);
   if (box.isEmpty()) return;
   const c = box.getCenter(new THREE.Vector3()), r = Math.max(10, box.getSize(new THREE.Vector3()).length() / 2);
-  const fill = fillTo ?? (only ? 0.55 : 0.8); // how much of the view the bench should fill
+  const fill = fillTo ?? (only ? 0.62 : 0.88); // how much of the view the bench should fill
   // fit to each object's own box: the parts sit on a diagonal, so one box around everything has big empty corners
   const pts: THREE.Vector3[] = [];
   for (const o of only ? [only] : g.content.children) {

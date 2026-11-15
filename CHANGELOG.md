@@ -5,6 +5,7 @@ Each update the Windows installer delivers has a higher version, so it installs 
 ## 0.4.0
 
 - **New Wiring tab in real 3D:** your board and parts on a drawing-board bench, with the real wires from your project as cables in space.
+  - **Fills the window:** the bench runs to the bottom of the window and across its full width, the parts fill the view, and the bench stays in place while you scroll the side panel.
   - **Free camera:** drag to orbit, right-drag to move, scroll or pinch to zoom. Buttons turn the bench by 90°, zoom, and jump to an angled, top or front view.
   - **Click any part** (or its name tag) for a close-up: the camera flies to it, the other parts fade, and every pin is labelled with the board pin it goes to and its signal name. **Back to bench** returns to where you were.
   - **Board view** explains the board with callout cards (USB, chip, pin rows, buttons). Hover any pin to see what it can do and what's wired to it.
