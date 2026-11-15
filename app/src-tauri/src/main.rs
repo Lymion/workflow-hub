@@ -113,8 +113,25 @@ fn start_engine(app: &tauri::App) -> Option<Child> {
     }
 }
 
+/// Stop the engine this window started, so an update can replace engine.exe.
+/// Returns false when the engine was started by someone else (it is left alone).
+#[tauri::command]
+fn stop_engine(state: tauri::State<Engine>) -> bool {
+    match state.0.lock().unwrap().take() {
+        Some(mut child) => {
+            let _ = child.kill();
+            let _ = child.wait();
+            true
+        }
+        None => false,
+    }
+}
+
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        .invoke_handler(tauri::generate_handler![stop_engine])
         .setup(|app| {
             let child = start_engine(app);
             app.manage(Engine(Mutex::new(child)));
