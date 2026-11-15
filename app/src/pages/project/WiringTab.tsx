@@ -153,11 +153,13 @@ export function WiringTab({ project }: TabProps) {
                   <div className="flex items-center gap-2">
                     <span className="wdot" style={{ background: color[wid(w)] }} />
                     <SignalName w={w} onRename={rename} />
-                    <button className="pin-sel ml-auto" aria-haspopup="listbox" aria-expanded={picker?.w === w} onClick={(e) => { e.stopPropagation(); setPicker(picker && wid(picker.w) === wid(w) ? null : { w, el: e.currentTarget, key: e.detail === 0 }); }}>
+                  </div>
+                  <div className="wp-wire-sub flex items-center gap-2">
+                    <span className="flex-1 min-w-0 truncate">{titleOf(w.part)}{qty > 1 ? ` #${w.instance}` : ""} <span className="font-mono">{w.partPin}</span></span>
+                    <button className="pin-sel" aria-haspopup="listbox" aria-expanded={picker?.w === w} onClick={(e) => { e.stopPropagation(); setPicker(picker && wid(picker.w) === wid(w) ? null : { w, el: e.currentTarget, key: e.detail === 0 }); }}>
                       {w.boardPin ? pinLabel(w.boardPin) : "Pick a pin"}<Icon name="down" />
                     </button>
                   </div>
-                  <div className="wp-wire-sub">{titleOf(w.part)}{qty > 1 ? ` #${w.instance}` : ""} <span className="font-mono">{w.partPin}</span></div>
                   <span className={`pin-msg ${lvl}`}>{lvl === "ok" ? <Icon name="check-c" /> : <span className="bang" aria-hidden="true">!</span>}<span>{f ? `${f.problem[0].toUpperCase()}${f.problem.slice(1)}. ${f.fix}` : w.divider ? "OK, through the 1k/2k divider." : "OK"}</span></span>
                 </div>
               );
