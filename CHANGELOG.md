@@ -9,6 +9,7 @@ Each update the Windows installer delivers has a higher version, so it installs 
   - **Click any part** (or its name tag) for a close-up: the camera flies to it, the other parts fade, and every pin is labelled with the board pin it goes to and its signal name. **Back to bench** returns to where you were.
   - **Board view** explains the board with callout cards (USB, chip, pin rows, buttons). Hover any pin to see what it can do and what's wired to it.
   - **Project view** places every part around the board without overlaps. Name tags never cover a part or another tag, at any angle or zoom.
+  - **Wires never pass through parts:** each cable leaves its pin, climbs over anything in its way and drops straight onto the board pin. A pin on the far side of a part has its lead wrapped around the part, like a real cable.
   - **Move a wire:** click it, then click the pin you want; pins.h updates. The pin picker works in the Wires panel and in a part's pin list.
   - **Side panel:** Overview (board facts, warnings, parts, or the selected part's pins), Pinout, Wires and pins.h.
   - **All four boards** and 15 parts have 3D models, kept as data in the board files and handbook chapters. Computers without WebGL get the flat angled drawing instead.

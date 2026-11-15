@@ -204,3 +204,112 @@ export function placeTags(tags: { id: string; w: number; h: number; of: Rect; sh
   }
   return out;
 }
+
+// ---------------- wire routing ----------------
+
+export type P3 = [number, number, number];
+export type Box3D = { id: string; x0: number; x1: number; y0: number; y1: number; z0: number; z1: number };
+
+/** A shape's box in plan coordinates (offset by its part's position). */
+export function shapeBox(id: string, sh: Shape, dx = 0, dy = 0): Box3D {
+  const hw = sh.kind === "cyl" ? sh.r ?? 1 : (sh.w ?? 1) / 2, hd = sh.kind === "cyl" ? sh.r ?? 1 : (sh.d ?? 1) / 2;
+  const x = (sh.x ?? 0) + dx, y = (sh.y ?? 0) + dy, z = sh.z ?? 0;
+  return { id, x0: x - hw, x1: x + hw, y0: y - hd, y1: y + hd, z0: z, z1: z + sh.h };
+}
+
+const inFoot = (b: Box3D, x: number, y: number, m: number) => x > b.x0 - m && x < b.x1 + m && y > b.y0 - m && y < b.y1 + m;
+
+/** Route a wire from a part's pin (A) to a board pin (B) without passing through anything:
+ *  out of its own part sideways, up above everything on its way, across, and straight down onto the pin.
+ *  Corners are rounded so it reads as a cable. Returns points along the route. */
+export function routeWire(A: P3, B: P3, own: string, boxes: Box3D[], lane = 0, margin = 1.8, clear = 5): P3[] {
+  const mine = boxes.filter((b) => b.id === own), others = boxes.filter((b) => b.id !== own);
+  // leave the part away from its middle (or toward the board when the pin sits dead centre)
+  const cx = mine.length ? (Math.min(...mine.map((b) => b.x0)) + Math.max(...mine.map((b) => b.x1))) / 2 : A[0];
+  const cy = mine.length ? (Math.min(...mine.map((b) => b.y0)) + Math.max(...mine.map((b) => b.y1))) / 2 : A[1];
+  let ox = A[0] - cx, oy = A[1] - cy;
+  if (Math.hypot(ox, oy) < 0.5) { ox = B[0] - A[0]; oy = B[1] - A[1]; }
+  const ol = Math.hypot(ox, oy) || 1;
+  ox /= ol; oy /= ol;
+  let t = 0;
+  while (t < 80 && boxes.some((b) => inFoot(b, A[0] + ox * t, A[1] + oy * t, margin) && b.z1 > A[2] - 0.5 && (b.id === own || b.z0 < A[2] + 6))) t += 0.5;
+  t += 2.5;
+  const A1: P3 = [A[0] + ox * t, A[1] + oy * t, A[2]];
+  // cruise height: above everything whose footprint the crossing passes over (and above both ends)
+  let H = Math.max(A[2], B[2]) + clear;
+  const steps = Math.max(2, Math.ceil(Math.hypot(B[0] - A1[0], B[1] - A1[1])));
+  for (let i = 0; i <= steps; i++) {
+    const x = A1[0] + ((B[0] - A1[0]) * i) / steps, y = A1[1] + ((B[1] - A1[1]) * i) / steps;
+    for (const b of boxes) if (inFoot(b, x, y, margin)) H = Math.max(H, b.z1 + clear);
+  }
+  for (const b of others) if (inFoot(b, A1[0], A1[1], margin)) H = Math.max(H, b.z1 + clear);
+  H += lane;
+  const back = ox * (B[0] - A1[0]) + oy * (B[1] - A1[1]) < 0;
+  if (back && mine.length) {
+    const around = wrapAround(A, B, mine, others, H, margin);
+    if (around) {
+      const [S2] = around.slice(-1);
+      let H2 = Math.max(H, S2[2]);
+      const n = Math.max(2, Math.ceil(Math.hypot(B[0] - S2[0], B[1] - S2[1])));
+      for (let i = 0; i <= n; i++) {
+        const x = S2[0] + ((B[0] - S2[0]) * i) / n, y = S2[1] + ((B[1] - S2[1]) * i) / n;
+        for (const b of boxes) if (inFoot(b, x, y, margin)) H2 = Math.max(H2, b.z1 + clear + lane);
+      }
+      const pts: P3[] = [A, ...around.slice(0, -1), [S2[0], S2[1], H2], [B[0], B[1], H2], B];
+      return roundCorners(pts.filter((p, i) => i === 0 || Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1], p[2] - pts[i - 1][2]) > 0.05));
+    }
+  }
+  const pts: P3[] = [A, A1, [A1[0], A1[1], H], [B[0], B[1], H], B];
+  return roundCorners(pts.filter((p, i) => i === 0 || Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1], p[2] - pts[i - 1][2]) > 0.05));
+}
+
+/** A pin on the far side of its part (facing away from the board): lead the cable out of that face,
+ *  along the side of the part nearest the board pin, and back past the part, climbing as it goes,
+ *  the way you would dress a real lead around it. Null when something else is in the way. */
+function wrapAround(A: P3, B: P3, mine: Box3D[], others: Box3D[], H: number, margin: number): P3[] | null {
+  const U = { x0: Math.min(...mine.map((b) => b.x0)), x1: Math.max(...mine.map((b) => b.x1)), y0: Math.min(...mine.map((b) => b.y0)), y1: Math.max(...mine.map((b) => b.y1)) };
+  const gap = margin + 2.5;
+  // the face the pin sits on: the nearest side of the part's outline
+  const faces = [
+    { d: Math.abs(A[0] - U.x0), ax: 0, s: -1 }, { d: Math.abs(A[0] - U.x1), ax: 0, s: 1 },
+    { d: Math.abs(A[1] - U.y0), ax: 1, s: -1 }, { d: Math.abs(A[1] - U.y1), ax: 1, s: 1 },
+  ].sort((a, b) => a.d - b.d);
+  const f = faces[0], q = 1 - f.ax; // q: the axis along the face
+  const lo = [U.x0, U.y0], hi = [U.x1, U.y1];
+  const out = f.s > 0 ? hi[f.ax] + gap : lo[f.ax] - gap; // just outside the pin's face
+  const side = B[q] >= (lo[q] + hi[q]) / 2 ? hi[q] + gap : lo[q] - gap; // the side nearer the board pin
+  const behind = f.s > 0 ? lo[f.ax] - gap : hi[f.ax] + gap; // past the far face
+  const P = (a: number, b: number, z: number): P3 => { const v: P3 = [0, 0, z]; v[f.ax] = a; v[q] = b; return v; };
+  const z1 = A[2], climb = Math.max(z1, Math.min(H, z1 + 8));
+  const pts = [P(out, A[q], z1), P(out, side, z1), P(behind, side, climb)];
+  // keep clear of the other parts at these heights
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1], n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1])) + 1;
+    for (let k = 0; k <= n; k++) {
+      const x = a[0] + ((b[0] - a[0]) * k) / n, y = a[1] + ((b[1] - a[1]) * k) / n, z = a[2] + ((b[2] - a[2]) * k) / n;
+      if (others.some((o) => inFoot(o, x, y, margin) && o.z0 < z + 1 && o.z1 > z - 1)) return null;
+    }
+  }
+  return pts;
+}
+
+/** A polyline with each corner replaced by a short curve, sampled about every 1.5 mm. */
+function roundCorners(pts: P3[]): P3[] {
+  if (pts.length < 3) return pts;
+  const sub = (a: P3, b: P3): P3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const len = (v: P3) => Math.hypot(v[0], v[1], v[2]);
+  const lerp = (a: P3, b: P3, k: number): P3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+  const out: P3[] = [pts[0]];
+  const line = (a: P3, b: P3) => { const n = Math.max(1, Math.ceil(len(sub(b, a)) / 1.5)); for (let i = 1; i <= n; i++) out.push(lerp(a, b, i / n)); };
+  let start = pts[0];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const p = pts[i], a = pts[i - 1], b = pts[i + 1];
+    const r = Math.min(8, len(sub(p, a)) / 2, len(sub(b, p)) / 2);
+    const s = lerp(p, a, r / (len(sub(p, a)) || 1)), e = lerp(p, b, r / (len(sub(b, p)) || 1));
+    line(start, s);
+    for (let k = 1; k <= 8; k++) { const t = k / 8; out.push(lerp(lerp(s, p, t), lerp(p, e, t), t)); } // quadratic corner
+    start = e;
+  }
+  line(start, pts[pts.length - 1]);
+  return out;
+}

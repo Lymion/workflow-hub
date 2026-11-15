@@ -196,22 +196,22 @@ export default function BenchGL(p: BenchProps) {
       const hitWireMat = new THREE.MeshBasicMaterial({ visible: false });
       for (const w of wires) {
         if (!w.boardPin) continue;
-        const it = d.insts.find((x) => x.id === `${w.part}#${w.instance}`), bp = d.pins.find((x) => x.id === String(w.boardPin)), a = it?.model.pins[w.partPin];
-        if (!it || !bp || !a) continue;
-        const A = V(a[0] + it.at[0], a[1] + it.at[1], a[2]), B = V(bp.x, bp.y, d.pinZ);
-        const lift = 8 + A.distanceTo(B) * 0.22;
-        const curve = new THREE.CubicBezierCurve3(A, A.clone().add(new THREE.Vector3(0, lift, 0)), B.clone().add(new THREE.Vector3(0, lift, 0)), B);
+        const route = d.routes.get(wid(w));
+        if (!route || route.length < 2) continue;
+        const A = V(...route[0]), B = V(...route[route.length - 1]);
+        const curve = new THREE.CatmullRomCurve3(route.map((q) => V(q[0], q[1], q[2])), false, "centripetal");
+        const segs = Math.min(400, route.length * 2);
         const col = p.color[wid(w)] ?? "#ff9f0a";
         const wm = new THREE.MeshLambertMaterial({ color: col, transparent: true });
         if (p.bad(w)) { wm.alphaMap = stripeTexture(10); wm.alphaMap.repeat.set(14, 1); wm.alphaTest = 0.5; }
-        const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.45, 8), wm);
+        const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, 0.45, 8), wm);
         tube.castShadow = true;
         const endM = new THREE.MeshLambertMaterial({ color: col, transparent: true });
         const e1 = new THREE.Mesh(new THREE.SphereGeometry(0.75, 12, 10), endM), e2 = e1.clone();
         e1.position.copy(A); e2.position.copy(B);
-        const fl = new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.5, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, alphaMap: g.flowTex, transparent: true, depthWrite: false }));
+        const fl = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, 0.5, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, alphaMap: g.flowTex, transparent: true, depthWrite: false }));
         fl.visible = false;
-        const hit = new THREE.Mesh(new THREE.TubeGeometry(curve, 24, 1.8, 6), hitWireMat);
+        const hit = new THREE.Mesh(new THREE.TubeGeometry(curve, Math.ceil(segs / 2), 1.8, 6), hitWireMat);
         hit.userData = { wire: wid(w) };
         g.content.add(tube, e1, e2, fl, hit);
         g.pickables.push(hit);
@@ -220,7 +220,7 @@ export default function BenchGL(p: BenchProps) {
     }
     g.content.traverse((o) => { if ((o as THREE.Mesh).isMesh && !(o as THREE.Mesh).userData.pin && !(o as THREE.Mesh).userData.wire) { o.castShadow = true; } });
     g.dirty = true;
-  }, [ready, d.boardShapes, d.insts, wires, showParts, p.color, theme]);
+  }, [ready, d.boardShapes, d.insts, d.routes, wires, showParts, p.color, theme]);
 
   // ---------- frame the bench (new data or view) ----------
   const frameKey = `${mode}|${d.insts.map((x) => x.id).join()}|${board.board}`;

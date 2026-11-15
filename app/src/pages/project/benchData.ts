@@ -1,7 +1,7 @@
 /** What the Wiring bench draws, shared by the 3D view (BenchGL) and the flat fallback (Bench3D):
  *  the board's model and pins, the board's shapes, and the project's part instances placed around it. */
 import { useMemo } from "react";
-import { boardPins, fallbackBoard, fallbackPart, layoutParts, type BoardModel, type PartModel, type Pt, type Shape } from "../../lib/iso";
+import { boardPins, fallbackBoard, fallbackPart, layoutParts, routeWire, shapeBox, type BoardModel, type Box3D, type P3, type PartModel, type Pt, type Shape } from "../../lib/iso";
 
 export type BenchWire = { part: string; instance: number; partPin: string; boardPin: string | null; signalName: string; mode: string; divider: boolean };
 export type BenchPin = { id: string; label: string; caps?: string[]; note?: string; strapping?: string; reserved?: string };
@@ -29,15 +29,16 @@ export function wrap2(text: string, n: number): [string, string] {
   return [a, b.length > n ? `${b.slice(0, n - 1)}…` : b];
 }
 
-export function useBenchData(board: BenchBoard, parts: BenchPart[], wires: BenchWire[]) {
-  const model = useMemo(() => board.model ?? fallbackBoard(board.header, board.color ?? "#1F3A5F"), [board]);
-  const pins = useMemo(() => boardPins(model), [model]);
+/** Everything the bench draws, as a plain function (so it can be tested outside React). */
+export function computeBench(board: BenchBoard, parts: BenchPart[], wires: BenchWire[]) {
+  const model = board.model ?? fallbackBoard(board.header, board.color ?? "#1F3A5F");
+  const pins = boardPins(model);
   const pinInfo = (id: string) => board.pins.find((x) => x.id === id);
   const silkName = (id: string) => (pinInfo(id) ? model.names?.[id] ?? `${model.prefix ?? ""}${id}` : id);
   const pinZ = model.size[2] + 3.2;
 
   // the board's own shapes in plan coordinates (its parts sit on its top), headers and pins included
-  const boardShapes = useMemo<Shape[]>(() => {
+  const boardShapes = ((): Shape[] => {
     const [bw, bd, bt] = model.size;
     const out: Shape[] = [{ w: bw, d: bd, h: bt, color: model.color, top: model.top }];
     for (const sh of model.shapes ?? []) out.push({ ...sh, z: (sh.z ?? 0) + bt });
@@ -56,11 +57,10 @@ export function useBenchData(board: BenchBoard, parts: BenchPart[], wires: Bench
     });
     for (const pn of pins) out.push({ x: pn.x, y: pn.y, w: 0.9, d: 0.9, z: bt + 2.6, h: 0.7, color: "#c99a2e", top: "#f2c75c" });
     return out;
-  }, [model, pins]);
+  })();
 
   // part instances placed around the board
-  const wireKey = wires.map((w) => `${wid(w)}${w.boardPin}`).join();
-  const insts = useMemo<Inst[]>(() => {
+  const insts = ((): Inst[] => {
     const rowOf = new Map(pins.map((x) => [x.id, x.row]));
     const items = parts.filter((pt) => pt.section !== "boards").flatMap((pt) => {
       const wireable = (pt.meta.pins ?? []).filter((x) => WIREABLE.has((x.mode ?? "").toUpperCase())).map((x) => x.name);
@@ -77,9 +77,31 @@ export function useBenchData(board: BenchBoard, parts: BenchPart[], wires: Bench
     });
     const at = layoutParts(sized, boardShapes);
     return sized.map((x) => ({ id: x.id, part: x.pt, inst: x.inst, model: x.m, at: at[x.id] }));
-  }, [parts, wireKey, boardShapes, pins]);
+  })();
 
-  return { model, pins, pinInfo, silkName, pinZ, boardShapes, insts };
+  // every wire's route: out of its part, over anything in the way, down onto its pin
+  const routes = (() => {
+    const boxes: Box3D[] = [...boardShapes.map((sh) => shapeBox("board", sh)), ...insts.flatMap((it) => it.model.shapes.map((sh) => shapeBox(it.id, sh, it.at[0], it.at[1])))];
+    const out = new Map<string, P3[]>();
+    const lanes = new Map<string, number>();
+    for (const w of wires) {
+      if (!w.boardPin) continue;
+      const it = insts.find((x) => x.id === `${w.part}#${w.instance}`), bp = pins.find((x) => x.id === String(w.boardPin)), a = it?.model.pins[w.partPin];
+      if (!it || !bp || !a) continue;
+      const k = lanes.get(it.id) ?? 0; // wires from the same part cruise at slightly different heights
+      lanes.set(it.id, k + 1);
+      out.set(wid(w), routeWire([a[0] + it.at[0], a[1] + it.at[1], a[2]], [bp.x, bp.y, pinZ], it.id, boxes, k * 0.9));
+    }
+    return out;
+  })();
+
+  return { model, pins, pinInfo, silkName, pinZ, boardShapes, insts, routes };
+}
+
+export function useBenchData(board: BenchBoard, parts: BenchPart[], wires: BenchWire[]) {
+  const wireKey = wires.map((w) => `${wid(w)}${w.boardPin}`).join();
+  const partKey = parts.map((x) => `${x.key}${x.qty}`).join();
+  return useMemo(() => computeBench(board, parts, wires), [board, partKey, wireKey]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 /** WebGL available? (The 3D bench needs it; without it the flat drawing is used.) */

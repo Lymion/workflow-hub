@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { calm } from "../../lib/router";
 import { Icon } from "../../components/Icon";
 import {
-  BASE_ANGLE, H, W, bounds, boardPins, cable, footprint, makeView, shapePolys,
+  BASE_ANGLE, H, W, bounds, boardPins, footprint, makeView, shapePolys,
   placeTags, type BoardModel, type Pt, type Rect, type Shape, type View,
 } from "../../lib/iso";
 
@@ -27,7 +27,7 @@ export function Bench3D(p: Props) {
   const target = useRef({ angle: BASE_ANGLE, zoom: 1 });
   const raf = useRef<Record<string, number>>({});
 
-  const { model, pins, pinInfo, silkName, pinZ, boardShapes, insts } = useBenchData(board, p.parts, wires);
+  const { model, pins, pinInfo, silkName, pinZ, boardShapes, insts, routes } = useBenchData(board, p.parts, wires);
   const showParts = mode === "project";
 
   // fit: turn around the middle of the bench, and scale so it fills the stage at the base angle
@@ -109,7 +109,9 @@ export function Bench3D(p: Props) {
       const it = insts.find((x) => x.id === `${w.part}#${w.instance}`), bp = pins.find((x) => x.id === String(w.boardPin));
       const anchor = it?.model.pins[w.partPin];
       if (!it || !bp || !anchor) continue;
-      const a = v.P(anchor[0] + it.at[0], anchor[1] + it.at[1], anchor[2]), b = v.P(bp.x, bp.y, pinZ), d = cable(a, b);
+      const route = (routes.get(wid(w)) ?? []).map((q) => v.P(q[0], q[1], q[2]));
+      if (route.length < 2) continue;
+      const a = route[0], b = route[route.length - 1], d = `M${route.map((q) => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join(" L")}`;
       const dim = dimWire(w), col = p.color[wid(w)];
       wireEls.push(
         <g key={wid(w)} className={`bench-wire-g ${dim ? "dim" : ""} ${p.traced === wid(w) ? "hot" : ""}`}>
