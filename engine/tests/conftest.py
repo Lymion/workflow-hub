@@ -42,3 +42,24 @@ def client(paths: HubPaths):
 @pytest.fixture()
 def hub(client):
     return client.app.state.hub
+
+
+def make_fake_tool(folder: Path, name: str, source: str = "") -> Path:
+    """Write a fake command-line tool that runs the given Python source.
+
+    Linux/macOS get an executable script with a shebang; Windows gets a
+    name.cmd wrapper (which shutil.which finds through PATHEXT).
+    """
+    import stat
+    import sys
+
+    script = folder / f"{name}_fake.py"
+    script.write_text(source or "pass\n", encoding="utf-8")
+    if sys.platform == "win32":
+        tool = folder / f"{name}.cmd"
+        tool.write_text(f'@"{sys.executable}" -u "{script}" %*\r\n', encoding="utf-8")
+    else:
+        tool = folder / name
+        tool.write_text(f"#!{sys.executable} -u\n" + script.read_text(encoding="utf-8"), encoding="utf-8")
+        tool.chmod(tool.stat().st_mode | stat.S_IEXEC)
+    return tool

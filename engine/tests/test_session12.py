@@ -8,6 +8,8 @@ import pytest
 
 from engine.routes import cart
 
+from .conftest import make_fake_tool
+
 
 @pytest.fixture(autouse=True)
 def inline(monkeypatch):
@@ -126,6 +128,7 @@ import base64
 import io
 import shutil
 import stat
+import sys
 import subprocess
 import time
 
@@ -243,12 +246,8 @@ def test_icons_from_one_image(client, gitenv):
 def test_release_starts_the_eas_build(client, gitenv, tmp_path, monkeypatch):
     d = tmp_path / "bin"
     d.mkdir()
-    for name, script in (("npm", "#!/bin/sh\n"), ("npx", "#!/bin/sh\necho \"eas build $*\"\necho 'Build queued'\n"), ("git", None)):
-        if script is None:
-            continue
-        f = d / name
-        f.write_text(script)
-        f.chmod(f.stat().st_mode | stat.S_IEXEC)
+    make_fake_tool(d, "npm")
+    make_fake_tool(d, "npx", "import sys\nprint('eas build ' + ' '.join(sys.argv[1:]))\nprint('Build queued')\n")
     real = shutil.which
     monkeypatch.setattr(shutil, "which", lambda n, *a, **k: real(n, path=str(d)) or (real(n, *a, **k) if n == "git" else None))
     p, root = expo_app(client)

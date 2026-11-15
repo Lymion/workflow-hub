@@ -14,23 +14,24 @@ import pytest
 from engine import runner
 from engine.routes import cart
 
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="fake tools are shell scripts")
+from .conftest import make_fake_tool
 
-FAKE_PIO = """#!/bin/sh
-echo "Processing esp32dev (platform: espressif32)"
-if [ "$FAIL" = "1" ]; then
-  echo "src/main.cpp:12:3: error: 'motorSpeed' was not declared in this scope"
-  exit 1
-fi
-if [ "$2" = "-t" ]; then echo "Writing at 0x00010000... (100 %)"; fi
-echo "========== [SUCCESS] Took 3.21 seconds =========="
+FAKE_PIO = """import os, sys
+print("Processing esp32dev (platform: espressif32)")
+if os.environ.get("FAIL") == "1":
+    print("src/main.cpp:12:3: error: 'motorSpeed' was not declared in this scope")
+    sys.exit(1)
+if len(sys.argv) > 2 and sys.argv[2] == "-t":
+    print("Writing at 0x00010000... (100 %)")
+print("========== [SUCCESS] Took 3.21 seconds ==========")
 """
 
-FAKE_NPX = """#!/bin/sh
-echo "Starting Metro Bundler"
-echo "Metro waiting on exp://192.168.1.20:8081"
-echo "Web is waiting on http://localhost:8081"
-while read line; do echo "got: $line"; done
+FAKE_NPX = """import sys
+print("Starting Metro Bundler")
+print("Metro waiting on exp://192.168.1.20:8081")
+print("Web is waiting on http://localhost:8081")
+for line in sys.stdin:
+    print("got: " + line.rstrip())
 """
 
 
@@ -41,10 +42,8 @@ def fakebin(tmp_path, monkeypatch):
     d.mkdir()
     real_which = shutil.which
 
-    def add(name: str, script: str):
-        f = d / name
-        f.write_text(script)
-        f.chmod(f.stat().st_mode | stat.S_IEXEC)
+    def add(name: str, script: str = ""):
+        make_fake_tool(d, name, script)
 
     monkeypatch.setattr(cart, "BACKGROUND_SYNC", True)
     monkeypatch.setattr(shutil, "which", lambda name, *a, **k: real_which(name, path=str(d)))
@@ -89,7 +88,7 @@ def test_unknown_target_lists_the_real_ones(client, fakebin):
 
 
 def test_app_targets_need_setup_first(client, fakebin):
-    fakebin("npm", "#!/bin/sh\n")
+    fakebin("npm")
     fakebin("npx", FAKE_NPX)
     p = client.post("/projects", json={"name": "Budget Buddy", "module": "app-dev", "stack": ["expo"]}).json()
     ts = client.get(f"/projects/{p['id']}/run").json()["targets"]
@@ -126,7 +125,7 @@ def test_failed_build_shows_past_fix(client, fakebin, monkeypatch):
 
 
 def test_dev_server_send_stop_and_no_double_start(client, fakebin):
-    fakebin("npm", "#!/bin/sh\n")
+    fakebin("npm")
     fakebin("npx", FAKE_NPX)
     p = client.post("/projects", json={"name": "Budget Buddy", "module": "app-dev", "stack": ["expo"]}).json()
     (Path(p["path"]) / "package.json").write_text('{"scripts": {}}')
