@@ -123,7 +123,7 @@ cd app
 npx tauri build --bundles nsis
 ```
 
-**Publish an update:** `python packaging/bump_version.py minor` (or `patch`), add the version's section to `CHANGELOG.md`, merge to `main`, then push a tag `v<version>`. The workflow signs the build with the `TAURI_SIGNING_PRIVATE_KEY` repository secret and publishes the release with `latest.json`, which installed apps check.
+**Publish an update:** `python packaging/bump_version.py minor` (or `patch`), add the version's section to `CHANGELOG.md`, and merge to `main`. When `main` has a version with no release yet, the workflow tags it `v<version>`, signs the build with the `TAURI_SIGNING_PRIVATE_KEY` repository secret and publishes the release with `latest.json`, which installed apps check.
 
 The first command packs the engine into `app\src-tauri\engine-dist\` (so the installed app needs no Python); the setup `.exe` lands in `app\src-tauri\target\release\bundle\nsis\`.
 
