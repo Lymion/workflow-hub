@@ -10,7 +10,7 @@ import { Empty, Sk } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import type { TabProps } from "./tabs";
 import { Bench3D, wid, type BenchBoard, type BenchPart, type BenchWire, type Mode } from "./Bench3D";
-import { canUseWebGL } from "./benchData";
+import { canUseWebGL, useFullscreen } from "./benchData";
 import { Schematic } from "./Schematic";
 
 // three.js loads only when the Wiring tab opens
@@ -22,11 +22,11 @@ type WiringRes = { wiring: { wires?: Wire[] }; pins_h: string; board: Board | nu
 type Part = BenchPart;
 type Finding = { level: "ok" | "warn" | "bad"; part: string; problem: string; fix: string; signal?: string; gpio?: string };
 type Option = { id: string; label: string; level: "ok" | "warn" | "bad"; note: string; used_by: string | null; current: boolean };
-type Tab = "overview" | "pinout" | "wires" | "code";
+type Tab = "pinout" | "wires";
 
 const COLORS = ["#FF9F0A", "#0A84FF", "#FFD60A", "#64D2FF", "#BF5AF2", "#30D158", "#5E5CE6", "#FF375F", "#FF453A", "#AC8E68", "#66D4CF", "#FF6482"];
 const rank = { ok: 0, warn: 1, bad: 2 } as const;
-const TABS: [Tab, string][] = [["overview", "Overview"], ["pinout", "Pinout"], ["wires", "Wires"], ["code", "pins.h"]];
+const TABS: [Tab, string][] = [["wires", "Wires"], ["pinout", "Pinout"]];
 
 export function WiringTab({ project }: TabProps) {
   const toast = useToast();
@@ -39,10 +39,11 @@ export function WiringTab({ project }: TabProps) {
   const [traced, setTraced] = useState<string | null>(null);
   const [selPart, setSelPart] = useState<string | null>(null);
   const [pin, setPin] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>("overview");
+  const [tab, setTab] = useState<Tab>("wires");
   const [mode, setMode] = useState<Mode | null>(null);
   const [picker, setPicker] = useState<{ w: Wire; el: HTMLElement; key: boolean } | null>(null);
   const webgl = useMemo(canUseWebGL, []);
+  const [full, toggleFull] = useFullscreen();
 
   useEffect(() => {
     if (!res.data) return;
@@ -86,8 +87,8 @@ export function WiringTab({ project }: TabProps) {
     save(wires.map((x) => (wid(x) === wid(w) ? { ...x, signalName: name } : x)), name, `Renamed to ${name}. pins.h updated.`);
   };
   const trace = (id: string | null) => { setTraced(id); if (id) { setTab("wires"); setSelPart(null); } };
-  const pickPart = (id: string | null) => { setSelPart(id); if (id) { setTab("overview"); setTraced(null); } };
-  const pickPin = (id: string | null) => { setPin(id); if (id) setTab("pinout"); };
+  const pickPart = (id: string | null) => { setSelPart(id); if (id) setTraced(null); };
+  const pickPin = (id: string | null) => { setPin(id); if (id) { setTab("pinout"); setSelPart(null); } };
 
   if (res.loading || partsRes.loading) return <div className="grid gap-3"><Sk h={420} r={20} /></div>;
   if (!board) return <div className="card"><Empty icon="cpu" title="No board yet" action={<a className="btn btn-primary" href={`#project/${project.id}/parts`}>Open Parts</a>}>Pick a board in the Parts tab, then wire it up here.</Empty></div>;
@@ -98,16 +99,59 @@ export function WiringTab({ project }: TabProps) {
 
   return (
     <div className="wire-layout">
+      <div className="wire-main">
       {(() => {
-        const bp = { board, parts, wires, color, bad: (w: Wire) => verdict(w)?.level === "bad", mode: mode ?? ("board" as Mode), setMode, traced, setTraced: trace, selPart, setSelPart: pickPart, pin, setPin: pickPin, onMove: move };
+        const bp = { board, parts, wires, color, bad: (w: Wire) => verdict(w)?.level === "bad", mode: mode ?? ("board" as Mode), setMode, traced, setTraced: trace, selPart, setSelPart: pickPart, pin, setPin: pickPin, onMove: move, full, toggleFull };
         if (bp.mode === "schematic") return <Schematic {...bp} />;
         return webgl ? <Suspense fallback={<div className="bench"><Sk h={460} r={20} /></div>}><BenchGL {...bp} /></Suspense> : <Bench3D {...bp} />;
       })()}
-      <aside className="wire-panel" aria-label="Wiring details">
-        <div className="wp-tabs" role="tablist" aria-label="Wiring details">
-          {TABS.map(([id, label]) => <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}{id === "wires" && badCount ? <span className="wp-bad">{badCount}</span> : null}</button>)}
+        <div className="wire-below">
+          <section className="wire-card wire-ov" aria-label="Overview">
+          <div className="wp-body ov-grid">
+            <div className="ov-a">
+            <h2 className="wp-h">{board.name}</h2>
+            {board.good_for && <p className="wp-p">{board.good_for}</p>}
+            <div className="wp-facts">
+              {board.logic_voltage ? <div className="wp-fact"><span className="fi"><Icon name="zap" /></span><span><b>{board.logic_voltage} V logic</b><span>{board.logic_voltage < 5 ? "Never feed 5 V into a pin; use a divider." : "5 V parts plug straight in."}</span></span></div> : null}
+              {board.wireless?.length ? <div className="wp-fact"><span className="fi"><Icon name="globe" /></span><span><b>{board.wireless.map((x) => (x === "ble" ? "Bluetooth" : x === "wifi" ? "Wi-Fi" : x)).join(" + ")}</b><span>Built in, no extra parts.</span></span></div> : null}
+              {board.max_pin_ma ? <div className="wp-fact"><span className="fi"><Icon name="cpu" /></span><span><b>{board.max_pin_ma} mA per pin</b><span>Drive motors and servos through a driver.</span></span></div> : null}
+            </div>
+            </div>
+            <div className="ov-b">
+            {watch.slice(0, 3).map((f, i) => <div key={i} className={`wp-watch ${f.level}`}><b>{f.part}</b> {f.problem}. {f.fix}</div>)}
+            {!watch.length && board.watch_out && <div className="wp-watch warn"><b>Watch out</b> {board.watch_out}</div>}
+            {parts.length > 0 && <h3 className="wp-sub">In this project</h3>}
+            {parts.map((p) => {
+              const n = wires.filter((w) => w.part === p.key && w.boardPin).length;
+              const id = `${p.key}#1`;
+              return (
+                <button key={p.key} className={`wp-row ${selPart?.startsWith(`${p.key}#`) ? "sel" : ""}`} onClick={() => { setMode("project"); pickPart(selPart === id ? null : id); }}>
+                  <span className="kd" style={{ background: p.meta.color ?? "#64748b" }} />
+                  <span className="flex-1 min-w-0"><b className="block truncate">{p.title}{p.qty > 1 ? ` ×${p.qty}` : ""}</b></span>
+                  <span className="text-xs text-label-2">{n ? `${n} wire${n > 1 ? "s" : ""}` : "no wires"}</span>
+                </button>
+              );
+            })}
+            {!parts.length && <p className="wp-p">No parts yet. <a className="text-accent-text font-medium" href={`#project/${project.id}/parts`}>Add parts</a> and they appear on the bench, wired to good pins.</p>}
+            </div>
+          </div>
+          </section>
+          <section className="wire-card" aria-label="pins.h">
+          <div className="wp-body">
+            <div className="code-head !px-0"><Icon name="code" className="text-label-2" /><b className="flex-1 font-mono text-[12.5px]">include/pins.h</b><span className="chip">{changed ? "updated just now" : "auto-generated"}</span></div>
+            <pre className="code wp-code">{pinsH ? pinsH.split("\n").map((l, i) => {
+              const hot = changed && l.includes(changed.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toUpperCase());
+              return <span key={i} className={`ln ${hot ? "flash" : ""} ${l.includes("// !") ? "chg" : ""}`}><span className="no">{i + 1}</span>{l || " "}{"\n"}</span>;
+            }) : "// pins.h appears once the project is set up."}</pre>
+          </div>
+          </section>
         </div>
-        {tab === "overview" && selPart && (() => {
+      </div>
+      <aside className="wire-panel" aria-label="Wiring details">
+        {!selPart && <div className="wp-tabs" role="tablist" aria-label="Wiring details">
+          {TABS.map(([id, label]) => <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}{id === "wires" && badCount ? <span className="wp-bad">{badCount}</span> : null}</button>)}
+        </div>}
+        {selPart && (() => {
           const [key, n] = selPart.split("#"), part = parts.find((x) => x.key === key);
           if (!part) return null;
           const pinsOf = part.meta.pins ?? [];
@@ -130,33 +174,8 @@ export function WiringTab({ project }: TabProps) {
             </div>
           );
         })()}
-        {tab === "overview" && !selPart && (
-          <div className="wp-body">
-            <h2 className="wp-h">{board.name}</h2>
-            {board.good_for && <p className="wp-p">{board.good_for}</p>}
-            <div className="wp-facts">
-              {board.logic_voltage ? <div className="wp-fact"><span className="fi"><Icon name="zap" /></span><span><b>{board.logic_voltage} V logic</b><span>{board.logic_voltage < 5 ? "Never feed 5 V into a pin; use a divider." : "5 V parts plug straight in."}</span></span></div> : null}
-              {board.wireless?.length ? <div className="wp-fact"><span className="fi"><Icon name="globe" /></span><span><b>{board.wireless.map((x) => (x === "ble" ? "Bluetooth" : x === "wifi" ? "Wi-Fi" : x)).join(" + ")}</b><span>Built in, no extra parts.</span></span></div> : null}
-              {board.max_pin_ma ? <div className="wp-fact"><span className="fi"><Icon name="cpu" /></span><span><b>{board.max_pin_ma} mA per pin</b><span>Drive motors and servos through a driver.</span></span></div> : null}
-            </div>
-            {watch.slice(0, 3).map((f, i) => <div key={i} className={`wp-watch ${f.level}`}><b>{f.part}</b> {f.problem}. {f.fix}</div>)}
-            {!watch.length && board.watch_out && <div className="wp-watch warn"><b>Watch out</b> {board.watch_out}</div>}
-            {parts.length > 0 && <h3 className="wp-sub">In this project</h3>}
-            {parts.map((p) => {
-              const n = wires.filter((w) => w.part === p.key && w.boardPin).length;
-              const id = `${p.key}#1`;
-              return (
-                <button key={p.key} className={`wp-row ${selPart?.startsWith(`${p.key}#`) ? "sel" : ""}`} onClick={() => { setMode("project"); pickPart(selPart === id ? null : id); }}>
-                  <span className="kd" style={{ background: p.meta.color ?? "#64748b" }} />
-                  <span className="flex-1 min-w-0"><b className="block truncate">{p.title}{p.qty > 1 ? ` ×${p.qty}` : ""}</b></span>
-                  <span className="text-xs text-label-2">{n ? `${n} wire${n > 1 ? "s" : ""}` : "no wires"}</span>
-                </button>
-              );
-            })}
-            {!parts.length && <p className="wp-p">No parts yet. <a className="text-accent-text font-medium" href={`#project/${project.id}/parts`}>Add parts</a> and they appear on the bench, wired to good pins.</p>}
-          </div>
-        )}
-        {tab === "pinout" && (
+
+        {!selPart && tab === "pinout" && (
           <div className="wp-body wp-scroll">
             <table className="wp-pins">
               <thead><tr><th>Pin</th><th>Can do</th><th>Wired to</th></tr></thead>
@@ -175,7 +194,7 @@ export function WiringTab({ project }: TabProps) {
             </table>
           </div>
         )}
-        {tab === "wires" && (
+        {!selPart && tab === "wires" && (
           <div className="wp-body">
             {!wires.length && <p className="wp-p">No wires yet. Add sensors, drivers or servos in the <a className="text-accent-text font-medium" href={`#project/${project.id}/parts`}>Parts tab</a>; their pins get wired to good GPIOs automatically.</p>}
             {wires.map((w) => {
@@ -202,15 +221,6 @@ export function WiringTab({ project }: TabProps) {
                 <button className="btn btn-sm" onClick={() => { navigator.clipboard?.writeText(pinTable(wires, board, parts)).then(() => toast("Pin table copied as Markdown."), () => toast("Couldn't copy. Select the table in the Wires list instead.", "bad")); }}><Icon name="copy" />Copy pin table</button>
               </div>
             )}
-          </div>
-        )}
-        {tab === "code" && (
-          <div className="wp-body">
-            <div className="code-head !px-0"><Icon name="code" className="text-label-2" /><b className="flex-1 font-mono text-[12.5px]">include/pins.h</b><span className="chip">{changed ? "updated just now" : "auto-generated"}</span></div>
-            <pre className="code wp-code">{pinsH ? pinsH.split("\n").map((l, i) => {
-              const hot = changed && l.includes(changed.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toUpperCase());
-              return <span key={i} className={`ln ${hot ? "flash" : ""} ${l.includes("// !") ? "chg" : ""}`}><span className="no">{i + 1}</span>{l || " "}{"\n"}</span>;
-            }) : "// pins.h appears once the project is set up."}</pre>
           </div>
         )}
       </aside>

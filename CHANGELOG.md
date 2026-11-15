@@ -2,6 +2,11 @@
 
 Each update the Windows installer delivers has a higher version, so it installs over the old one as an upgrade. Your data in `%LOCALAPPDATA%\Workflow Hub` is kept.
 
+## 0.4.1
+
+- **Fullscreen viewer:** a fullscreen button on the 3D bench and the schematic fills the screen with the view. Esc or the button returns. Switching between Board, Project and Schematic stays fullscreen.
+- **Roomier Wiring tab:** Overview and pins.h now sit in two wide cards under the 3D view (board facts beside warnings and parts), and the side panel keeps Wires and Pinout with more width. Clicking a part shows its pins in the side panel.
+
 ## 0.4.0
 
 - **New Wiring tab in real 3D:** your board and parts on a drawing-board bench, with the real wires from your project as cables in space.

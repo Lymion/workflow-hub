@@ -1,6 +1,6 @@
 /** What the Wiring bench draws, shared by the 3D view (BenchGL) and the flat fallback (Bench3D):
  *  the board's model and pins, the board's shapes, and the project's part instances placed around it. */
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { boardPins, fallbackBoard, fallbackPart, layoutParts, routeWire, shapeBox, type BoardModel, type Box3D, type P3, type PartModel, type Pt, type Shape } from "../../lib/iso";
 
 export type BenchWire = { part: string; instance: number; partPin: string; boardPin: string | null; signalName: string; mode: string; divider: boolean };
@@ -14,6 +14,7 @@ export type BenchProps = {
   mode: Mode; setMode: (m: Mode) => void; traced: string | null; setTraced: (id: string | null) => void;
   selPart: string | null; setSelPart: (id: string | null) => void; pin: string | null; setPin: (id: string | null) => void;
   onMove: (w: BenchWire, pin: string) => void;
+  full?: boolean; toggleFull?: () => void;
 };
 
 export const WIREABLE = new Set(["OUTPUT", "INPUT", "INPUT_PULLUP", "PWM", "ANALOG", "I2C"]);
@@ -112,4 +113,36 @@ export function canUseWebGL() {
   } catch {
     return false;
   }
+}
+
+/** Fullscreen for the viewer: the bench fills the window (and the screen, where the app allows it).
+ *  Esc or the button leaves it. */
+export function useFullscreen() {
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    if (!full) return;
+    document.documentElement.requestFullscreen?.().catch(() => {}); // a fixed full-window bench still works without it
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") setFull(false); };
+    const left = () => { if (!document.fullscreenElement) setFull(false); };
+    addEventListener("keydown", key);
+    document.addEventListener("fullscreenchange", left);
+    document.body.classList.add("bench-is-full");
+    return () => {
+      removeEventListener("keydown", key);
+      document.removeEventListener("fullscreenchange", left);
+      document.body.classList.remove("bench-is-full");
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    };
+  }, [full]);
+  return [full, () => setFull((f) => !f)] as const;
+}
+
+/** Height of the viewer: the rest of the window below the Wiring layout, or the whole window in fullscreen. */
+export function benchHeight(el: HTMLElement) {
+  const w = el.clientWidth;
+  if (el.closest(".bench-full")) return window.innerHeight;
+  const main = el.closest("main"), layout = el.closest(".wire-layout");
+  let h = w * 0.64;
+  if (main && layout) h = main.clientHeight - (layout.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop) - 24;
+  return Math.round(Math.max(440, Math.min(h, w * 1.2)));
 }
