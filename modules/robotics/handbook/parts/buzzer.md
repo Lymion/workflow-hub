@@ -23,6 +23,12 @@ wokwi:
 docs:
 - title: "Arduino · tone()"
   url: https://docs.arduino.cc/language-reference/en/functions/advanced-io/tone/
+model:
+  tag: 14
+  shapes:
+  - {kind: cyl, r: 6, h: 9.5, color: '#1d1f24', top: '#2a2d34', inner: '#0b0c0f'}
+  pins:
+    SIG: [3.2, 5, 1.5]
 ---
 # Active buzzer
 

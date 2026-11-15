@@ -182,3 +182,27 @@ watch_out: No wireless and only 2 KB of RAM. A6/A7 are analog input only.
 wokwi:
   element: wokwi-arduino-nano
   prefix: ''
+# 3D drawing for the Wiring tab: plan mm, origin at the board's centre, z up.
+model:
+  size: [18, 43.2, 1.6]
+  color: '#0b6f86'
+  top: '#0f7f99'
+  silk: '#f2f7f8'
+  pitch: 2.54
+  label: NANO
+  label_at: [0, 10]
+  prefix: D
+  names: {'0': RX0, '1': TX1}
+  rows:
+  - {x: -7.62, y: -17.8, pins: ['13', 3V3, AREF, A0, A1, A2, A3, A4, A5, A6, A7, 5V, RST, GND, VIN]}
+  - {x: 7.62, y: -17.8, pins: ['12', '11', '10', '9', '8', '7', '6', '5', '4', '3', '2', GND, RST, '0', '1']}
+  shapes:
+  - {y: -21.6, w: 7.6, d: 5.6, h: 2.6, color: '#b4bac4', top: '#cfd4db'}
+  - {y: -2, w: 7, d: 7, h: 1.1, color: '#24272e', text: ATMEGA328P}
+  - {x: 0, y: 8, w: 3.4, d: 3.4, h: 1.2, color: '#d7dbe0'}
+  - {x: -3, y: 14, w: 1.6, d: 0.9, h: 0.6, color: '#30d158'}
+  hotspots:
+  - {x: 0, y: -22, z: 2, title: USB port, body: Power and uploads (CH340 or FTDI driver).}
+  - {x: 0, y: -2, z: 1.2, title: ATmega328P, body: '16 MHz, 32 KB flash, 5 V logic.'}
+  - {row: 0, title: Analog side, body: A0–A7 read 0–5 V. A6/A7 are input only.}
+  - {row: 1, title: Digital side, body: 'D2–D12. PWM on 3, 5, 6, 9, 10, 11.'}

@@ -25,6 +25,15 @@ docs:
   url: https://github.com/adafruit/Adafruit_VL53L0X
 - title: "Arduino · Wire (I2C)"
   url: https://docs.arduino.cc/language-reference/en/functions/communication/wire/
+model:
+  tag: 10
+  shapes:
+  - {w: 25, d: 13, h: 1.6, color: '#1f2937', top: '#2b3646'}
+  - {w: 4.4, d: 2.4, z: 1.6, h: 1, color: '#0b0d12'}
+  - {y: 5.2, w: 15.2, d: 2.5, z: 1.6, h: 2.6, color: '#14171d'}
+  pins:
+    SDA: [1.27, 5.2, 4.6]
+    SCL: [-1.27, 5.2, 4.6]
 ---
 # VL53L0X laser distance
 

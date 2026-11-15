@@ -25,6 +25,16 @@ docs:
   url: https://docs.arduino.cc/language-reference/en/functions/analog-io/analogRead/
 - title: "Arduino · digitalRead()"
   url: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalread/
+model:
+  tag: 10
+  shapes:
+  - {w: 32, d: 14, h: 1.6, color: '#2257c2', top: '#2a64d4'}
+  - {x: -12, w: 6, d: 10, z: 1.6, h: 4, color: '#1d1f24'}
+  - {kind: cyl, x: 4, y: -2, r: 3.2, z: 1.6, h: 5, color: '#2f6fe0'}
+  - {x: 14, w: 2.5, d: 10.2, z: 1.6, h: 2.6, color: '#14171d'}
+  pins:
+    DO: [14, 1.27, 4.6]
+    AO: [14, 3.81, 4.6]
 ---
 # IR line sensor (TCRT5000)
 

@@ -245,3 +245,35 @@ wokwi:
   element: wokwi-esp32-devkit-v1
   prefix: D
   pins: {'36': VP, '39': VN, '1': TX0, '3': RX0, '16': RX2, '17': TX2}
+# 3D drawing for the Wiring tab: plan mm, origin at the board's centre, z up.
+model:
+  size: [28.4, 52, 2.4]
+  color: '#1d2a44'
+  top: '#21324f'
+  silk: '#e9eef8'
+  pitch: 2.54
+  label: ESP32 DEVKIT V1
+  label_at: [0, 16.6]
+  prefix: D
+  names: {'36': VP, '39': VN, '1': TX0, '3': RX0, '17': TX2, '16': RX2}
+  rows:
+  - {x: -11.43, y: -15.7, pins: [EN, '36', '39', '34', '35', '32', '33', '25', '26', '27', '14', '12', '13', GND, VIN]}
+  - {x: 11.43, y: -15.7, pins: ['23', '22', '1', '3', '21', '19', '18', '5', '17', '16', '4', '2', '15', GND, 3V3]}
+  shapes:
+  - {y: -12.2, w: 15, d: 25.5, h: 0.8, color: '#161b26', top: '#1b2130', antenna: true}
+  - {y: -8.6, w: 13.4, d: 17.6, z: 0.8, h: 2.9, color: '#b9c1cc', top: '#d6dce4', text: ESP-WROOM-32}
+  - {x: -5.5, y: 13, w: 6.5, d: 3.6, h: 1.7, color: '#2a2e37'}
+  - {x: 5, y: 11.2, w: 5, d: 5, h: 1.1, color: '#2a2e37'}
+  - {x: -8.2, y: 21.6, w: 4.4, d: 3.4, h: 1.4, color: '#c2c7ce'}
+  - {x: -8.2, y: 21.6, w: 2, d: 1.6, z: 1.4, h: 1, color: '#2a2e36'}
+  - {x: 8.2, y: 21.6, w: 4.4, d: 3.4, h: 1.4, color: '#c2c7ce'}
+  - {x: 8.2, y: 21.6, w: 2, d: 1.6, z: 1.4, h: 1, color: '#2a2e36'}
+  - {x: -3, y: 18.4, w: 1.6, d: 0.9, h: 0.7, color: '#ff4b3a', top: '#ff8a7d'}
+  - {x: 3, y: 18.4, w: 1.6, d: 0.9, h: 0.7, color: '#3a7bff', top: '#8cb4ff'}
+  - {y: 25.2, w: 8, d: 5.8, h: 2.9, color: '#b4bac4', top: '#cfd4db'}
+  hotspots:
+  - {x: 0, y: 26.5, z: 2, title: USB port, body: Power and uploads. Plug in here to flash the code.}
+  - {x: 0, y: -8, z: 3.8, title: ESP32-WROOM, body: Dual-core 240 MHz brain with Wi-Fi and Bluetooth.}
+  - {row: 0, title: Left pins, body: GPIO 36–13 and VIN. 34–39 can only read.}
+  - {row: 1, title: Right pins, body: GPIO 23–15 and 3V3. I²C on 21 and 22.}
+  - {x: 8.2, y: 21.6, z: 2.4, title: EN · BOOT, body: EN resets. Hold BOOT if an upload stalls.}

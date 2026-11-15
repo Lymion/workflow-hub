@@ -136,3 +136,28 @@ pins:
   note: UART0 RX/TX (free when using USB CDC).
 good_for: Tiny, cheap wireless sensor nodes that sip power.
 watch_out: Fewer pins than the DevKit; GPIO 2, 8 and 9 are strapping pins.
+# 3D drawing for the Wiring tab: plan mm, origin at the board's centre, z up.
+model:
+  size: [18, 22.5, 1.2]
+  color: '#1f2937'
+  top: '#273244'
+  silk: '#e9eef8'
+  pitch: 2.54
+  label: C3 MINI
+  label_at: [0, -2]
+  prefix: ''
+  names: {}
+  rows:
+  - {x: -7.62, y: -8.9, pins: [5V, GND, 3V3, '4', '3', '2', '1', '0']}
+  - {x: 7.62, y: -8.9, pins: ['5', '6', '7', '8', '9', '10', '20', '21']}
+  shapes:
+  - {y: 9.6, w: 9, d: 4.6, h: 3.2, color: '#b4bac4', top: '#cfd4db'}
+  - {y: -4, w: 5, d: 5, h: 0.9, color: '#24272e', text: C3}
+  - {y: -9.6, w: 9, d: 2.4, h: 0.6, color: '#c8a64b'}
+  - {x: -4, y: 5, w: 2.6, d: 2, h: 1, color: '#d7dbe0'}
+  - {x: 4, y: 5, w: 2.6, d: 2, h: 1, color: '#d7dbe0'}
+  hotspots:
+  - {x: 0, y: 10, z: 3, title: USB-C, body: 'Power, uploads and serial, built into the chip.'}
+  - {x: 0, y: -4, z: 1, title: ESP32-C3, body: RISC-V 160 MHz with Wi-Fi and Bluetooth LE.}
+  - {row: 0, title: Power side, body: '5V, GND, 3V3 and GPIO 0–4 (analog).'}
+  - {row: 1, title: GPIO side, body: 'GPIO 5–10, 20, 21. Avoid 8 and 9 at boot.'}

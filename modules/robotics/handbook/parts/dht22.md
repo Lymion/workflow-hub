@@ -24,6 +24,13 @@ wokwi:
 docs:
 - title: Adafruit DHT sensor library
   url: https://github.com/adafruit/DHT-sensor-library
+model:
+  tag: 30
+  shapes:
+  - {w: 15.1, d: 7.7, h: 25, color: '#e9edf2', top: '#f7f9fb'}
+  - {y: 3.9, w: 7.6, d: 1.2, h: 2.6, color: '#14171d'}
+  pins:
+    DATA: [-1.27, 3.9, 2.8]
 ---
 # DHT22 temperature + humidity
 
