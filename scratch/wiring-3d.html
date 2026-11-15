@@ -1,0 +1,683 @@
+<title>Wiring 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: hub chrome (sidebar, project header, tabs) around a drawing-board stage with a right panel.
+   The stage is an illustrated workbench: warm blueprint paper, an angled 3D board, ink outlines. */
+:root {
+  --bg: #f3f2ef; --side: #ebe9e4; --surface: rgba(255,255,255,.84); --surface-solid: #ffffff;
+  --fg: #1a1e29; --fg2: #586074; --fg3: #8a91a2; --sep: rgba(26,30,41,.09); --fill: rgba(26,30,41,.05);
+  --accent: #0071e3; --accent-tint: rgba(0,113,227,.10); --accent-text: #0062c4;
+  --rob: #f56300; --rob-tint: rgba(245,99,0,.12); --rob-text: #b84a00;
+  --hot: #f56300; --good: #1e7b34; --good-tint: rgba(52,199,89,.14); --warn: #9a5b00; --warn-tint: rgba(255,159,10,.16);
+  --paper: #f6efe1; --grid: rgba(120,92,52,.10); --grid-major: rgba(120,92,52,.16); --trace: rgba(176,128,64,.20);
+  --ink: #1c2333; --shadow-fill: rgba(60,40,20,.16); --card: rgba(255,252,246,.94); --card-line: rgba(28,35,51,.14);
+  --hl: inset 0 1px 0 rgba(255,255,255,.75); --sh: 0 1px 2px rgba(20,24,33,.08), 0 8px 28px rgba(20,24,33,.08);
+  --sh2: 0 1px 2px rgba(20,24,33,.10), 0 14px 40px rgba(20,24,33,.14);
+  --f-display: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e121a; --side: #121722; --surface: rgba(24,30,43,.86); --surface-solid: #1a2130;
+  --fg: #e8ecf4; --fg2: #a3abbd; --fg3: #6f788c; --sep: rgba(232,236,244,.09); --fill: rgba(232,236,244,.06);
+  --accent: #0a84ff; --accent-tint: rgba(10,132,255,.18); --accent-text: #5aa9ff;
+  --rob: #ff8a3d; --rob-tint: rgba(255,138,61,.16); --rob-text: #ffa366;
+  --hot: #ff8a3d; --good: #4ade80; --good-tint: rgba(48,209,88,.16); --warn: #ffc266; --warn-tint: rgba(255,159,10,.18);
+  --paper: #111a29; --grid: rgba(120,170,230,.07); --grid-major: rgba(120,170,230,.12); --trace: rgba(90,169,255,.16);
+  --ink: #05080e; --shadow-fill: rgba(0,0,0,.38); --card: rgba(22,30,46,.94); --card-line: rgba(160,190,230,.18);
+  --hl: inset 0 1px 0 rgba(255,255,255,.07); --sh: 0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.35);
+  --sh2: 0 1px 2px rgba(0,0,0,.5), 0 14px 40px rgba(0,0,0,.5); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0e121a; --side: #121722; --surface: rgba(24,30,43,.86); --surface-solid: #1a2130;
+  --fg: #e8ecf4; --fg2: #a3abbd; --fg3: #6f788c; --sep: rgba(232,236,244,.09); --fill: rgba(232,236,244,.06);
+  --accent: #0a84ff; --accent-tint: rgba(10,132,255,.18); --accent-text: #5aa9ff;
+  --rob: #ff8a3d; --rob-tint: rgba(255,138,61,.16); --rob-text: #ffa366;
+  --hot: #ff8a3d; --good: #4ade80; --good-tint: rgba(48,209,88,.16); --warn: #ffc266; --warn-tint: rgba(255,159,10,.18);
+  --paper: #111a29; --grid: rgba(120,170,230,.07); --grid-major: rgba(120,170,230,.12); --trace: rgba(90,169,255,.16);
+  --ink: #05080e; --shadow-fill: rgba(0,0,0,.38); --card: rgba(22,30,46,.94); --card-line: rgba(160,190,230,.18);
+  --hl: inset 0 1px 0 rgba(255,255,255,.07); --sh: 0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.35);
+  --sh2: 0 1px 2px rgba(0,0,0,.5), 0 14px 40px rgba(0,0,0,.5); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 var(--f-body); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.app { display: flex; flex-wrap: wrap; min-height: 100vh; }
+
+/* sidebar */
+.side { flex: 0 0 216px; background: var(--side); padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--sep); }
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px; font-weight: 700; font-size: 15px; }
+.logo { width: 28px; height: 28px; border-radius: 8px; background: conic-gradient(from 200deg, #ff9f0a, #ff375f, #bf5af2, #0a84ff, #30d158, #ff9f0a); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.2); }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; color: var(--fg); text-decoration: none; font-weight: 500; }
+.nav a[aria-current] { background: var(--surface-solid); box-shadow: var(--hl), 0 1px 2px rgba(0,0,0,.06); }
+.nav svg { width: 17px; height: 17px; color: var(--fg2); }
+.nav-label { font-size: 11.5px; color: var(--fg3); font-weight: 600; padding: 14px 10px 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rob); }
+
+/* main */
+.main { flex: 999 1 640px; min-width: 0; padding-block: 22px 28px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 900px) { .main { padding-left: 28px; padding-right: 28px; } }
+.phead { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 16px; }
+.ptile { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; color: #fff; background: linear-gradient(160deg, #ffa94d, #f56300); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 1px 2px rgba(0,0,0,.2), 0 6px 16px rgba(245,99,0,.25); }
+.ptile svg { width: 24px; height: 24px; }
+.phead h1 { margin: 0; font: 700 26px/1.1 var(--f-body); letter-spacing: -.02em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.chip { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: var(--fill); color: var(--fg2); }
+.chip.rob { background: var(--rob-tint); color: var(--rob-text); }
+.btn-primary { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; border-radius: 11px; background: var(--accent); color: #fff; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.15), 0 6px 16px rgba(0,113,227,.25); }
+.tabs { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 12px; background: var(--fill); margin-bottom: 16px; max-width: 100%; }
+.tabs button { padding: 6px 14px; border-radius: 9px; font-weight: 500; color: var(--fg2); }
+.tabs button[aria-selected="true"] { background: var(--surface-solid); color: var(--fg); box-shadow: var(--hl), 0 1px 2px rgba(0,0,0,.08); }
+
+/* work area */
+.work { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.stage { position: relative; flex: 999 1 620px; min-width: 0; border-radius: 20px; overflow: hidden; background: var(--paper); box-shadow: var(--hl), var(--sh); }
+.stage svg#scene { display: block; width: 100%; height: auto; touch-action: none; user-select: none; }
+.stage-top { position: absolute; top: 14px; left: 14px; right: 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; pointer-events: none; }
+.stage-top > * { pointer-events: auto; }
+.seg { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--card); border: 1px solid var(--card-line); box-shadow: var(--hl), var(--sh); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.seg button { padding: 5px 12px; border-radius: 8px; font: 600 12.5px var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--fg2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+:root[data-theme="dark"] .seg button[aria-pressed="true"] { background: var(--hot); color: #111; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seg button[aria-pressed="true"] { background: var(--hot); color: #111; } }
+.hint { font: 500 12px var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--fg2); padding: 6px 10px; border-radius: 9px; background: var(--card); border: 1px solid var(--card-line); }
+.toolbar { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 13px; background: var(--card); border: 1px solid var(--card-line); box-shadow: var(--hl), var(--sh2); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); max-width: calc(100% - 20px); flex-wrap: wrap; justify-content: center; }
+.toolbar button { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; color: var(--fg2); transition: background-color 140ms ease, color 140ms ease, transform 120ms ease; }
+.toolbar button:active { transform: scale(.94); }
+@media (hover: hover) { .toolbar button:hover { background: var(--fill); color: var(--fg); } }
+.toolbar button[aria-pressed="true"] { background: var(--rob-tint); color: var(--rob-text); }
+.toolbar svg { width: 18px; height: 18px; }
+.toolbar .sep { width: 1px; height: 20px; background: var(--sep); margin: 0 4px; }
+
+/* svg pieces */
+.poly { stroke: var(--ink); stroke-width: .9; stroke-linejoin: round; }
+.silk { font-family: var(--f-display); font-weight: 600; }
+.hot-ring { fill: none; stroke: var(--hot); stroke-width: 2; animation: pulse 2.2s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.hot-dot { fill: var(--hot); stroke: #fff; stroke-width: 2; }
+@keyframes pulse { 0% { opacity: .9; transform: scale(.6); } 80%, 100% { opacity: 0; transform: scale(2.2); } }
+.leader { stroke: var(--ink); stroke-width: 1.2; stroke-dasharray: 3 4; fill: none; opacity: .55; }
+.ccard rect { fill: var(--card); stroke: var(--card-line); }
+.ccard .t { font: 700 13px var(--f-display); letter-spacing: .07em; fill: var(--fg); text-transform: uppercase; }
+.ccard .b { font: 400 11.5px var(--f-body); fill: var(--fg2); }
+.tag { cursor: pointer; }
+.tag rect { fill: var(--card); stroke: var(--card-line); }
+.tag text { font: 700 11.5px var(--f-display); letter-spacing: .07em; fill: var(--fg); }
+.tag.on rect { fill: var(--ink); } .tag.on text { fill: #fff; }
+.wire-case { fill: none; stroke: var(--paper); stroke-width: 6; stroke-linecap: round; }
+.wire { fill: none; stroke-width: 3.2; stroke-linecap: round; cursor: pointer; transition: opacity 160ms ease; }
+.wire-hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer; }
+.wire.dim { opacity: .18; }
+.flow { fill: none; stroke: rgba(255,255,255,.85); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 2 12; animation: flow .9s linear infinite; pointer-events: none; }
+@keyframes flow { to { stroke-dashoffset: -14; } }
+.end { stroke: var(--ink); stroke-width: 1; }
+.pin-hit { fill: transparent; cursor: pointer; }
+.pin-glow { fill: none; stroke: var(--hot); stroke-width: 2.5; }
+@media (prefers-reduced-motion: reduce) { .hot-ring, .flow { animation: none; } .hot-ring { opacity: .5; } }
+
+/* tooltip, schematic */
+.tip { position: absolute; transform: translate(-50%, calc(-100% - 14px)); min-width: 190px; max-width: 260px; padding: 10px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--card-line); box-shadow: var(--hl), var(--sh2); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); pointer-events: none; }
+.tip b { font: 700 14px var(--f-display); letter-spacing: .06em; }
+.tip .caps { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+.cap { font: 600 10.5px var(--f-body); padding: 2px 7px; border-radius: 99px; background: var(--fill); color: var(--fg2); }
+.cap.warn { background: var(--warn-tint); color: var(--warn); }
+.tip .to { font-size: 12px; color: var(--fg2); }
+.schem { position: absolute; top: 58px; left: 14px; width: min(340px, calc(100% - 28px)); padding: 12px 14px 10px; border-radius: 14px; background: var(--card); border: 1px solid var(--card-line); box-shadow: var(--hl), var(--sh2); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.schem h3 { margin: 0 0 6px; font: 700 12.5px var(--f-display); letter-spacing: .08em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
+.schem h3 span { color: var(--fg3); font-weight: 500; }
+.schem svg { width: 100%; height: auto; display: block; }
+.schem text { font: 600 10px var(--f-mono); fill: var(--fg); }
+.schem .muted { fill: var(--fg2); font-weight: 500; }
+
+/* states */
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; }
+.empty-card { max-width: 340px; padding: 18px; border-radius: 16px; background: var(--card); border: 1px solid var(--card-line); box-shadow: var(--hl), var(--sh2); text-align: center; }
+.empty-card h3 { margin: 4px 0 6px; font: 700 16px var(--f-display); letter-spacing: .06em; text-transform: uppercase; }
+.empty-card p { margin: 0 0 12px; color: var(--fg2); font-size: 13px; }
+.btn-tint { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 10px; background: var(--accent-tint); color: var(--accent-text); font-weight: 600; }
+.shimmer { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%) var(--paper); background-size: 200% 100%; animation: shim 1.3s linear infinite; }
+@keyframes shim { to { background-position: -200% 0; } }
+.banner { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--warn-tint); color: var(--warn); font-weight: 500; margin-bottom: 12px; }
+
+/* panel */
+.panel { flex: 1 1 300px; max-width: 100%; min-width: 0; border-radius: 20px; background: var(--surface); box-shadow: var(--hl), var(--sh); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 6px 6px 14px; }
+@media (min-width: 1100px) { .panel { max-width: 360px; } }
+.ptabs { display: flex; gap: 2px; padding: 4px; border-bottom: 1px solid var(--sep); margin-bottom: 10px; overflow-x: auto; }
+.ptabs button { padding: 8px 10px; font: 600 12.5px var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--fg3); border-bottom: 2px solid transparent; border-radius: 0; white-space: nowrap; }
+.ptabs button[aria-selected="true"] { color: var(--fg); border-color: var(--hot); }
+.pbody { padding: 0 12px; }
+.pbody h2 { margin: 2px 0 6px; font: 700 20px var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.pbody p { margin: 0 0 12px; color: var(--fg2); }
+.facts { display: grid; gap: 8px; margin-bottom: 14px; }
+.fact { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 11px; background: var(--fill); }
+.fact .fi { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--surface-solid); color: var(--rob-text); box-shadow: var(--hl), 0 1px 2px rgba(0,0,0,.08); flex: none; }
+.fact .fi svg { width: 16px; height: 16px; }
+.fact b { display: block; font-size: 13px; } .fact span { font-size: 12px; color: var(--fg2); }
+.watch { padding: 10px 12px; border-radius: 11px; background: var(--warn-tint); color: var(--warn); font-size: 12.5px; }
+.watch b { display: block; margin-bottom: 2px; }
+table.pins { width: 100%; border-collapse: collapse; font-size: 12px; }
+.pins th { text-align: left; font: 600 10.5px var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--fg3); padding: 4px 6px; }
+.pins td { padding: 6px; border-top: 1px solid var(--sep); vertical-align: top; }
+.pins tr.sel td { background: var(--rob-tint); }
+.pins button { font: 700 12px var(--f-mono); display: inline-flex; align-items: center; gap: 6px; }
+.kdot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+.wrow { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px; }
+.wrow + .wrow { box-shadow: inset 0 1px 0 var(--sep); }
+.wrow.sel { background: var(--rob-tint); box-shadow: none; }
+@media (hover: hover) { .wrow:hover { background: var(--fill); } }
+.sw { width: 18px; height: 6px; border-radius: 3px; flex: none; box-shadow: 0 0 0 1px var(--card-line); }
+.wrow b { font: 700 12.5px var(--f-mono); } .wrow span { font-size: 12px; color: var(--fg2); }
+pre.code { margin: 0; padding: 12px; border-radius: 12px; background: var(--fill); font: 12px/1.55 var(--f-mono); overflow-x: auto; }
+.code .c { color: var(--fg3); } .code .k { color: var(--accent-text); } .code .n { color: var(--rob-text); }
+
+/* prototype switcher (not part of the design) */
+.proto { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: flex; gap: 4px; align-items: center; padding: 4px; border-radius: 12px; background: #1c2333; color: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.3); font-size: 11.5px; }
+.proto span { padding: 0 6px; opacity: .7; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.proto button { color: #fff; padding: 5px 8px; border-radius: 8px; font-weight: 600; }
+.proto button[aria-pressed="true"] { background: #f56300; }
+
+@media (max-width: 760px) {
+  .toolbar { position: static; transform: none; margin: 0 auto 12px; width: fit-content; box-shadow: var(--hl), var(--sh); }
+  .stage { display: flex; flex-direction: column; }
+  .stage-top { position: static; padding: 12px 12px 0; order: -1; }
+  .hint { display: none; }
+  .ccard, .leader { display: none; }
+  .hot-dot, .hot-ring { cursor: pointer; }
+  .proto span { display: none; }
+  .side { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--sep); }
+  .side .nav-label, .side .recent { display: none; }
+  .brand { padding: 0 8px 0 0; }
+  .nav { display: flex; flex-wrap: wrap; gap: 2px; }
+  .nav a span { display: none; }
+  .btn-primary { margin-left: 0; }
+}
+</style>
+
+<div class="app">
+  <aside class="side" aria-label="Workflow Hub">
+    <div class="brand"><span class="logo" aria-hidden="true"></span>Workflow Hub</div>
+    <nav class="nav" aria-label="Main">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+      <a href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Projects</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Handbook</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg><span>Docs</span></a>
+    </nav>
+    <div class="nav-label">Recent</div>
+    <nav class="nav recent" aria-label="Recent projects"><a href="#"><span class="dot" aria-hidden="true"></span><span>Rover-02</span></a></nav>
+  </aside>
+
+  <main class="main">
+    <header class="phead">
+      <span class="ptile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span>
+      <div>
+        <h1>Rover-02</h1>
+        <div class="chips"><span class="chip rob">Robotics</span><span class="chip">ESP32 DevKit V1</span><span class="chip" id="partsChip">6 parts · 19 wires</span></div>
+      </div>
+      <button class="btn-primary" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Open in VS Code</button>
+    </header>
+    <div class="tabs" role="tablist" aria-label="Project sections">
+      <button role="tab" aria-selected="false">Tasks</button><button role="tab" aria-selected="true">Wiring</button><button role="tab" aria-selected="false">Parts</button><button role="tab" aria-selected="false">Journal</button><button role="tab" aria-selected="false">Run</button><button role="tab" aria-selected="false">Git</button>
+    </div>
+    <div id="banner"></div>
+    <div class="work">
+      <section class="stage" aria-label="Wiring view">
+        <svg id="scene" viewBox="0 0 1000 640" role="img" aria-label="Rover-02 wiring: ESP32 DevKit with its parts and wires"></svg>
+        <div class="stage-top">
+          <div class="seg" role="group" aria-label="View">
+            <button type="button" data-mode="board" aria-pressed="false">Board</button>
+            <button type="button" data-mode="project" aria-pressed="true">Project</button>
+          </div>
+          <span class="hint" id="hint">Hover a pin · click a wire</span>
+        </div>
+        <div class="tip" id="tip" hidden></div>
+        <div class="schem" id="schem" hidden></div>
+        <div id="stateLayer"></div>
+        <div class="toolbar" role="toolbar" aria-label="View controls">
+          <button type="button" id="rotL" aria-label="Turn left" title="Turn left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+          <button type="button" id="rotR" aria-label="Turn right" title="Turn right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+          <span class="sep" aria-hidden="true"></span>
+          <button type="button" id="zoomOut" aria-label="Zoom out" title="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+          <button type="button" id="zoomIn" aria-label="Zoom in" title="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg></button>
+          <button type="button" id="reset" aria-label="Reset view" title="Reset view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6"/></svg></button>
+          <span class="sep" aria-hidden="true"></span>
+          <button type="button" id="tLabels" aria-pressed="true" aria-label="Labels" title="Labels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v10H8l-5 4z"/></svg></button>
+          <button type="button" id="tFlow" aria-pressed="false" aria-label="Show current flow" title="Show current flow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-7 6 14 3-7h4"/></svg></button>
+          <button type="button" id="tSchem" aria-pressed="false" aria-label="Show schematic" title="Show schematic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="6" height="10" rx="1"/><path d="M9 10h5l2-3h5M9 14h5l2 3h5"/></svg></button>
+        </div>
+      </section>
+
+      <aside class="panel" aria-label="Details">
+        <div class="ptabs" role="tablist" aria-label="Details">
+          <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+          <button role="tab" data-tab="pinout" aria-selected="false">Pinout</button>
+          <button role="tab" data-tab="wires" aria-selected="false">Wires</button>
+          <button role="tab" data-tab="code" aria-selected="false">pins.h</button>
+        </div>
+        <div class="pbody" id="pbody"></div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<div class="proto" role="group" aria-label="Prototype controls">
+  <span>Prototype</span>
+  <button type="button" data-state="full" aria-pressed="true">Full</button>
+  <button type="button" data-state="empty" aria-pressed="false">Empty</button>
+  <button type="button" data-state="loading" aria-pressed="false">Loading</button>
+  <button type="button" data-state="error" aria-pressed="false">Error</button>
+  <button type="button" id="themeBtn" aria-label="Switch light or dark">◐</button>
+</div>
+
+<script>
+(() => {
+const W = 1000, H = 640;
+const $ = (s) => document.querySelector(s);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- projection ----------
+function shade(hex, f) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  if (f < 0) { r *= 1 + f; g *= 1 + f; b *= 1 + f; } else { r += (255 - r) * f; g += (255 - g) * f; b += (255 - b) * f; }
+  const h = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+  return '#' + h(r) + h(g) + h(b);
+}
+const K = 0.82;
+function makeView(angleDeg, s, focus) {
+  const a = angleDeg * Math.PI / 180, c = Math.cos(a), sn = Math.sin(a);
+  const cx = W / 2, cy = H / 2 + 26, fx = focus[0], fy = focus[1];
+  const P = (x, y, z) => { const X = x - fx, Y = y - fy; return [cx + s * (X * c - Y * sn), cy + s * 0.5 * (X * sn + Y * c) - z * s * K]; };
+  const depth = (x, y) => (x - fx) * sn + (y - fy) * c;
+  const plane = (z) => { const o = P(0, 0, z); return `matrix(${(s * c).toFixed(4)} ${(s * .5 * sn).toFixed(4)} ${(-s * sn).toFixed(4)} ${(s * .5 * c).toFixed(4)} ${o[0].toFixed(2)} ${o[1].toFixed(2)})`; };
+  return { P, depth, plane, s, c, sn };
+}
+const pstr = (arr) => arr.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+function box(v, b) {
+  const { x, y, w, d, z = 0, h, color } = b, x0 = x - w / 2, x1 = x + w / 2, y0 = y - d / 2, y1 = y + d / 2, z1 = z + h, out = [];
+  for (const sd of [{ n: [0, -1], q: [[x0, y0], [x1, y0]] }, { n: [1, 0], q: [[x1, y0], [x1, y1]] }, { n: [0, 1], q: [[x1, y1], [x0, y1]] }, { n: [-1, 0], q: [[x0, y1], [x0, y0]] }]) {
+    if (sd.n[0] * v.sn + sd.n[1] * v.c <= 0.001) continue;
+    const f = (sd.n[0] * v.c - sd.n[1] * v.sn) < 0 ? -0.16 : -0.36;
+    const [p, q] = sd.q;
+    out.push(`<polygon class="poly" points="${pstr([v.P(p[0], p[1], z), v.P(q[0], q[1], z), v.P(q[0], q[1], z1), v.P(p[0], p[1], z1)])}" fill="${shade(color, f)}"/>`);
+  }
+  out.push(`<polygon class="poly" points="${pstr([v.P(x0, y0, z1), v.P(x1, y0, z1), v.P(x1, y1, z1), v.P(x0, y1, z1)])}" fill="${b.top || shade(color, .05)}"/>`);
+  return out.join('');
+}
+function cyl(v, cy) {
+  const { x, y, r, z = 0, h, color } = cy, N = 30;
+  const ring = (zz) => Array.from({ length: N }, (_, i) => { const t = i / N * Math.PI * 2; return v.P(x + r * Math.cos(t), y + r * Math.sin(t), zz); });
+  const b = ring(z), t = ring(z + h);
+  let li = 0, ri = 0; b.forEach((p, i) => { if (p[0] < b[li][0]) li = i; if (p[0] > b[ri][0]) ri = i; });
+  const walk = (dir) => { const o = []; for (let i = li; ; i = (i + dir + N) % N) { o.push(b[i]); if (i === ri) break; } return o; };
+  const f1 = walk(1), f2 = walk(-1), avg = (a) => a.reduce((s, p) => s + p[1], 0) / a.length;
+  const front = avg(f1) > avg(f2) ? f1 : f2, up = h * v.s * K;
+  return `<polygon class="poly" points="${pstr(front.concat(front.slice().reverse().map((p) => [p[0], p[1] - up])))}" fill="${shade(color, -.22)}"/>` +
+    `<polygon class="poly" points="${pstr(t)}" fill="${cy.top || shade(color, .1)}"/>` + (cy.inner ? `<polygon points="${pstr(ring(z + h).map((p) => [p[0] + (v.P(x, y, z + h)[0] - p[0]) * .32, p[1] + (v.P(x, y, z + h)[1] - p[1]) * .32]))}" fill="${cy.inner}" opacity=".9"/>` : '');
+}
+
+// ---------- the board: ESP32 DevKit V1 (30 pins) ----------
+const LEFT = ['EN', 'VP', 'VN', 'D34', 'D35', 'D32', 'D33', 'D25', 'D26', 'D27', 'D14', 'D12', 'D13', 'GND', 'VIN'];
+const RIGHT = ['D23', 'D22', 'TX0', 'RX0', 'D21', 'D19', 'D18', 'D5', 'TX2', 'RX2', 'D4', 'D2', 'D15', 'GND', '3V3'];
+const ALIAS = { VP: 36, VN: 39, TX0: 1, RX0: 3, TX2: 17, RX2: 16 };
+const KIND = { gpio: ['#3b7bf6', 'GPIO'], adc: ['#18a999', 'GPIO + analog'], input: ['#8b5cf6', 'Input only'], power: ['#e5484d', 'Power'], gnd: ['#5b6170', 'Ground'], ctl: ['#f59e0b', 'Control'] };
+function pinInfo(label) {
+  if (label === 'GND') return { kind: 'gnd', caps: ['Ground'], note: 'Every circuit returns here. Join all grounds.' };
+  if (label === 'VIN') return { kind: 'power', caps: ['5 V in'], note: '5 V from USB, or feed 5–12 V here.' };
+  if (label === '3V3') return { kind: 'power', caps: ['3.3 V out'], note: 'Regulated 3.3 V, about 500 mA for everything.' };
+  if (label === 'EN') return { kind: 'ctl', caps: ['Reset'], note: 'Pull low to reset the board.' };
+  const g = ALIAS[label] ?? Number(label.slice(1)), caps = [`GPIO ${g}`], warn = [];
+  let kind = 'gpio';
+  if (g >= 34) { kind = 'input'; caps.push('ADC1'); warn.push('Input only: no output, no pull-up'); }
+  else if ([32, 33].includes(g)) { kind = 'adc'; caps.push('ADC1', 'PWM', 'Touch'); }
+  else if ([25, 26].includes(g)) { kind = 'adc'; caps.push('ADC2', 'PWM', 'DAC'); }
+  else if ([27, 14, 12, 13, 4, 2, 15].includes(g)) { kind = 'adc'; caps.push('ADC2', 'PWM', 'Touch'); }
+  else caps.push('PWM');
+  if (g === 21) caps.push('I²C SDA'); if (g === 22) caps.push('I²C SCL');
+  if (g === 18) caps.push('SPI SCK'); if (g === 19) caps.push('SPI MISO'); if (g === 23) caps.push('SPI MOSI');
+  if ([1, 3].includes(g)) warn.push('USB serial: busy while uploading');
+  if ([0, 2, 5, 12, 15].includes(g)) warn.push('Boot pin: keep it free at power-up');
+  if (kind === 'adc' && caps.includes('ADC2')) warn.push('ADC2 stops working while Wi-Fi is on');
+  return { kind, caps, warn, gpio: g };
+}
+const PIN_Y = (i) => -15.7 + i * 2.54, HEADER_X = 11.43, PIN_Z = 5.6;
+const PINS = [...LEFT.map((l, i) => ({ id: 'L' + i, label: l, x: -HEADER_X, y: PIN_Y(i) })), ...RIGHT.map((l, i) => ({ id: 'R' + i, label: l, x: HEADER_X, y: PIN_Y(i) }))];
+PINS.forEach((p) => Object.assign(p, pinInfo(p.label)));
+const pinBy = (label, side) => PINS.find((p) => p.label === label && (!side || p.id[0] === side));
+
+const BOARD = { id: 'board', name: 'ESP32 DevKit V1', x: 0, y: 0, shapes: [
+  { x: 0, y: 0, w: 28.4, d: 52, h: 2.4, color: '#1d2a44', top: '#21324f' },
+  { kind: 'silk', z: 2.4 },
+  { x: 0, y: -12.2, w: 15, d: 25.5, z: 2.4, h: .8, color: '#161b26', top: '#1b2130' },
+  { kind: 'antenna', z: 3.21 },
+  { x: 0, y: -8.6, w: 13.4, d: 17.6, z: 3.2, h: 2.9, color: '#b9c1cc', top: '#d6dce4' },
+  { kind: 'shieldtext', z: 6.11 },
+  { x: -5.5, y: 13, w: 6.5, d: 3.6, z: 2.4, h: 1.7, color: '#2a2e37' },
+  { x: 5, y: 11.2, w: 5, d: 5, z: 2.4, h: 1.1, color: '#2a2e37' },
+  { x: -8.2, y: 21.6, w: 4.4, d: 3.4, z: 2.4, h: 1.4, color: '#c2c7ce' }, { x: -8.2, y: 21.6, w: 2, d: 1.6, z: 3.8, h: 1, color: '#2a2e36' },
+  { x: 8.2, y: 21.6, w: 4.4, d: 3.4, z: 2.4, h: 1.4, color: '#c2c7ce' }, { x: 8.2, y: 21.6, w: 2, d: 1.6, z: 3.8, h: 1, color: '#2a2e36' },
+  { x: -3, y: 18.4, w: 1.6, d: .9, z: 2.4, h: .7, color: '#ff4b3a', top: '#ff8a7d' },
+  { x: 3, y: 18.4, w: 1.6, d: .9, z: 2.4, h: .7, color: '#3a7bff', top: '#8cb4ff' },
+  { x: 0, y: 25.2, w: 8, d: 5.8, z: 2.4, h: 2.9, color: '#b4bac4', top: '#cfd4db' },
+  { x: -HEADER_X, y: 2.08, w: 2.5, d: 38.1, z: 2.4, h: 2.6, color: '#14171d', top: '#1d2129' },
+  { x: HEADER_X, y: 2.08, w: 2.5, d: 38.1, z: 2.4, h: 2.6, color: '#14171d', top: '#1d2129' },
+  ...PINS.map((p) => ({ x: p.x, y: p.y, w: .9, d: .9, z: 5, h: .7, color: '#c99a2e', top: '#f2c75c' })),
+], hot: [
+  { id: 'usb', x: 0, y: 26.5, z: 4.5, title: 'USB port', body: ['Power and uploads.', 'Plug in here to flash the code.'], card: [26, 430] },
+  { id: 'mcu', x: 0, y: -8, z: 6.2, title: 'ESP32-WROOM', body: ['Dual-core 240 MHz brain,', 'Wi-Fi and Bluetooth built in.'], card: [744, 70] },
+  { id: 'left', x: -HEADER_X, y: -6, z: 5.4, title: 'Left pins', body: ['GPIO 36–13 and VIN.', '34–39 can only read.'], card: [26, 110] },
+  { id: 'right', x: HEADER_X, y: -2, z: 5.4, title: 'Right pins', body: ['GPIO 23–15 and 3V3.', 'I²C on 21 (SDA) and 22 (SCL).'], card: [744, 268] },
+  { id: 'btn', x: 8.2, y: 21.6, z: 4.6, title: 'EN · BOOT', body: ['EN resets the board.', 'Hold BOOT if an upload stalls.'], card: [744, 444] },
+] };
+
+// ---------- the project's parts ----------
+const PARTS = [
+  { id: 'l298n', name: 'L298N', role: 'Motor driver', x: -52, y: 6, tagZ: 30, shapes: [
+    { x: -52, y: 6, w: 43, d: 43, h: 1.6, color: '#c3302b', top: '#d43a34' },
+    { x: -49, y: 1, w: 15, d: 22, z: 1.6, h: 21, color: '#22252c', top: '#2c3038' },
+    ...[0, 1, 2, 3, 4].map((i) => ({ x: -49, y: -8.8 + i * 4.9, w: 16.4, d: 1.1, z: 22.6, h: 2.2, color: '#22252c' })),
+    { x: -70.5, y: -7, w: 6, d: 10, z: 1.6, h: 9, color: '#2b6de0', top: '#3b7cf0' },
+    { x: -70.5, y: 19, w: 6, d: 10, z: 1.6, h: 9, color: '#2b6de0', top: '#3b7cf0' },
+    { x: -52, y: 24.5, w: 15, d: 6, z: 1.6, h: 9, color: '#2b6de0', top: '#3b7cf0' },
+    { x: -33.5, y: 8, w: 2.5, d: 15.2, z: 1.6, h: 2.6, color: '#14171d' },
+  ], pins: { ENA: [-33.5, 1.65, 4.6], IN1: [-33.5, 4.19, 4.6], IN2: [-33.5, 6.73, 4.6], IN3: [-33.5, 9.27, 4.6], IN4: [-33.5, 11.81, 4.6], ENB: [-33.5, 14.35, 4.6], '12V': [-56.5, 24.5, 10.6], GND: [-52, 24.5, 10.6], '5V': [-47.5, 24.5, 10.6], OUT1: [-70.5, -9.5, 10.6], OUT2: [-70.5, -4.5, 10.6], OUT3: [-70.5, 16.5, 10.6], OUT4: [-70.5, 21.5, 10.6] } },
+  { id: 'm1', name: 'TT motor', role: 'Left wheel', x: -52, y: -44, tagZ: 22, shapes: [
+    { x: -52, y: -44, w: 37, d: 22, h: 18.5, color: '#f2b705', top: '#f8c936' },
+    { x: -40, y: -44, w: 4, d: 26, z: 7.5, h: 4, color: '#f3f3f3' },
+    { x: -66, y: -44, w: 8, d: 10, z: 4, h: 10, color: '#e8e8ea' },
+  ], pins: { '+': [-70, -46.5, 9], '-': [-70, -41.5, 9] } },
+  { id: 'm2', name: 'TT motor', role: 'Right wheel', x: -52, y: 58, tagZ: 22, shapes: [
+    { x: -52, y: 58, w: 37, d: 22, h: 18.5, color: '#f2b705', top: '#f8c936' },
+    { x: -40, y: 58, w: 4, d: 26, z: 7.5, h: 4, color: '#f3f3f3' },
+    { x: -66, y: 58, w: 8, d: 10, z: 4, h: 10, color: '#e8e8ea' },
+  ], pins: { '+': [-70, 55.5, 9], '-': [-70, 60.5, 9] } },
+  { id: 'hc', name: 'HC-SR04', role: 'Distance sensor', x: 0, y: -50, tagZ: 16, shapes: [
+    { x: 0, y: -50, w: 45, d: 20, h: 1.6, color: '#2257c2', top: '#2a64d4' },
+    { kind: 'cyl', x: -13, y: -50, r: 7.6, z: 1.6, h: 12, color: '#c5cbd3', top: '#d9dee5', inner: '#3a404c' },
+    { kind: 'cyl', x: 13, y: -50, r: 7.6, z: 1.6, h: 12, color: '#c5cbd3', top: '#d9dee5', inner: '#3a404c' },
+    { x: 0, y: -55, w: 6, d: 3, z: 1.6, h: 1.6, color: '#d8dbe0' },
+    { x: 0, y: -41.5, w: 10.2, d: 2.5, z: 1.6, h: 2.6, color: '#14171d' },
+  ], pins: { VCC: [-3.81, -41.5, 4.6], TRIG: [-1.27, -41.5, 4.6], ECHO: [1.27, -41.5, 4.6], GND: [3.81, -41.5, 4.6] } },
+  { id: 'servo', name: 'SG90', role: 'Sensor head servo', x: 44, y: -24, tagZ: 30, shapes: [
+    { x: 44, y: -24, w: 23, d: 12.5, h: 22.5, color: '#2c5fd8', top: '#4a7cef' },
+    { x: 44, y: -24, w: 32, d: 12.5, z: 15.5, h: 2.2, color: '#2c5fd8', top: '#4a7cef' },
+    { kind: 'cyl', x: 38, y: -24, r: 3, z: 22.5, h: 3, color: '#f2f2f2' },
+    { x: 38, y: -24, w: 3.8, d: 19, z: 25.5, h: 1.5, color: '#f7f7f7' },
+  ], pins: { GND: [32.5, -27, 5], 'V+': [32.5, -24, 5], SIG: [32.5, -21, 5] } },
+  { id: 'bat', name: '2× 18650', role: 'Battery, 7.4 V', x: 50, y: 50, tagZ: 24, shapes: [
+    { x: 50, y: 50, w: 77, d: 40, h: 17, color: '#252932', top: '#2e333e' },
+    { x: 50, y: 41, w: 66, d: 16, z: 17, h: 2.4, color: '#2aa04b', top: '#36b75a' },
+    { x: 50, y: 59, w: 66, d: 16, z: 17, h: 2.4, color: '#2aa04b', top: '#36b75a' },
+  ], pins: { '+': [88.5, 45, 9], '-': [88.5, 55, 9] } },
+];
+// lay the bench out around the board: board in front, parts behind and beside it
+const MOVE = { l298n: [-2, 38], m1: [3, 139], m2: [140, -71], hc: [-34, 1], servo: [-18, -43], bat: [-143, -52] };
+for (const p of PARTS) { const [dx, dy] = MOVE[p.id] || [0, 0]; p.x += dx; p.y += dy; p.shapes.forEach((sh) => { sh.x += dx; sh.y += dy; }); Object.values(p.pins).forEach((q) => { q[0] += dx; q[1] += dy; }); }
+const partBy = (id) => PARTS.find((p) => p.id === id);
+
+// wires: board pin (or part pin) to part pin, with the signal name pins.h uses
+const WIRES = [
+  { from: ['L', 'D25'], to: ['l298n', 'ENA'], color: '#ff8a00', sig: 'MOTOR_A_EN' },
+  { from: ['L', 'D26'], to: ['l298n', 'IN1'], color: '#ffd23f', sig: 'MOTOR_A_IN1' },
+  { from: ['L', 'D27'], to: ['l298n', 'IN2'], color: '#36c98a', sig: 'MOTOR_A_IN2' },
+  { from: ['L', 'D14'], to: ['l298n', 'IN3'], color: '#34aef8', sig: 'MOTOR_B_IN3' },
+  { from: ['L', 'D13'], to: ['l298n', 'IN4'], color: '#a77bff', sig: 'MOTOR_B_IN4' },
+  { from: ['L', 'D33'], to: ['l298n', 'ENB'], color: '#ff6fb5', sig: 'MOTOR_B_EN' },
+  { from: ['R', 'D18'], to: ['hc', 'TRIG'], color: '#14c2c7', sig: 'SONAR_TRIG' },
+  { from: ['R', 'D19'], to: ['hc', 'ECHO'], color: '#86d34a', sig: 'SONAR_ECHO' },
+  { from: ['R', 'D23'], to: ['servo', 'SIG'], color: '#ff9f43', sig: 'SERVO_SIGNAL' },
+  { from: ['L', 'VIN'], to: ['l298n', '5V'], color: '#e5484d', sig: '5V', power: true },
+  { from: ['L', 'GND'], to: ['l298n', 'GND'], color: '#2b303b', sig: 'GND', power: true },
+  { from: ['R', 'GND'], to: ['hc', 'GND'], color: '#2b303b', sig: 'GND', power: true },
+  { from: ['l298n', '5V'], to: ['hc', 'VCC'], color: '#e5484d', sig: '5V', power: true },
+  { from: ['l298n', '5V'], to: ['servo', 'V+'], color: '#e5484d', sig: '5V', power: true },
+  { from: ['l298n', 'GND'], to: ['servo', 'GND'], color: '#2b303b', sig: 'GND', power: true },
+  { from: ['bat', '+'], to: ['l298n', '12V'], color: '#e5484d', sig: 'BATT+', power: true },
+  { from: ['bat', '-'], to: ['l298n', 'GND'], color: '#2b303b', sig: 'BATT−', power: true },
+  { from: ['l298n', 'OUT1'], to: ['m1', '+'], color: '#e5484d', sig: 'M1+', power: true },
+  { from: ['l298n', 'OUT2'], to: ['m1', '-'], color: '#2b303b', sig: 'M1−', power: true },
+  { from: ['l298n', 'OUT3'], to: ['m2', '+'], color: '#e5484d', sig: 'M2+', power: true },
+  { from: ['l298n', 'OUT4'], to: ['m2', '-'], color: '#2b303b', sig: 'M2−', power: true },
+];
+WIRES.forEach((w, i) => { w.id = i; });
+const endPos = (e) => {
+  if (e[0] === 'L' || e[0] === 'R') { const p = pinBy(e[1], e[0]); return { x: p.x, y: p.y, z: PIN_Z, pin: p }; }
+  const pp = partBy(e[0]).pins[e[1]]; return { x: pp[0], y: pp[1], z: pp[2] };
+};
+const endName = (e) => (e[0] === 'L' || e[0] === 'R') ? e[1] : `${partBy(e[0]).name} ${e[1]}`;
+document.getElementById('partsChip').textContent = `${PARTS.length} parts · ${WIRES.length} wires`;
+
+// ---------- state ----------
+const st = { mode: 'project', angle: 35, angleTo: 35, zoom: 1, zoomTo: 1, labels: true, flow: false, schem: false, tab: 'overview', hover: null, sel: null, state: 'full' };
+const MODES = { project: { s: 3.95, focus: [-9, 0] }, board: { s: 10, focus: [0, 1] } };
+
+// ---------- drawing ----------
+function silk(v, kind) {
+  if (kind === 'silk') {
+    const t = PINS.map((p) => `<text x="${(p.x < 0 ? p.x + 1.9 : p.x - 1.9).toFixed(2)}" y="${(p.y + .4).toFixed(2)}" font-size="1.05" fill="#e9eef8" text-anchor="${p.x < 0 ? 'start' : 'end'}" class="silk">${p.label}</text>`).join('');
+    return `<g transform="${v.plane(2.41)}">${t}<text x="0" y="16.6" font-size="1.7" fill="#e9eef8" text-anchor="middle" class="silk">ESP32 DEVKIT V1</text><rect x="-13.6" y="-25.4" width="27.2" height="50.8" rx="1.6" fill="none" stroke="#e9eef8" stroke-opacity=".25" stroke-width=".25"/></g>`;
+  }
+  if (kind === 'antenna') return `<g transform="${v.plane(3.21)}"><polyline points="-6,-21.6 -6,-24 -3.5,-24 -3.5,-21.8 -1,-21.8 -1,-24 1.5,-24 1.5,-21.8 4,-21.8 4,-24 6,-24" fill="none" stroke="#d9a93a" stroke-width=".55"/></g>`;
+  if (kind === 'shieldtext') return `<g transform="${v.plane(6.11)}"><text x="0" y="-9" font-size="1.9" fill="#5b6472" text-anchor="middle" class="silk">ESP-WROOM-32</text><text x="0" y="-6.4" font-size="1.1" fill="#7a8392" text-anchor="middle" class="silk">WI-FI · BT</text></g>`;
+  return '';
+}
+function drawObject(v, obj) {
+  const shapes = obj.shapes.map((sh, i) => ({ ...sh, i })).sort((a, b) => (a.z || 0) - (b.z || 0) || ((a.kind ? -1 : 0) - (b.kind ? -1 : 0)) || v.depth(a.x || 0, a.y || 0) - v.depth(b.x || 0, b.y || 0));
+  return shapes.map((sh) => sh.kind === 'cyl' ? cyl(v, sh) : sh.kind ? silk(v, sh.kind) : box(v, sh)).join('');
+}
+function footprint(v, obj) {
+  const b = obj.shapes[0], pad = 1.5, x0 = b.x - b.w / 2 - pad, x1 = b.x + b.w / 2 + pad, y0 = b.y - b.d / 2 - pad, y1 = b.y + b.d / 2 + pad;
+  return `<polygon points="${pstr([[x0, y0], [x1, y0], [x1, y1], [x0, y1]].map(([x, y]) => { const p = v.P(x, y, 0); return [p[0] + 5, p[1] + 7]; }))}" fill="var(--shadow-fill)" filter="url(#soft)"/>`;
+}
+function curve(a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], dist = Math.hypot(dx, dy), lift = 26 + dist * .16;
+  return `M${a[0].toFixed(1)} ${a[1].toFixed(1)} C${a[0].toFixed(1)} ${(a[1] - lift).toFixed(1)} ${b[0].toFixed(1)} ${(b[1] - lift).toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
+}
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+function render() {
+  const m = MODES[st.mode], v = makeView(st.angle, m.s * st.zoom, m.focus);
+  const showParts = st.mode === 'project' && st.state !== 'empty';
+  const objs = [BOARD, ...(showParts ? PARTS : [])].sort((a, b) => v.depth(a.x, a.y) - v.depth(b.x, b.y));
+  const selWires = st.sel == null ? null : st.sel.type === 'wire' ? new Set([st.sel.id]) : new Set(WIRES.filter((w) => w.from[0] === st.sel.id || w.to[0] === st.sel.id).map((w) => w.id));
+  let out = `<defs>
+    <pattern id="g1" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern>
+    <pattern id="g2" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#g1)"/><path d="M100 0H0V100" fill="none" stroke="var(--grid-major)" stroke-width="1"/></pattern>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="card" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation=".8" flood-opacity=".12"/><feDropShadow dx="0" dy="8" stdDeviation="10" flood-opacity=".10"/></filter>
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#g2)"/>
+  <g fill="none" stroke="var(--trace)" stroke-width="2" stroke-linecap="round">
+    <path d="M0 560 H120 L160 600 H260"/><circle cx="264" cy="600" r="4"/><path d="M0 590 H90 L110 610 V640"/>
+    <path d="M1000 90 H880 L850 60 H760"/><circle cx="756" cy="60" r="4"/><path d="M1000 120 H900 L880 140 V180"/><circle cx="880" cy="184" r="4"/>
+    <path d="M40 0 V40 L70 70 H140"/><circle cx="144" cy="70" r="4"/>
+  </g>`;
+  if (st.state === 'loading') { $('#scene').innerHTML = out; return; }
+  out += objs.map((o) => footprint(v, o)).join('');
+  out += objs.map((o) => drawObject(v, o)).join('');
+
+  // wires
+  if (showParts) {
+    const ws = WIRES.slice().sort((a, b) => (a.power ? 0 : 1) - (b.power ? 0 : 1));
+    for (const w of ws) {
+      const A = endPos(w.from), B = endPos(w.to), a = v.P(A.x, A.y, A.z), b = v.P(B.x, B.y, B.z), d = curve(a, b);
+      const dim = selWires && !selWires.has(w.id) ? ' dim' : '';
+      out += `<path class="wire-case${dim}" d="${d}"${w.power ? ' style="stroke-width:4.5"' : ''}/><path class="wire${dim}" d="${d}" stroke="${w.color}"${w.power ? ' style="stroke-width:2.2"' : ''}/>`;
+      if (st.flow && !dim) out += `<path class="flow" d="${d}"/>`;
+      out += `<circle class="end" cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="2.6" fill="${w.color}"/><circle class="end" cx="${b[0].toFixed(1)}" cy="${b[1].toFixed(1)}" r="2.6" fill="${w.color}"/>`;
+      out += `<path class="wire-hit" d="${d}" data-wire="${w.id}"><title>${esc(endName(w.from))} → ${esc(endName(w.to))} · ${esc(w.sig)}</title></path>`;
+    }
+  }
+
+  // pins: glow on hover / selection, hit targets
+  const r = Math.max(4, v.s * 1.15);
+  const lit = new Set();
+  if (st.hover) lit.add(st.hover);
+  if (selWires) WIRES.filter((w) => selWires.has(w.id)).forEach((w) => { [w.from, w.to].forEach((e) => { if (e[0] === 'L' || e[0] === 'R') lit.add(pinBy(e[1], e[0]).id); }); });
+  for (const p of PINS) {
+    const q = v.P(p.x, p.y, PIN_Z);
+    if (lit.has(p.id)) out += `<circle class="pin-glow" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${(r * .9).toFixed(1)}"/>`;
+    out += `<circle class="pin-hit" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${r.toFixed(1)}" data-pin="${p.id}"/>`;
+  }
+
+  // labels: callouts in board view, name tags in project view
+  if (st.labels && st.mode === 'board') {
+    for (const h of BOARD.hot) {
+      const q = v.P(h.x, h.y, h.z), [cx, cy] = h.card, cw = 230, ch = 70;
+      const ax = cx + cw / 2 < q[0] ? cx + cw : cx, ay = Math.max(cy + 14, Math.min(cy + ch - 14, q[1]));
+      out += `<path class="leader" d="M${q[0].toFixed(1)} ${q[1].toFixed(1)} L${(ax + (ax === cx ? -18 : 18)).toFixed(1)} ${ay.toFixed(1)} L${ax} ${ay.toFixed(1)}"/>`;
+      out += `<circle class="hot-ring" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="8"/><circle class="hot-dot" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="5"/><circle class="pin-hit" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="13" data-hot="${h.id}"/>`;
+      out += `<g class="ccard" filter="url(#card)"><rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="12"/><text class="t" x="${cx + 16}" y="${cy + 24}">${h.title}</text><text class="b" x="${cx + 16}" y="${cy + 43}">${h.body[0]}</text><text class="b" x="${cx + 16}" y="${cy + 59}">${h.body[1]}</text></g>`;
+    }
+  }
+  if (st.labels && showParts) {
+    for (const p of PARTS) {
+      const q = v.P(p.x, p.y, p.tagZ), label = `${p.name.toUpperCase()} · ${p.role.toUpperCase()}`, w = label.length * 6.4 + 22;
+      const on = st.sel && st.sel.type === 'part' && st.sel.id === p.id ? ' on' : '';
+      out += `<g class="tag${on}" data-part="${p.id}" tabindex="0" role="button" aria-label="Select ${p.name}"><line x1="${q[0].toFixed(1)}" y1="${(q[1] - 6).toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${(q[1] - 18).toFixed(1)}" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="2 3" opacity=".5"/><rect x="${(q[0] - w / 2).toFixed(1)}" y="${(q[1] - 42).toFixed(1)}" width="${w.toFixed(1)}" height="24" rx="12" filter="url(#card)"/><text x="${q[0].toFixed(1)}" y="${(q[1] - 26).toFixed(1)}" text-anchor="middle">${esc(label)}</text></g>`;
+    }
+    const bq = v.P(0, -28, 8), bl = 'ESP32 DEVKIT V1 · BRAIN', bw = bl.length * 6.4 + 22;
+    out += `<g class="tag"><rect x="${(bq[0] - bw / 2).toFixed(1)}" y="${(bq[1] - 30).toFixed(1)}" width="${bw}" height="24" rx="12" filter="url(#card)"/><text x="${bq[0].toFixed(1)}" y="${(bq[1] - 14).toFixed(1)}" text-anchor="middle">${bl}</text></g>`;
+  }
+  const narrow = $('#scene').getBoundingClientRect().width < 560;
+  $('#scene').setAttribute('viewBox', narrow && st.mode === 'board' ? '200 150 600 420' : `0 0 ${W} ${H}`);
+  $('#scene').innerHTML = out;
+  renderTip(v);
+}
+
+function renderTip(v) {
+  const tip = $('#tip');
+  if (st.hot && st.mode === 'board') {
+    const h = BOARD.hot.find((x) => x.id === st.hot), q = v.P(h.x, h.y, h.z);
+    tip.innerHTML = `<b>${h.title.toUpperCase()}</b><div class="to" style="margin-top:4px">${h.body.join(' ')}</div>`;
+    tip.style.left = (q[0] / W * 100) + '%'; tip.style.top = (q[1] / H * 100) + '%'; tip.hidden = false; return;
+  }
+  if (!st.hover || st.state === 'loading') { tip.hidden = true; return; }
+  const p = PINS.find((x) => x.id === st.hover), q = v.P(p.x, p.y, PIN_Z);
+  const ws = WIRES.filter((w) => [w.from, w.to].some((e) => (e[0] === 'L' || e[0] === 'R') && pinBy(e[1], e[0]).id === p.id));
+  const to = st.mode === 'project' && st.state !== 'empty' && ws.length ? ws.map((w) => `Wired to <b>${esc(endName(w.to))}</b> · <span style="font-family:var(--f-mono)">${esc(w.sig)}</span>`).join('<br>') : 'Free: nothing wired here yet.';
+  tip.innerHTML = `<b>${p.label}</b> <span class="cap" style="background:${KIND[p.kind][0]}22;color:${KIND[p.kind][0]}">${KIND[p.kind][1]}</span><div class="caps">${p.caps.map((c) => `<span class="cap">${c}</span>`).join('')}${(p.warn || []).map((c) => `<span class="cap warn">${c}</span>`).join('')}</div><div class="to">${p.note ? p.note + '<br>' : ''}${to}</div>`;
+  tip.style.left = (q[0] / W * 100) + '%'; tip.style.top = (q[1] / H * 100) + '%';
+  tip.hidden = false;
+}
+
+// ---------- panel ----------
+const ICON = { cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>', wifi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.6a10 10 0 0 1 14 0M8.5 16.4a5 5 0 0 1 7 0"/><circle cx="12" cy="20" r="1"/></svg>', bolt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>' };
+function panel() {
+  document.querySelectorAll('.ptabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === st.tab)));
+  const pb = $('#pbody'), proj = st.mode === 'project' && st.state !== 'empty';
+  if (st.tab === 'overview') {
+    const parts = proj ? `<h3 style="margin:14px 0 6px;font:700 12.5px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">In this project</h3>` + PARTS.map((p) => { const n = WIRES.filter((w) => w.from[0] === p.id || w.to[0] === p.id).length; return `<button class="wrow${st.sel && st.sel.id === p.id ? ' sel' : ''}" data-selpart="${p.id}"><span class="kdot" style="background:${p.shapes[0].color}"></span><span style="flex:1"><b style="font-family:var(--f-body)">${p.name}</b><br><span>${p.role}</span></span><span>${n} wires</span></button>`; }).join('') : '';
+    pb.innerHTML = `<h2>ESP32 DevKit V1</h2><p>A small board with Wi-Fi and Bluetooth built in. Fast enough for robots, and every output pin can do PWM for motors, servos and LEDs.</p>
+      <div class="facts"><div class="fact"><span class="fi">${ICON.cpu}</span><span><b>Dual-core, 240 MHz</b><span>Runs your code from 4 MB of flash</span></span></div>
+      <div class="fact"><span class="fi">${ICON.wifi}</span><span><b>Wi-Fi + Bluetooth</b><span>Phone control without extra parts</span></span></div>
+      <div class="fact"><span class="fi">${ICON.bolt}</span><span><b>3.3 V logic</b><span>Never feed 5 V into a pin; use a divider</span></span></div></div>
+      <div class="watch"><b>Watch out</b>HC-SR04 ECHO sends 5 V into D19. Add a 1 kΩ + 2 kΩ divider, or use the 3.3 V-safe HC-SR04P.</div>${parts}`;
+  } else if (st.tab === 'pinout') {
+    pb.innerHTML = `<div style="overflow-x:auto"><table class="pins"><thead><tr><th>Pin</th><th>Can do</th><th>Wired to</th></tr></thead><tbody>` + PINS.map((p) => {
+      const w = proj ? WIRES.find((x) => [x.from, x.to].some((e) => (e[0] === 'L' || e[0] === 'R') && pinBy(e[1], e[0]).id === p.id)) : null;
+      return `<tr class="${st.hover === p.id ? 'sel' : ''}"><td><button data-pinrow="${p.id}"><span class="kdot" style="background:${KIND[p.kind][0]}"></span>${p.label}</button></td><td>${p.caps.slice(p.kind === 'gpio' || p.kind === 'adc' || p.kind === 'input' ? 1 : 0).join(', ') || KIND[p.kind][1]}</td><td>${w ? esc(endName(w.to)) : '<span style="color:var(--fg3)">free</span>'}</td></tr>`;
+    }).join('') + `</tbody></table></div>`;
+  } else if (st.tab === 'wires') {
+    pb.innerHTML = proj ? WIRES.map((w) => `<button class="wrow${st.sel && st.sel.type === 'wire' && st.sel.id === w.id ? ' sel' : ''}" data-selwire="${w.id}"><span class="sw" style="background:${w.color}"></span><span style="flex:1;min-width:0"><b>${esc(endName(w.from))} → ${esc(endName(w.to))}</b><br><span>${esc(w.sig)}${w.power ? ' · power' : ''}</span></span></button>`).join('') : `<p>No wires yet. Add parts in the Parts tab, then drag from a pin to a part.</p>`;
+  } else {
+    const sig = WIRES.filter((w) => !w.power && (w.from[0] === 'L' || w.from[0] === 'R'));
+    pb.innerHTML = `<pre class="code"><span class="c">// AUTO-GENERATED by Workflow Hub.</span>\n<span class="c">// Edit wires in the Wiring tab.</span>\n<span class="k">#pragma once</span>\n\n` + (proj ? sig.map((w) => { const p = pinBy(w.from[1], w.from[0]); return `<span class="k">#define</span> <span class="n">${w.sig.padEnd(13)}</span> ${String(p.gpio).padStart(2)}  <span class="c">// ${p.label} → ${esc(endName(w.to))}</span>`; }).join('\n') : '<span class="c">// No wires yet.</span>') + `</pre>`;
+  }
+}
+
+// ---------- schematic ----------
+function schematic() {
+  const el = $('#schem');
+  el.hidden = !st.schem || st.state === 'loading';
+  if (el.hidden) return;
+  const rows = st.mode === 'project' && st.state !== 'empty' ? WIRES.filter((w) => !w.power && (w.from[0] === 'L' || w.from[0] === 'R')) : [];
+  const h = Math.max(1, rows.length) * 18 + 16;
+  let svg = `<svg viewBox="0 0 320 ${h}" role="img" aria-label="Schematic of the signal wires"><rect x="4" y="6" width="64" height="${h - 12}" rx="6" fill="none" stroke="var(--fg)" stroke-width="1.3"/><text x="36" y="${h / 2 + 3}" text-anchor="middle">ESP32</text>`;
+  rows.forEach((w, i) => { const y = 18 + i * 18; svg += `<text x="72" y="${y + 3}" class="muted">${w.from[1]}</text><line x1="100" y1="${y}" x2="200" y2="${y}" stroke="${w.color}" stroke-width="2"/><circle cx="200" cy="${y}" r="2.4" fill="${w.color}"/><text x="206" y="${y + 3}">${esc(endName(w.to))}</text>`; });
+  if (!rows.length) svg += `<text x="80" y="${h / 2 + 3}" class="muted">No signal wires yet</text>`;
+  el.innerHTML = `<h3>Schematic <span>signal wires</span></h3>${svg}</svg>`;
+}
+
+// ---------- states ----------
+function stateLayer() {
+  const L = $('#stateLayer'), B = $('#banner');
+  B.innerHTML = st.state === 'error' ? `<div class="banner" role="alert"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>wiring.json has a stray comma on line 12. Fix it in VS Code, or press Reset wiring.</div>` : '';
+  if (st.state === 'loading') L.innerHTML = `<div class="shimmer" aria-label="Loading the board"></div>`;
+  else if (st.state === 'empty' && st.mode === 'project') L.innerHTML = `<div class="overlay" style="place-items:end center;padding-bottom:84px;pointer-events:none"><div class="empty-card" style="pointer-events:auto"><h3>No parts yet</h3><p>Add motors, sensors and power in the Parts tab. They appear here, ready to wire.</p><button class="btn-tint" type="button">Add parts</button></div></div>`;
+  else L.innerHTML = '';
+}
+
+function all() { render(); panel(); schematic(); stateLayer();
+  document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === st.mode)));
+  document.querySelectorAll('.proto [data-state]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.state === st.state)));
+  $('#tLabels').setAttribute('aria-pressed', String(st.labels)); $('#tFlow').setAttribute('aria-pressed', String(st.flow)); $('#tSchem').setAttribute('aria-pressed', String(st.schem));
+  $('#hint').textContent = st.mode === 'board' ? 'Meet the board · hover a pin' : st.sel ? (st.sel.type === 'wire' ? `${endName(WIRES[st.sel.id].from)} → ${endName(WIRES[st.sel.id].to)}` : `${partBy(st.sel.id).name}: ${WIRES.filter((w) => w.from[0] === st.sel.id || w.to[0] === st.sel.id).length} wires`) : 'Hover a pin · click a wire';
+}
+
+// ---------- motion ----------
+const raf = {};
+function tween(key, to) {
+  st[key + 'To'] = to;
+  if (reduce) { st[key] = to; all(); return; }
+  cancelAnimationFrame(raf[key]);
+  const from = st[key], t0 = performance.now(), dur = 460;
+  const step = (t) => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); st[key] = from + (to - from) * e; render(); if (k < 1) raf[key] = requestAnimationFrame(step); };
+  raf[key] = requestAnimationFrame(step);
+}
+
+// ---------- events ----------
+$('#rotL').onclick = () => tween('angle', st.angleTo - 90);
+$('#rotR').onclick = () => tween('angle', st.angleTo + 90);
+$('#zoomIn').onclick = () => tween('zoom', Math.min(2.4, st.zoomTo * 1.25));
+$('#zoomOut').onclick = () => tween('zoom', Math.max(.6, st.zoomTo / 1.25));
+$('#reset').onclick = () => { tween('angle', 35); tween('zoom', 1); st.sel = null; all(); };
+$('#tLabels').onclick = () => { st.labels = !st.labels; all(); };
+$('#tFlow').onclick = () => { st.flow = !st.flow; all(); };
+$('#tSchem').onclick = () => { st.schem = !st.schem; all(); };
+document.querySelectorAll('.seg button').forEach((b) => b.onclick = () => { st.mode = b.dataset.mode; st.sel = null; st.zoom = st.zoomTo = 1; all(); });
+document.querySelectorAll('.ptabs button').forEach((b) => b.onclick = () => { st.tab = b.dataset.tab; panel(); });
+document.querySelectorAll('.proto [data-state]').forEach((b) => b.onclick = () => { st.state = b.dataset.state; st.sel = null; all(); });
+$('#themeBtn').onclick = () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme = dark ? 'light' : 'dark'; all(); };
+const scene = $('#scene');
+scene.addEventListener('mouseover', (e) => { const hid = e.target.dataset && e.target.dataset.hot; if (hid && st.hot !== hid) { st.hot = hid; render(); return; } const id = e.target.dataset && e.target.dataset.pin; if (id && st.hover !== id) { st.hover = id; render(); if (st.tab === 'pinout') panel(); } });
+scene.addEventListener('mouseout', (e) => { if (e.target.dataset && e.target.dataset.hot) { st.hot = null; render(); return; } if (e.target.dataset && e.target.dataset.pin && !(e.relatedTarget && e.relatedTarget.dataset && e.relatedTarget.dataset.pin)) { st.hover = null; render(); if (st.tab === 'pinout') panel(); } });
+scene.addEventListener('click', (e) => {
+  const hot = e.target.closest('[data-hot]');
+  if (hot) { st.hot = st.hot === hot.dataset.hot ? null : hot.dataset.hot; render(); return; }
+  const t = e.target.closest('[data-wire],[data-part],[data-pin]');
+  if (!t) { if (st.sel || st.hot) { st.sel = null; st.hot = null; all(); } return; }
+  if (t.dataset.wire) { st.sel = { type: 'wire', id: Number(t.dataset.wire) }; st.tab = 'wires'; }
+  else if (t.dataset.part) { st.sel = { type: 'part', id: t.dataset.part }; st.tab = 'overview'; }
+  else if (t.dataset.pin) { st.hover = t.dataset.pin; st.tab = 'pinout'; }
+  all();
+});
+scene.addEventListener('keydown', (e) => { const t = e.target.closest && e.target.closest('[data-part]'); if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); st.sel = { type: 'part', id: t.dataset.part }; st.tab = 'overview'; all(); } });
+$('#pbody').addEventListener('click', (e) => {
+  const w = e.target.closest('[data-selwire]'), p = e.target.closest('[data-selpart]'), r = e.target.closest('[data-pinrow]');
+  if (w) st.sel = { type: 'wire', id: Number(w.dataset.selwire) };
+  else if (p) st.sel = { type: 'part', id: p.dataset.selpart };
+  else if (r) st.hover = st.hover === r.dataset.pinrow ? null : r.dataset.pinrow;
+  else return;
+  all();
+});
+// drag to turn
+let drag = null;
+scene.addEventListener('pointerdown', (e) => { if (e.target.closest('[data-wire],[data-part],[data-pin],[data-hot]')) return; drag = { x: e.clientX, a: st.angle }; scene.setPointerCapture(e.pointerId); });
+scene.addEventListener('pointermove', (e) => { if (!drag) return; st.angle = st.angleTo = drag.a + (e.clientX - drag.x) * .4; render(); });
+scene.addEventListener('pointerup', () => { if (!drag) return; drag = null; tween('angle', Math.round((st.angle - 35) / 90) * 90 + 35); });
+
+const q = new URLSearchParams(location.search);
+if (q.get('mode')) st.mode = q.get('mode');
+if (q.get('state')) st.state = q.get('state');
+if (q.get('flow')) st.flow = true;
+if (q.get('schem')) st.schem = true;
+if (q.get('hover')) st.hover = q.get('hover');
+if (q.get('sel')) st.sel = { type: 'part', id: q.get('sel') };
+if (q.get('tab')) st.tab = q.get('tab');
+if (q.get('angle')) st.angle = st.angleTo = Number(q.get('angle'));
+addEventListener('resize', () => render());
+all();
+})();
+</script>

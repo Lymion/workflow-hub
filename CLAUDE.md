@@ -21,7 +21,7 @@ Desktop project workshop for makers (robotics + app development). It plans, sets
 
 ## UI work
 
-For any UI work, use UI UX Pro Max (Apple Native Experience style), Emil Kowalski's apple-design and emil-design-eng skills, and ui-elevate. Prototype new screens with the scratch skill first. Keep it simplistic and intuitive.
+For any UI work, use UI UX Pro Max (Apple Native Experience style), Emil Kowalski's apple-design and emil-design-eng skills, and ui-elevate. Prototype new screens first with the review-prototype skill (`.claude/skills/review-prototype`): a commentable page plus screenshots the user can review from their phone. Keep it simplistic and intuitive.
 
 Don't make it too flat; give it depth where it fits:
 - 1 pixel inner highlight on the top
