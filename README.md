@@ -29,10 +29,10 @@ Every Haiku call goes through one guard: the model is fixed (`engine/config.py`)
 ## Install on Windows 11 (no coding tools needed)
 
 1. Open the repository on GitHub → **Actions** → **Windows installer** → the latest green run. Under **Artifacts**, download **Workflow-Hub-Windows-installer** and unzip it. (When a version is tagged, the installer is also on the **Releases** page.)
-2. Run `Workflow Hub_0.1.0_x64-setup.exe`. It installs for your user only, so it doesn't need admin rights. Windows SmartScreen may say "Windows protected your PC" because the installer isn't signed: click **More info** → **Run anyway**.
+2. Run `Workflow Hub_<version>_x64-setup.exe`. It installs for your user only, so it doesn't need admin rights. Windows SmartScreen may say "Windows protected your PC" because the installer isn't signed: click **More info** → **Run anyway**.
 3. Open **Workflow Hub** from the Start menu. It starts its own engine; nothing else to run.
 
-Your data lives in `%LOCALAPPDATA%\Workflow Hub` (database, your snippets, handbook notes, `data\engine.log`). Uninstalling the app keeps it. To update, run a newer installer over the old one.
+Your data lives in `%LOCALAPPDATA%\Workflow Hub` (database, your snippets, handbook notes, `data\engine.log`). Uninstalling the app keeps it. To update, close the app and run the newer installer over the old one (no uninstall). Each update has a higher version number, so it installs as an upgrade; what changed is in [CHANGELOG.md](CHANGELOG.md).
 
 Install the tools for your projects (table in step 5 below) so Build, Upload, Git and app setup work. The engine runs while the app window is open, so scheduled automations run only then.
 

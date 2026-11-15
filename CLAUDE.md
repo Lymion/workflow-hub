@@ -69,3 +69,4 @@ cd app && npm run build          # typecheck + build the UI
 - Small commits with clear messages. Add tests for what you build.
 - Engine errors return one line: what is wrong and how to fix it.
 - Keep features to their roadmap session (`docs/spec.md` → Build roadmap).
+- Bump the version with every update the user will install: `python packaging/bump_version.py minor` for new features, `patch` for fixes. It updates every version field (a test checks they match), so the Windows installer upgrades cleanly. Add a line to `CHANGELOG.md`.
