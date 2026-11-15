@@ -6,6 +6,7 @@ import { Sidebar } from "./components/Sidebar";
 import { CommandBar } from "./components/CommandBar";
 import { Capture } from "./components/Capture";
 import { Banner } from "./components/ui";
+import { UpdateBanner } from "./components/UpdateBanner";
 import { Home } from "./pages/Home";
 import { NewProject } from "./pages/NewProject";
 import { Projects } from "./pages/Projects";
@@ -64,6 +65,7 @@ export default function App() {
       />
       <main id="main">
         <div className="page" key={route.name + (route.params[0] ?? "")}>
+          <UpdateBanner />
           {engine === "offline" && (
             <div className="mb-[18px]">
               <Banner action={<button className="btn btn-sm" onClick={check}>Retry</button>}>{OFFLINE_MSG}</Banner>

@@ -4,7 +4,9 @@ import { go } from "./lib/router";
 import { COMMAND_SOURCES } from "./components/CommandBar";
 import { PAGES, SIDEBAR_FOOTERS } from "./pages/registry";
 import { Guide } from "./pages/Guide";
-import { SettingsPage } from "./pages/Settings";
+import { SETTINGS_SECTIONS, SettingsPage } from "./pages/Settings";
+import { UpdatesSection } from "./components/UpdateBanner";
+import { useLoad } from "./lib/api";
 import { SpendMeter } from "./components/SpendMeter";
 import { MODULE_TABS, TRAILING_TABS } from "./pages/project/tabs";
 import { PartsTab } from "./pages/project/PartsTab";
@@ -86,3 +88,9 @@ HOME_SECTIONS.push(HealthNote, () => <ReviewCard />);
 // ---- docs page: official docs online, online Ask, docs per part ----
 PAGES.docs = Docs;
 NAV.splice(NAV.findIndex((n) => n.href === "#guide"), 0, { href: "#docs", icon: "globe", label: "Docs" });
+
+// ---- app updates (Settings section; the banner lives in App) ----
+SETTINGS_SECTIONS.unshift(() => {
+  const h = useLoad(() => api.get<{ version: string }>("/health"), [], { live: false });
+  return <UpdatesSection version={h.data?.version} />;
+});

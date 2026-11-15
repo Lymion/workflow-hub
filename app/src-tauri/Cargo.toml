@@ -1,6 +1,6 @@
 [package]
 name = "workflow-hub"
-version = "0.2.0"
+version = "0.3.0"
 description = "Workflow Hub desktop shell"
 edition = "2021"
 
@@ -9,3 +9,6 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+serde_json = "1"
