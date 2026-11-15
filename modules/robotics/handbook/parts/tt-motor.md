@@ -2,6 +2,7 @@
 part: tt-motor
 category: actuator
 glyph: TT
+symbol: motor
 color: '#CA8A04'
 library: none
 price_rm:

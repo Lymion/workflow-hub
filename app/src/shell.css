@@ -641,3 +641,31 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 @media (min-width: 1100px) { .wire-layout > .bench { position: sticky; top: 0; } }
 /* the Wiring tab uses the whole width of the window */
 .page:has(.wire-layout) { max-width: none; }
+/* schematic view */
+.sch-host { position: relative; width: 100%; overflow: hidden; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.sch-host:active { cursor: grabbing; }
+.sch-host svg { display: block; }
+.bench-sch text { font-family: var(--font-label); }
+.sch-board .body, .sch-part .body { fill: var(--surface-solid); stroke: var(--label); stroke-width: 1.4; }
+.sch-part .ring { fill: none; }
+.sch-title { font-weight: 700; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; fill: var(--label); }
+.sch-title.on-dark, .sch-glyph.on-dark { fill: #fff; }
+.sch-glyph { font-weight: 700; font-size: 12px; letter-spacing: .12em; }
+.sch-pin line, .sch-sym line, .sch-sym path, .sch-sym circle { stroke: var(--label); stroke-width: 1.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.sch-sym .fillbg { fill: var(--surface-solid); }
+.sch-sym .hitbox { fill: transparent; stroke: none; }
+.sch-pin.free line { stroke-dasharray: 3 3; opacity: .55; }
+.sch-pinname { font: 600 10.5px ui-monospace, SFMono-Regular, Menlo, monospace; fill: var(--label); }
+.sch-pinno { font-size: 9.5px; font-weight: 600; letter-spacing: .04em; fill: var(--label-3); }
+.sch-volt { font-size: 10px; font-weight: 700; letter-spacing: .05em; fill: var(--red); }
+.sch-m { font-size: 20px; font-weight: 700; fill: var(--label); }
+.sch-net { font: 600 10px ui-monospace, SFMono-Regular, Menlo, monospace; fill: var(--label-2); pointer-events: none; }
+.sch-wire { cursor: pointer; transition: opacity 160ms var(--ease-out); }
+.sch-wire .ln { fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+.sch-wire .ln.bad { stroke-dasharray: 6 4; }
+.sch-wire .hit { fill: none; stroke: transparent; stroke-width: 12; }
+.sch-wire.hot .ln { stroke-width: 3.4; }
+.sch-wire.hot .sch-net { fill: var(--label); }
+.sch-wire.dim, .sch-part.dim { opacity: .22; }
+.sch-part { cursor: pointer; outline: none; transition: opacity 160ms var(--ease-out); }
+.sch-part.on .body, .sch-part:focus-visible .body { stroke: var(--hot); stroke-width: 2.4; }

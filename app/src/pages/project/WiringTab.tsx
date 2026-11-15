@@ -11,6 +11,7 @@ import { useToast } from "../../components/Toast";
 import type { TabProps } from "./tabs";
 import { Bench3D, wid, type BenchBoard, type BenchPart, type BenchWire, type Mode } from "./Bench3D";
 import { canUseWebGL } from "./benchData";
+import { Schematic } from "./Schematic";
 
 // three.js loads only when the Wiring tab opens
 const BenchGL = lazy(() => import("./BenchGL"));
@@ -99,6 +100,7 @@ export function WiringTab({ project }: TabProps) {
     <div className="wire-layout">
       {(() => {
         const bp = { board, parts, wires, color, bad: (w: Wire) => verdict(w)?.level === "bad", mode: mode ?? ("board" as Mode), setMode, traced, setTraced: trace, selPart, setSelPart: pickPart, pin, setPin: pickPin, onMove: move };
+        if (bp.mode === "schematic") return <Schematic {...bp} />;
         return webgl ? <Suspense fallback={<div className="bench"><Sk h={460} r={20} /></div>}><BenchGL {...bp} /></Suspense> : <Bench3D {...bp} />;
       })()}
       <aside className="wire-panel" aria-label="Wiring details">

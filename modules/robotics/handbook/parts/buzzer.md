@@ -2,6 +2,7 @@
 part: buzzer
 category: output
 glyph: BZ
+symbol: buzzer
 color: '#3F3F46'
 library: none
 price_rm:

@@ -2,6 +2,7 @@
 part: buttons
 category: input
 glyph: BTN
+symbol: switch
 color: '#52525B'
 library: none
 price_rm:

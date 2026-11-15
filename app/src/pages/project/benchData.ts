@@ -7,7 +7,7 @@ export type BenchWire = { part: string; instance: number; partPin: string; board
 export type BenchPin = { id: string; label: string; caps?: string[]; note?: string; strapping?: string; reserved?: string };
 export type BenchBoard = { board: string; name: string; color: string; header?: { left: string[]; right: string[] }; pins: BenchPin[]; model?: BoardModel };
 export type BenchPart = { key: string; qty: number; title: string; section: string; meta: { color?: string; category?: string; pins?: { name: string; mode?: string; voltage?: string }[]; model?: PartModel } };
-export type Mode = "board" | "project";
+export type Mode = "board" | "project" | "schematic";
 export type Inst = { id: string; part: BenchPart; inst: number; model: PartModel; at: Pt };
 export type BenchProps = {
   board: BenchBoard; parts: BenchPart[]; wires: BenchWire[]; color: Record<string, string>; bad: (w: BenchWire) => boolean;
@@ -34,7 +34,7 @@ export function computeBench(board: BenchBoard, parts: BenchPart[], wires: Bench
   const model = board.model ?? fallbackBoard(board.header, board.color ?? "#1F3A5F");
   const pins = boardPins(model);
   const pinInfo = (id: string) => board.pins.find((x) => x.id === id);
-  const silkName = (id: string) => (pinInfo(id) ? model.names?.[id] ?? `${model.prefix ?? ""}${id}` : id);
+  const silkName = (id: string) => (pinInfo(id) ? model.names?.[id] ?? `${/^\d/.test(id) ? model.prefix ?? "" : ""}${id}` : id); // "A4" stays A4, "13" becomes D13
   const pinZ = model.size[2] + 3.2;
 
   // the board's own shapes in plan coordinates (its parts sit on its top), headers and pins included

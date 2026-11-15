@@ -10,8 +10,10 @@ Each update the Windows installer delivers has a higher version, so it installs 
   - **Click any part** (or its name tag) for a close-up: the camera flies to it, the other parts fade, and every pin is labelled with the board pin it goes to and its signal name. **Back to bench** returns to where you were.
   - **Board view** explains the board with callout cards (USB, chip, pin rows, buttons). Hover any pin to see what it can do and what's wired to it.
   - **Project view** places every part around the board without overlaps. Name tags never cover a part or another tag, at any angle or zoom.
+  - **Schematic view:** a clean circuit drawing next to Board and Project, in the style of Tinkercad's. The board is a chip block, parts are drawn as symbols (button, buzzer, motor) or labelled blocks, wires run straight with right-angle bends and never cross the board, and an I²C bus is drawn as one line with junction dots. Power and ground pins get the usual arrow and ground symbols. Click a wire to trace it, click a part to see its pins, drag to move, scroll to zoom.
   - **Wires never pass through parts:** each cable leaves its pin, climbs over anything in its way and drops straight onto the board pin. A pin on the far side of a part has its lead wrapped around the part, like a real cable.
   - **Move a wire:** click it, then click the pin you want; pins.h updates. The pin picker works in the Wires panel and in a part's pin list.
+  - **Pin names:** analog pins on Arduino boards read A4 instead of DA4.
   - **Side panel:** Overview (board facts, warnings, parts, or the selected part's pins), Pinout, Wires and pins.h.
   - **All four boards** and 15 parts have 3D models, kept as data in the board files and handbook chapters. Computers without WebGL get the flat angled drawing instead.
 - **I²C pins stay free for I²C parts:** new wires no longer land on SDA/SCL (GPIO 21/22 on the ESP32) unless nothing else is free. A plain signal already on a bus pin gets its own warning that says where to move it; I²C parts sharing the bus are fine.

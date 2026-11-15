@@ -45,6 +45,26 @@ def test_every_part_model_anchors_its_wireable_pins(hub):
     assert models >= 15
 
 
+SYMBOLS = {"switch", "buzzer", "motor"}  # the schematic draws these; anything else is a labelled block
+
+
+def test_schematic_symbols_are_known_and_fit_their_pins(hub):
+    hb = current(hub)
+    seen = set()
+    for ch in hb.chapters.values():
+        sym = ch.meta.get("symbol")
+        if sym is None:
+            continue
+        assert sym in SYMBOLS, f"{ch.path}: unknown schematic symbol {sym!r} (use one of {sorted(SYMBOLS)}, or leave it out)"
+        pins = ch.meta.get("pins") or []
+        if sym == "motor":
+            assert len(pins) == 2, f"{ch.path}: a motor symbol has two leads"
+        else:  # two terminals: one signal pin, the other side goes to ground
+            assert len([p for p in pins if (p.get("mode") or "").upper() in WIREABLE]) == 1, f"{ch.path}: a {sym} symbol has one signal pin"
+        seen.add(sym)
+    assert seen == SYMBOLS
+
+
 def test_models_reach_the_wiring_tab(client):
     p = client.post("/projects", json={"name": "Rover", "module": "robotics", "board": "esp32-devkit"}).json()
     client.post(f"/projects/{p['id']}/parts", json={"items": [{"key": "sg90", "qty": 1}]})

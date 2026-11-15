@@ -33,7 +33,6 @@ export default function BenchGL(p: BenchProps) {
   const [size, setSize] = useState({ w: 900, h: 576 });
   const [labels, setLabels] = useState(true);
   const [flow, setFlow] = useState(false);
-  const [schem, setSchem] = useState(false);
   const [hover, setHover] = useState<string | null>(null);
   const [hot, setHot] = useState<number | null>(null);
   const [theme, setTheme] = useState(document.documentElement.dataset.theme ?? "light");
@@ -442,6 +441,7 @@ export default function BenchGL(p: BenchProps) {
         <div className="bench-seg" role="group" aria-label="View">
           <button type="button" aria-pressed={mode === "board"} onClick={() => { p.setSelPart(null); p.setMode("board"); }}>Board</button>
           <button type="button" aria-pressed={mode === "project"} onClick={() => p.setMode("project")}>Project</button>
+          <button type="button" aria-pressed={false} onClick={() => { p.setSelPart(null); p.setMode("schematic"); }}>Schematic</button>
         </div>
         {focus ? (
           <div className="gl-focus">
@@ -451,19 +451,6 @@ export default function BenchGL(p: BenchProps) {
           </div>
         ) : <span className="bench-hint">{hint}</span>}
       </div>
-      {schem && (
-        <div className="bench-schem">
-          <h3>Schematic <span>signal wires</span></h3>
-          <svg viewBox={`0 0 320 ${Math.max(1, sigWires.length) * 18 + 16}`} role="img" aria-label="Schematic of the signal wires">
-            <rect x="4" y="6" width="64" height={Math.max(1, sigWires.length) * 18 + 4} rx="6" fill="none" stroke="var(--label)" strokeWidth="1.3" />
-            <text x="36" y={(Math.max(1, sigWires.length) * 18 + 16) / 2 + 3} textAnchor="middle">{board.name.split(" ")[0]}</text>
-            {sigWires.map((w, i) => { const y = 18 + i * 18; return (
-              <g key={wid(w)}><text x="72" y={y + 3} className="muted">{d.silkName(String(w.boardPin))}</text><line x1="104" y1={y} x2="196" y2={y} stroke={p.color[wid(w)]} strokeWidth="2" /><circle cx="196" cy={y} r="2.4" fill={p.color[wid(w)]} /><text x="202" y={y + 3}>{(p.parts.find((x) => x.key === w.part)?.title ?? w.part).slice(0, 12)} {w.partPin}</text></g>
-            ); })}
-            {!sigWires.length && <text x="80" y="20" className="muted">No signal wires yet</text>}
-          </svg>
-        </div>
-      )}
       <div className="bench-tools" role="toolbar" aria-label="Camera and view">
         <button type="button" aria-label="Turn left" title="Turn left" onClick={() => turn(-90)}><Icon name="rot-l" /></button>
         <button type="button" aria-label="Turn right" title="Turn right" onClick={() => turn(90)}><Icon name="rot-r" /></button>
@@ -477,7 +464,7 @@ export default function BenchGL(p: BenchProps) {
         <span className="sep" aria-hidden="true" />
         <button type="button" aria-pressed={labels} aria-label="Labels" title="Labels" onClick={() => setLabels(!labels)}><Icon name="tag" /></button>
         <button type="button" aria-pressed={flow} aria-label="Show current flow" title="Show current flow" onClick={() => setFlow(!flow)}><Icon name="pulse" /></button>
-        <button type="button" aria-pressed={schem} aria-label="Show schematic" title="Show schematic" onClick={() => setSchem(!schem)}><Icon name="schem" /></button>
+        <button type="button" aria-label="Schematic view" title="Schematic view" onClick={() => { p.setSelPart(null); p.setMode("schematic"); }}><Icon name="schem" /></button>
       </div>
     </section>
   );
