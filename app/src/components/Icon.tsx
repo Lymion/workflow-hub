@@ -40,6 +40,8 @@ const P: Record<string, string> = {
   "rot-r": "M21 12a9 9 0 1 1-3-6.7L21 8|M21 3v5h-5",
   minus: "M5 12h14",
   fit: "M4 9V4h5|M20 15v5h-5|M4 4l6 6|M20 20l-6-6",
+  max: "M15 3h6v6|M9 21H3v-6|M21 3l-7 7|M3 21l7-7",
+  min: "M4 14h6v6|M20 10h-6V4|M14 10l7-7|M3 21l7-7",
   tag: "M3 5h18v10H8l-5 4z",
   pulse: "M2 12h4l3-7 6 14 3-7h4",
   schem: "M3 7h6v10H3z|M9 10h5l2-3h5|M9 14h5l2 3h5",

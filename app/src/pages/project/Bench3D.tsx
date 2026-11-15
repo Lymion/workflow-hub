@@ -239,7 +239,7 @@ export function Bench3D(p: Props) {
   const hint = mode === "board" ? "Meet the board · hover a pin" : tracedWire ? `${tracedWire.signalName}: click a pin to move it` : p.selPart ? `${insts.find((x) => x.id === p.selPart)?.part.title ?? ""}: its wires are lit` : "Hover a pin · click a wire";
 
   return (
-    <section className="bench" aria-label={`Wiring bench for ${board.name}`}>
+    <section className={`bench ${p.full ? "bench-full" : ""}`} aria-label={`Wiring bench for ${board.name}`}>
       <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${board.name}${showParts ? ` with ${insts.length} parts and ${sigWires.length} wires` : ""}`}
         onClick={onClick} onMouseOver={onOver} onMouseOut={onOut} onPointerDown={onDown} onPointerMove={onMoveP} onPointerUp={onUp}>
         <defs>
@@ -278,6 +278,8 @@ export function Bench3D(p: Props) {
         <button type="button" aria-pressed={labels} aria-label="Labels" title="Labels" onClick={() => setLabels(!labels)}><Icon name="tag" /></button>
         <button type="button" aria-pressed={flow} aria-label="Show current flow" title="Show current flow" onClick={() => setFlow(!flow)}><Icon name="pulse" /></button>
         <button type="button" aria-label="Schematic view" title="Schematic view" onClick={() => { p.setSelPart(null); p.setMode("schematic"); }}><Icon name="schem" /></button>
+        <span className="sep" aria-hidden="true" />
+        <button type="button" aria-pressed={!!p.full} aria-label={p.full ? "Exit fullscreen" : "Fullscreen"} title={p.full ? "Exit fullscreen (Esc)" : "Fullscreen"} onClick={p.toggleFull}><Icon name={p.full ? "min" : "max"} /></button>
       </div>
     </section>
   );

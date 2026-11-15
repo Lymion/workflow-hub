@@ -680,3 +680,8 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 @media (min-width: 1100px) {
   .wire-panel { flex-basis: 400px; max-width: 420px; position: sticky; top: 0; max-height: calc(100vh - 32px); overflow: auto; }
 }
+/* fullscreen viewer */
+.bench.bench-full { position: fixed; inset: 0; z-index: 60; border-radius: 0; box-shadow: none; }
+.bench.bench-full > svg { height: 100vh; }
+body.bench-is-full main { overflow: hidden; }
+body.bench-is-full .rise { transform: none !important; animation: none !important; } /* a leftover transform would trap the fixed bench */

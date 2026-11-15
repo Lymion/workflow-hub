@@ -10,7 +10,7 @@ import { Empty, Sk } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import type { TabProps } from "./tabs";
 import { Bench3D, wid, type BenchBoard, type BenchPart, type BenchWire, type Mode } from "./Bench3D";
-import { canUseWebGL } from "./benchData";
+import { canUseWebGL, useFullscreen } from "./benchData";
 import { Schematic } from "./Schematic";
 
 // three.js loads only when the Wiring tab opens
@@ -43,6 +43,7 @@ export function WiringTab({ project }: TabProps) {
   const [mode, setMode] = useState<Mode | null>(null);
   const [picker, setPicker] = useState<{ w: Wire; el: HTMLElement; key: boolean } | null>(null);
   const webgl = useMemo(canUseWebGL, []);
+  const [full, toggleFull] = useFullscreen();
 
   useEffect(() => {
     if (!res.data) return;
@@ -100,7 +101,7 @@ export function WiringTab({ project }: TabProps) {
     <div className="wire-layout">
       <div className="wire-main">
       {(() => {
-        const bp = { board, parts, wires, color, bad: (w: Wire) => verdict(w)?.level === "bad", mode: mode ?? ("board" as Mode), setMode, traced, setTraced: trace, selPart, setSelPart: pickPart, pin, setPin: pickPin, onMove: move };
+        const bp = { board, parts, wires, color, bad: (w: Wire) => verdict(w)?.level === "bad", mode: mode ?? ("board" as Mode), setMode, traced, setTraced: trace, selPart, setSelPart: pickPart, pin, setPin: pickPin, onMove: move, full, toggleFull };
         if (bp.mode === "schematic") return <Schematic {...bp} />;
         return webgl ? <Suspense fallback={<div className="bench"><Sk h={460} r={20} /></div>}><BenchGL {...bp} /></Suspense> : <Bench3D {...bp} />;
       })()}

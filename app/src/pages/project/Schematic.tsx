@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../../components/Icon";
 import { fallbackBoard } from "../../lib/iso";
-import type { BenchProps } from "./benchData";
+import { benchHeight, type BenchProps } from "./benchData";
 import { layoutSchematic, type SPin } from "./schematicLayout";
 
 type VB = { x: number; y: number; w: number; h: number };
@@ -19,12 +19,9 @@ export function Schematic(p: BenchProps) {
   const host = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 900, h: 560 });
   useEffect(() => {
-    const el = host.current!, main = el.closest("main"), layout = el.closest(".wire-layout");
+    const el = host.current!, main = el.closest("main");
     const ro = new ResizeObserver(() => {
-      const w = el.clientWidth;
-      let h = w * 0.64;
-      if (main && layout) h = main.clientHeight - (layout.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop) - 24;
-      setSize({ w, h: Math.round(Math.max(440, Math.min(h, w * 1.2))) });
+      setSize({ w: el.clientWidth, h: benchHeight(el) });
     });
     ro.observe(el);
     if (main) ro.observe(main);
@@ -89,7 +86,7 @@ export function Schematic(p: BenchProps) {
   const sig = wires.filter((w) => w.boardPin).length;
 
   return (
-    <section className="bench bench-sch" aria-label={`Schematic of ${board.name}`}>
+    <section className={`bench bench-sch ${p.full ? "bench-full" : ""}`} aria-label={`Schematic of ${board.name}`}>
       <div ref={host} className="sch-host" style={{ height: size.h }} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp}>
         <svg width={size.w} height={size.h} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`} role="img" aria-label={`Schematic: ${board.name}, ${s.parts.length} parts, ${sig} signal wires`}
           onClick={() => { if (clicked()) { p.setTraced(null); p.setSelPart(null); } }}>
@@ -204,6 +201,8 @@ export function Schematic(p: BenchProps) {
         <button type="button" aria-label="Fit to view" title="Fit to view" onClick={() => { setVb(null); p.setTraced(null); p.setSelPart(null); }}><Icon name="fit" /></button>
         <span className="sep" aria-hidden="true" />
         <button type="button" aria-pressed={labels} aria-label="Signal names" title="Signal names" onClick={() => setLabels(!labels)}><Icon name="tag" /></button>
+        <span className="sep" aria-hidden="true" />
+        <button type="button" aria-pressed={!!p.full} aria-label={p.full ? "Exit fullscreen" : "Fullscreen"} title={p.full ? "Exit fullscreen (Esc)" : "Fullscreen"} onClick={p.toggleFull}><Icon name={p.full ? "min" : "max"} /></button>
       </div>
     </section>
   );

@@ -7,7 +7,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { calm } from "../../lib/router";
 import { Icon } from "../../components/Icon";
 import { placeTags, type Rect, type Shape } from "../../lib/iso";
-import { CAP, pinRole, useBenchData, wid, type BenchProps, type BenchWire, type Inst } from "./benchData";
+import { benchHeight, CAP, pinRole, useBenchData, wid, type BenchProps, type BenchWire, type Inst } from "./benchData";
 
 const V = (x: number, y: number, z: number) => new THREE.Vector3(x, z, y); // plan (x right, y toward you, z up) → three (y up)
 const DEG = Math.PI / 180;
@@ -103,13 +103,10 @@ export default function BenchGL(p: BenchProps) {
       g.raf = requestAnimationFrame(loop);
     };
     g.raf = requestAnimationFrame(loop);
-    const main = el.closest("main"), layout = el.closest(".wire-layout");
+    const main = el.closest("main");
     const ro = new ResizeObserver(() => {
       // fill the window: from the top of the Wiring layout down to the bottom of the page area
-      const w = el.clientWidth;
-      let h = w * 0.64;
-      if (main && layout) h = main.clientHeight - (layout.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop) - 24;
-      h = Math.round(Math.max(440, Math.min(h, w * 1.2)));
+      const w = el.clientWidth, h = benchHeight(el);
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
@@ -429,7 +426,7 @@ export default function BenchGL(p: BenchProps) {
   const hint = focus ? "Close-up · drag to look around" : mode === "board" ? "Meet the board · hover a pin" : tracedWire ? `${tracedWire.signalName}: click a pin to move it` : "Drag to turn · right-drag to move · scroll to zoom";
 
   return (
-    <section className="bench bench-gl" aria-label={`3D wiring bench for ${board.name}`}>
+    <section className={`bench bench-gl ${p.full ? "bench-full" : ""}`} aria-label={`3D wiring bench for ${board.name}`}>
       <div ref={host} className="gl-host" style={{ height: size.h }} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}
         role="img" aria-label={`${board.name}${showParts ? ` with ${d.insts.length} parts and ${sigWires.length} wires` : ""}. Drag to turn the camera.`}>
         <svg className="gl-lines" width={size.w} height={size.h} aria-hidden="true">
@@ -465,6 +462,8 @@ export default function BenchGL(p: BenchProps) {
         <button type="button" aria-pressed={labels} aria-label="Labels" title="Labels" onClick={() => setLabels(!labels)}><Icon name="tag" /></button>
         <button type="button" aria-pressed={flow} aria-label="Show current flow" title="Show current flow" onClick={() => setFlow(!flow)}><Icon name="pulse" /></button>
         <button type="button" aria-label="Schematic view" title="Schematic view" onClick={() => { p.setSelPart(null); p.setMode("schematic"); }}><Icon name="schem" /></button>
+        <span className="sep" aria-hidden="true" />
+        <button type="button" aria-pressed={!!p.full} aria-label={p.full ? "Exit fullscreen" : "Fullscreen"} title={p.full ? "Exit fullscreen (Esc)" : "Fullscreen"} onClick={p.toggleFull}><Icon name={p.full ? "min" : "max"} /></button>
       </div>
     </section>
   );
