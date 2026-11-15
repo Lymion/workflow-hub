@@ -6,7 +6,7 @@ Each update the Windows installer delivers has a higher version, so it installs 
 
 - **New Wiring tab:** your board and parts drawn at an angle on a drawing-board bench, with the real wires from your project.
   - **Board view** explains the board with callout cards (USB, chip, pin rows, buttons). Hover any pin to see what it can do and what's wired to it.
-  - **Project view** places every part around the board, with no overlaps, and shows its wires and name tags.
+  - **Project view** places every part around the board without overlaps. Name tags are placed as it draws, so they never cover a part or another tag at any angle or zoom; a tag that can't fit shortens to the part's name.
   - **Move a wire:** click it, then click the pin you want; pins.h updates. The grouped pin picker still works in the Wires panel.
   - **Controls:** turn (buttons or drag), zoom, labels, animated current flow, and a schematic of the signal wires.
   - **Side panel:** Overview (board facts, warnings, parts), Pinout, Wires (rename signals, pick pins, checks, copy pin table) and pins.h.

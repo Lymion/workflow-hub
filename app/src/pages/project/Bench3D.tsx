@@ -5,7 +5,7 @@ import { calm } from "../../lib/router";
 import { Icon } from "../../components/Icon";
 import {
   BASE_ANGLE, H, W, bounds, boardPins, cable, fallbackBoard, fallbackPart, footprint, layoutParts, makeView, shapePolys,
-  type BoardModel, type PartModel, type Pt, type Shape, type View,
+  placeTags, type BoardModel, type PartModel, type Pt, type Rect, type Shape, type View,
 } from "../../lib/iso";
 
 export type BenchWire = { part: string; instance: number; partPin: string; boardPin: string | null; signalName: string; mode: string; divider: boolean };
@@ -144,11 +144,15 @@ export function Bench3D(p: Props) {
   ].sort((a, b) => v.depth(a.x, a.y) - v.depth(b.x, b.y));
 
   const scene: JSX.Element[] = [];
+  const rects: Record<string, Rect> = {}; // where each object lands on screen, so labels can avoid it
   for (const o of objects) scene.push(<polygon key={`sh-${o.id}`} points={footprint(v, o.shapes[0], 0, 0)} fill="var(--bench-shadow)" filter="url(#bench-soft)" />);
   for (const o of objects) {
     const order = o.shapes.map((sh, i) => ({ sh, i })).sort((a, b) => (a.sh.z ?? 0) - (b.sh.z ?? 0) || v.depth(a.sh.x ?? 0, a.sh.y ?? 0) - v.depth(b.sh.x ?? 0, b.sh.y ?? 0));
     for (const { sh, i } of order) {
-      shapePolys(v, sh).forEach((poly, j) => scene.push(<polygon key={`${o.id}-${i}-${j}`} className="bench-poly" points={poly.points} fill={poly.fill} />));
+      const polys = shapePolys(v, sh);
+      const b = bounds(polys), r = rects[o.id];
+      rects[o.id] = r ? { x0: Math.min(r.x0, b.x0), y0: Math.min(r.y0, b.y0), x1: Math.max(r.x1, b.x1), y1: Math.max(r.y1, b.y1) } : b;
+      polys.forEach((poly, j) => scene.push(<polygon key={`${o.id}-${i}-${j}`} className="bench-poly" points={poly.points} fill={poly.fill} />));
       if (o.isBoard && i === 0) scene.push(<Silk key="silk" v={v} model={model} pins={pins} name={silkName} />);
       if (sh.antenna) scene.push(<g key={`ant-${i}`} transform={v.plane((sh.z ?? 0) + sh.h + 0.01)}><polyline points={antenna(sh)} fill="none" stroke="#d9a93a" strokeWidth={0.55} /></g>);
       if (sh.text) scene.push(<g key={`txt-${i}`} transform={v.plane((sh.z ?? 0) + sh.h + 0.01)}><text x={sh.x ?? 0} y={(sh.y ?? 0) + 0.6} fontSize={Math.min(1.9, ((sh.w ?? 10) * 0.9) / Math.max(4, sh.text.length) * 1.7)} textAnchor="middle" fill={o.isBoard && (sh.color === "#b9c1cc") ? "#5b6472" : "rgba(255,255,255,.55)"} className="bench-silk">{sh.text}</text></g>);
@@ -217,15 +221,26 @@ export function Bench3D(p: Props) {
     </g>,
   ));
   if (labels && showParts) {
-    for (const it of insts) {
-      const q = v.P(it.at[0], it.at[1], it.model.tag ?? 20), n = wires.filter((w) => `${w.part}#${w.instance}` === it.id && w.boardPin).length;
-      const label = `${it.part.title}${it.part.qty > 1 ? ` #${it.inst}` : ""}${n ? ` · ${n} wire${n > 1 ? "s" : ""}` : ""}`.toUpperCase(), tw = label.length * 6.3 + 24;
+    const tags = insts.map((it) => {
+      const n = wires.filter((w) => `${w.part}#${w.instance}` === it.id && w.boardPin).length;
+      const label = `${it.part.title}${it.part.qty > 1 ? ` #${it.inst}` : ""}${n ? ` · ${n} wire${n > 1 ? "s" : ""}` : ""}`.toUpperCase();
+      const short = `${it.part.title.split(/[ (]/)[0]}${it.part.qty > 1 ? ` #${it.inst}` : ""}`.toUpperCase();
+      return { it, label, short, w: label.length * 6.3 + 24, shortW: short.length * 6.3 + 24, h: 24, of: rects[it.id] };
+    }).filter((t) => t.of);
+    // labels go where they cover no part, no other label, and not the controls at the top and bottom
+    const at = placeTags(tags.map((t) => ({ id: t.it.id, w: t.w, shortW: t.shortW, h: t.h, of: t.of })), Object.values(rects), { x0: 8, y0: 52, x1: W - 8, y1: H - 70 });
+    for (const t0 of tags) {
+      const spot = at[t0.it.id], t = spot.short ? { ...t0, label: t0.short, w: t0.shortW } : t0;
+      const [x, y] = spot.at, it = t.it, of = t.of;
+      // leader: from the part's nearest edge to the label's nearest edge
+      const ax = Math.max(of.x0, Math.min(of.x1, x)), ay = y < of.y0 ? of.y0 : y > of.y1 ? of.y1 : (of.y0 + of.y1) / 2;
+      const bx = Math.max(x - t.w / 2, Math.min(x + t.w / 2, ax)), by = ay < y - t.h / 2 ? y - t.h / 2 : ay > y + t.h / 2 ? y + t.h / 2 : y;
       overlay.push(
         <g key={`tag-${it.id}`} className={`bench-tag ${p.selPart === it.id ? "on" : ""}`} data-hit="" data-part={it.id} role="button" tabIndex={0} aria-label={`Show ${it.part.title}'s wires`}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); p.setSelPart(p.selPart === it.id ? null : it.id); p.setTraced(null); } }}>
-          <line x1={q[0]} y1={q[1] - 6} x2={q[0]} y2={q[1] - 18} className="bench-tagline" />
-          <rect x={q[0] - tw / 2} y={q[1] - 42} width={tw} height={24} rx={12} filter="url(#bench-card)" data-part={it.id} data-hit="" />
-          <text x={q[0]} y={q[1] - 26} textAnchor="middle" data-part={it.id} data-hit="">{label}</text>
+          {Math.hypot(ax - bx, ay - by) > 3 && <line x1={ax} y1={ay} x2={bx} y2={by} className="bench-tagline" />}
+          <rect x={x - t.w / 2} y={y - t.h / 2} width={t.w} height={t.h} rx={12} filter="url(#bench-card)" data-part={it.id} data-hit="" />
+          <text x={x} y={y + 4} textAnchor="middle" data-part={it.id} data-hit="">{t.label}</text>
         </g>,
       );
     }

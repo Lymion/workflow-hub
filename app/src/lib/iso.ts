@@ -164,3 +164,43 @@ export function layoutParts(items: { id: string; side: "left" | "right" | "back"
   }
   return out;
 }
+
+export type Rect = { x0: number; y0: number; x1: number; y1: number };
+
+/** Put each name tag where it covers no part, no other tag and stays inside the safe area of the stage.
+ *  Tries above its part first (nearest first), then below, then beside. Returns tag centres. */
+export function placeTags(tags: { id: string; w: number; h: number; of: Rect; shortW?: number }[], obstacles: Rect[], safe: Rect, pad = 5): Record<string, { at: Pt; short: boolean }> {
+  const placed: Rect[] = [];
+  const out: Record<string, { at: Pt; short: boolean }> = {};
+  const inSafe = (r: Rect) => r.x0 >= safe.x0 && r.x1 <= safe.x1 && r.y0 >= safe.y0 && r.y1 <= safe.y1;
+  // how much a spot covers parts and other labels (0 = free)
+  const cover = (r: Rect) => obstacles.concat(placed).reduce((sum, o) => {
+    const w = Math.min(r.x1, o.x1 + pad) - Math.max(r.x0, o.x0 - pad), h = Math.min(r.y1, o.y1 + pad) - Math.max(r.y0, o.y0 - pad);
+    return sum + (w > 0 && h > 0 ? w * h : 0);
+  }, 0);
+  const search = (t: { w: number; h: number; of: Rect }) => {
+    const cx = (t.of.x0 + t.of.x1) / 2, cy = (t.of.y0 + t.of.y1) / 2, hw = t.w / 2, hh = t.h / 2;
+    const cands: Pt[] = [];
+    for (let k = 0; k < 10; k++) for (const dx of [0, -0.35, 0.35, -0.7, 0.7, -1.1, 1.1]) cands.push([cx + dx * t.w, t.of.y0 - 10 - hh - k * 12]);
+    for (let k = 0; k < 8; k++) for (const dx of [0, -0.35, 0.35, -0.7, 0.7]) cands.push([cx + dx * t.w, t.of.y1 + 10 + hh + k * 12]);
+    for (let k = 0; k < 8; k++) for (const sd of [1, -1]) for (const dy of [0, -1, 1, -2, 2]) cands.push([sd > 0 ? t.of.x1 + 10 + hw + k * 12 : t.of.x0 - 10 - hw - k * 12, cy + dy * 16]);
+    let best: Pt = [cx, t.of.y0 - 10 - hh], bestCover = Infinity;
+    for (const [x, y] of cands) {
+      const r = { x0: x - hw, x1: x + hw, y0: y - hh, y1: y + hh };
+      if (!inSafe(r)) continue;
+      const c = cover(r);
+      if (c < bestCover) { best = [x, y]; bestCover = c; if (c === 0) break; } // first free spot wins
+    }
+    return { best, bestCover };
+  };
+  for (const t of tags) {
+    let res = search(t), short = false, w = t.w;
+    if (res.bestCover > 0 && t.shortW) { // no free spot: try the short label
+      const alt = search({ ...t, w: t.shortW });
+      if (alt.bestCover < res.bestCover) { res = alt; short = true; w = t.shortW; }
+    }
+    placed.push({ x0: res.best[0] - w / 2, x1: res.best[0] + w / 2, y0: res.best[1] - t.h / 2, y1: res.best[1] + t.h / 2 });
+    out[t.id] = { at: res.best, short };
+  }
+  return out;
+}
