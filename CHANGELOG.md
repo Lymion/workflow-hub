@@ -4,13 +4,15 @@ Each update the Windows installer delivers has a higher version, so it installs 
 
 ## 0.4.0
 
-- **New Wiring tab:** your board and parts drawn at an angle on a drawing-board bench, with the real wires from your project.
+- **New Wiring tab in real 3D:** your board and parts on a drawing-board bench, with the real wires from your project as cables in space.
+  - **Free camera:** drag to orbit, right-drag to move, scroll or pinch to zoom. Buttons turn the bench by 90°, zoom, and jump to an angled, top or front view.
+  - **Click any part** (or its name tag) for a close-up: the camera flies to it, the other parts fade, and every pin is labelled with the board pin it goes to and its signal name. **Back to bench** returns to where you were.
   - **Board view** explains the board with callout cards (USB, chip, pin rows, buttons). Hover any pin to see what it can do and what's wired to it.
-  - **Project view** places every part around the board without overlaps. Name tags are placed as it draws, so they never cover a part or another tag at any angle or zoom; a tag that can't fit shortens to the part's name.
-  - **Move a wire:** click it, then click the pin you want; pins.h updates. The grouped pin picker still works in the Wires panel.
-  - **Controls:** turn (buttons or drag), zoom, labels, animated current flow, and a schematic of the signal wires.
-  - **Side panel:** Overview (board facts, warnings, parts), Pinout, Wires (rename signals, pick pins, checks, copy pin table) and pins.h.
-  - **All four boards** (ESP32 DevKit V1, ESP32-C3 Super Mini, Arduino Uno, Arduino Nano) and 15 parts have 3D models. They live in the board files and handbook chapters, so new ones need data, not code.
+  - **Project view** places every part around the board without overlaps. Name tags never cover a part or another tag, at any angle or zoom.
+  - **Move a wire:** click it, then click the pin you want; pins.h updates. The pin picker works in the Wires panel and in a part's pin list.
+  - **Side panel:** Overview (board facts, warnings, parts, or the selected part's pins), Pinout, Wires and pins.h.
+  - **All four boards** and 15 parts have 3D models, kept as data in the board files and handbook chapters. Computers without WebGL get the flat angled drawing instead.
+- **I²C pins stay free for I²C parts:** new wires no longer land on SDA/SCL (GPIO 21/22 on the ESP32) unless nothing else is free. A plain signal already on a bus pin gets its own warning that says where to move it; I²C parts sharing the bus are fine.
 
 ## 0.3.0
 

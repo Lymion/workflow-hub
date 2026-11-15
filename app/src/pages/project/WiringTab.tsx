@@ -1,7 +1,7 @@
 /** Wiring tab: the board and parts on an angled bench (Bench3D), with a side panel for the board, its pins,
  *  the wires and pins.h. Moving a wire (click it, then click a pin, or use the pin picker) saves wiring.json
  *  and regenerates pins.h. */
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { api, notifyChanged, useLoad } from "../../lib/api";
 import { calm } from "../../lib/router";
@@ -10,6 +10,10 @@ import { Empty, Sk } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import type { TabProps } from "./tabs";
 import { Bench3D, wid, type BenchBoard, type BenchPart, type BenchWire, type Mode } from "./Bench3D";
+import { canUseWebGL } from "./benchData";
+
+// three.js loads only when the Wiring tab opens
+const BenchGL = lazy(() => import("./BenchGL"));
 
 type Wire = BenchWire;
 type Board = BenchBoard & { logic_voltage?: number; max_pin_ma?: number; wireless?: string[]; good_for?: string; watch_out?: string };
@@ -37,6 +41,7 @@ export function WiringTab({ project }: TabProps) {
   const [tab, setTab] = useState<Tab>("overview");
   const [mode, setMode] = useState<Mode | null>(null);
   const [picker, setPicker] = useState<{ w: Wire; el: HTMLElement; key: boolean } | null>(null);
+  const webgl = useMemo(canUseWebGL, []);
 
   useEffect(() => {
     if (!res.data) return;
@@ -92,13 +97,38 @@ export function WiringTab({ project }: TabProps) {
 
   return (
     <div className="wire-layout">
-      <Bench3D board={board} parts={parts} wires={wires} color={color} bad={(w) => verdict(w)?.level === "bad"} mode={mode ?? "board"} setMode={setMode}
-        traced={traced} setTraced={trace} selPart={selPart} setSelPart={pickPart} pin={pin} setPin={pickPin} onMove={move} />
+      {(() => {
+        const bp = { board, parts, wires, color, bad: (w: Wire) => verdict(w)?.level === "bad", mode: mode ?? ("board" as Mode), setMode, traced, setTraced: trace, selPart, setSelPart: pickPart, pin, setPin: pickPin, onMove: move };
+        return webgl ? <Suspense fallback={<div className="bench"><Sk h={460} r={20} /></div>}><BenchGL {...bp} /></Suspense> : <Bench3D {...bp} />;
+      })()}
       <aside className="wire-panel" aria-label="Wiring details">
         <div className="wp-tabs" role="tablist" aria-label="Wiring details">
           {TABS.map(([id, label]) => <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}{id === "wires" && badCount ? <span className="wp-bad">{badCount}</span> : null}</button>)}
         </div>
-        {tab === "overview" && (
+        {tab === "overview" && selPart && (() => {
+          const [key, n] = selPart.split("#"), part = parts.find((x) => x.key === key);
+          if (!part) return null;
+          const pinsOf = part.meta.pins ?? [];
+          return (
+            <div className="wp-body">
+              <button className="wp-back" onClick={() => pickPart(null)}><Icon name="left" />{board.name}</button>
+              <h2 className="wp-h">{part.title}{part.qty > 1 ? ` #${n}` : ""}</h2>
+              <h3 className="wp-sub">Pins</h3>
+              {pinsOf.map((pn) => {
+                const w = wires.find((x) => x.part === key && String(x.instance) === n && x.partPin === pn.name), mode = (pn.mode ?? "").toUpperCase();
+                return (
+                  <div key={pn.name} className="wp-row wp-pinrow">
+                    <span className="kd" style={{ background: w ? color[wid(w)] : "var(--fill-strong)" }} />
+                    <span className="flex-1 min-w-0"><b className="font-mono">{pn.name}</b><span className="block text-xs text-label-2">{w ? w.signalName : mode === "POWER" ? `Power${(pn as { voltage?: string }).voltage ? `, ${(pn as { voltage?: string }).voltage}` : ""}` : mode === "GROUND" ? "Ground" : mode === "MOTOR" ? "To the motor driver" : "Not wired"}</span></span>
+                    {w && <button className="pin-sel" aria-haspopup="listbox" onClick={(e) => setPicker({ w, el: e.currentTarget, key: e.detail === 0 })}>{w.boardPin ? pinLabel(w.boardPin) : "Pick a pin"}<Icon name="down" /></button>}
+                  </div>
+                );
+              })}
+              {!pinsOf.length && <p className="wp-p">This part has no pins to wire.</p>}
+            </div>
+          );
+        })()}
+        {tab === "overview" && !selPart && (
           <div className="wp-body">
             <h2 className="wp-h">{board.name}</h2>
             {board.good_for && <p className="wp-p">{board.good_for}</p>}
