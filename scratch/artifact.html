@@ -1,0 +1,1713 @@
+<title>Workflow Hub</title>
+<script>(function(){var s;try{s=sessionStorage.getItem('rv-state')}catch(e){}document.body.dataset.state=s||'full'})();</script>
+<script src="https://cdn.jsdelivr.net/npm/@wokwi/elements@1.9.2/dist/wokwi-elements.bundle.min.js" async></script>
+<script>window.SCRATCH_STATES=['empty','loading','error','full']</script>
+<script>
+  (function(){var t;try{t=localStorage.getItem('wh-theme')}catch(e){}
+  if(!t)t=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.dataset.theme=t;})();
+</script>
+<style>
+:root{
+  color-scheme: light;
+  --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+
+  --bg:#F2F2F7;
+  --wash-1:rgba(255,149,0,.13); --wash-2:rgba(94,92,230,.12); --wash-3:rgba(52,199,89,.09);
+  --sidebar:rgba(248,248,251,.62);
+  --surface:rgba(255,255,255,.74);
+  --surface-solid:#FFFFFF;
+  --fill:rgba(118,118,128,.10);
+  --fill-strong:rgba(118,118,128,.18);
+  --label:#1D1D1F; --label-2:#5E5E66; --label-3:#8E8E95;
+  --sep:rgba(60,60,67,.12);
+
+  --accent:#0071E3; --accent-hover:#0062C4; --accent-text:#0066CC; --on-accent:#FFFFFF; --accent-tint:rgba(0,113,227,.10);
+  --robotics:#F56300; --robotics-text:#C2410C; --robotics-tint:rgba(245,99,0,.12);
+  --appdev:#5E5CE6; --appdev-text:#4F46E5; --appdev-tint:rgba(94,92,230,.12);
+  --green:#34C759; --green-text:#1E7B34; --green-tint:rgba(52,199,89,.14);
+  --amber:#FF9F0A; --amber-text:#9A5B00; --amber-tint:rgba(255,159,10,.16);
+  --red:#FF3B30; --red-text:#C8001A; --red-tint:rgba(255,59,48,.12);
+
+  --r-s:8px; --r:12px; --r-l:16px;
+  --hl: inset 0 1px 0 rgba(255,255,255,.85);
+  --shadow-1: 0 0 0 .5px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.06), 0 8px 24px -12px rgba(0,0,0,.16);
+  --shadow-2: 0 0 0 .5px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.06), 0 24px 48px -16px rgba(0,0,0,.22);
+  --blur: blur(24px) saturate(180%);
+
+  --mat:#EEF0F4; --mat-dot:rgba(60,60,67,.16);
+  --ease-out: cubic-bezier(.23,1,.32,1);
+  --ease-drawer: cubic-bezier(.32,.72,0,1);
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#141416;
+  --wash-1:rgba(255,149,0,.10); --wash-2:rgba(94,92,230,.14); --wash-3:rgba(48,209,88,.06);
+  --sidebar:rgba(30,30,33,.62);
+  --surface:rgba(44,44,48,.66);
+  --surface-solid:#2C2C2E;
+  --fill:rgba(118,118,128,.20);
+  --fill-strong:rgba(118,118,128,.32);
+  --label:#F5F5F7; --label-2:#AEAEB5; --label-3:#7C7C83;
+  --sep:rgba(255,255,255,.10);
+  --accent:#0A84FF; --accent-hover:#3395FF; --accent-text:#5AA9FF; --on-accent:#FFFFFF; --accent-tint:rgba(10,132,255,.18);
+  --robotics:#FF8A3D; --robotics-text:#FFA366; --robotics-tint:rgba(255,138,61,.16);
+  --appdev:#7D7AFF; --appdev-text:#A9A7FF; --appdev-tint:rgba(125,122,255,.18);
+  --green:#30D158; --green-text:#4ADE80; --green-tint:rgba(48,209,88,.16);
+  --amber:#FF9F0A; --amber-text:#FFC266; --amber-tint:rgba(255,159,10,.18);
+  --red:#FF453A; --red-text:#FF7B73; --red-tint:rgba(255,69,58,.18);
+  --hl: inset 0 1px 0 rgba(255,255,255,.07);
+  --mat:#1B1C20; --mat-dot:rgba(255,255,255,.08);
+  --shadow-1: 0 0 0 .5px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -12px rgba(0,0,0,.6);
+  --shadow-2: 0 0 0 .5px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4), 0 28px 56px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font:14px/1.45 var(--font); color:var(--label); -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(900px 520px at 8% -10%, var(--wash-1), transparent 60%),
+    radial-gradient(900px 600px at 105% 0%, var(--wash-2), transparent 60%),
+    radial-gradient(800px 500px at 50% 115%, var(--wash-3), transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+  display:grid; grid-template-columns:240px minmax(0,1fr); height:100%;
+}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+h1{font-size:26px;line-height:1.15;font-weight:700;letter-spacing:-.022em}
+h2{font-size:15px;font-weight:600;letter-spacing:-.01em}
+h3{font-size:14px;font-weight:600}
+.muted{color:var(--label-2)}
+.small{font-size:12px}
+.mono{font-family:var(--mono);font-size:12.5px}
+.num{font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;
+  border-radius:10px;border:0;font:600 13.5px var(--font);cursor:pointer;white-space:nowrap;
+  background:var(--surface-solid);color:var(--label);box-shadow:var(--hl),var(--shadow-1);
+  transition:transform 160ms var(--ease-out), background-color 160ms ease, opacity 160ms ease;
+}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 1px 2px rgba(0,0,0,.12),0 6px 16px -6px color-mix(in srgb,var(--accent) 70%,transparent)}
+.btn.tinted{background:var(--accent-tint);color:var(--accent-text);box-shadow:none}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--label-2)}
+.btn.sm{height:30px;padding:0 10px;font-size:12.5px;border-radius:8px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+@media (hover:hover) and (pointer:fine){
+  .btn.primary:not([disabled]):hover{background:var(--accent-hover)}
+  .btn.ghost:hover,.btn.tinted:hover{background:var(--fill)}
+  .btn:not(.primary):not(.ghost):not(.tinted):not([disabled]):hover{background:color-mix(in srgb,var(--surface-solid) 92%,var(--label))}
+}
+/* glow CTA: rotating conic stroke + bloom on hover, slight lift, inset shadow */
+@property --ga{syntax:'<angle>';inherits:false;initial-value:0deg}
+.btn.glow{position:relative;--ring:conic-gradient(from var(--ga),#FF9F0A,#FF375F,#BF5AF2,#0A84FF,#64D2FF,#30D158,#FF9F0A);
+  transition:transform 220ms var(--ease-out),box-shadow 220ms var(--ease-out),background-color 160ms ease}
+.btn.glow::before,.btn.glow::after{content:"";position:absolute;inset:-2px;border-radius:12px;background:var(--ring);pointer-events:none;
+  opacity:0;transition:opacity 220ms var(--ease-out);animation:ga-spin 3.2s linear infinite;animation-play-state:paused}
+.btn.glow::before{padding:1.5px;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.btn.glow::after{inset:-30px;padding:30px;border-radius:40px;background-clip:content-box;filter:blur(10px);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+@keyframes ga-spin{to{--ga:360deg}}
+@media (hover:hover) and (pointer:fine){
+  .btn.glow:hover{transform:translateY(-1px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 5px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.08),0 2px 4px rgba(0,0,0,.12),0 12px 28px -10px color-mix(in srgb,var(--accent) 80%,transparent)}
+  .btn.glow:hover::before{opacity:1;animation-play-state:running}
+  .btn.glow:hover::after{opacity:.6;animation-play-state:running}
+  .btn.glow:active{transform:translateY(0) scale(.97)}
+}
+kbd{font:600 11px var(--font);color:var(--label-2);background:var(--fill);border-radius:5px;padding:1px 6px}
+
+/* ---------- surfaces ---------- */
+.card{
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-radius:var(--r-l);box-shadow:var(--hl),var(--shadow-1);
+}
+.pad{padding:18px 20px}
+.chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--fill);color:var(--label-2);white-space:nowrap}
+.chip.rob{background:var(--robotics-tint);color:var(--robotics-text)}
+.chip.app{background:var(--appdev-tint);color:var(--appdev-text)}
+.chip.ok{background:var(--green-tint);color:var(--green-text)}
+.chip.warn{background:var(--amber-tint);color:var(--amber-text)}
+.chip.bad{background:var(--red-tint);color:var(--red-text)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--label-3)}
+.dot.rob{background:var(--robotics)}.dot.app{background:var(--appdev)}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
+
+/* project "needs doing" badges (cards + sidebar), driven by today's open tasks */
+.pbadge,.proj .top .pbadge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:grid;place-items:center;
+  font:700 11px/1 var(--font);font-variant-numeric:tabular-nums;color:#fff;background:var(--accent);
+  box-shadow:0 0 0 2px var(--surface-solid),0 2px 5px -1px rgba(0,0,0,.25);transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out)}
+.proj .top .pbadge.late{background:var(--red)}
+.proj .top .pbadge.off{opacity:0;transform:scale(.6)}
+.nav a .cnt{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;font:700 11px/18px var(--font);text-align:center;color:#fff;background:var(--accent);font-variant-numeric:tabular-nums}
+.nav a .cnt.late{background:var(--red)}
+.proj .top .due-line{display:block;font-size:12px;font-weight:600;color:var(--accent-text)}
+.proj .top .due-line.late{color:var(--red-text)}
+.tile{position:relative;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px -2px rgba(0,0,0,.25)}
+.tile svg.i{width:19px;height:19px}
+.tile.rob{background:linear-gradient(160deg,#FFA94D,#F56300)}
+.tile.app{background:linear-gradient(160deg,#9A98FF,#5E5CE6)}
+.tile.lg{width:48px;height:48px;border-radius:13px}
+.tile.lg svg.i{width:24px;height:24px}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;height:100%;display:flex;flex-direction:column;gap:14px;padding:16px 12px 14px;
+  background:var(--sidebar);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-right:1px solid var(--sep);box-shadow:inset -1px 0 0 rgba(255,255,255,.35);
+}
+:root[data-theme="dark"] .sidebar{box-shadow:inset -1px 0 0 rgba(255,255,255,.04)}
+/* engine is only "offline" when Home reports it */
+.engine .off{display:none}
+body[data-state="error"]:has(.route.on[data-route="#home"]) .engine .on-ok{display:none}
+body[data-state="error"]:has(.route.on[data-route="#home"]) .engine .off{display:inline-block}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 6px}
+.brand-mark{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 200deg,#FF9F0A,#FF375F,#5E5CE6,#0A84FF,#30D158,#FF9F0A);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 2px 6px -2px rgba(0,0,0,.3)}
+.brand b{font-size:14.5px;letter-spacing:-.01em}
+.search{margin-left:auto;width:30px;height:30px;padding:0;border-radius:8px;border:0;display:grid;place-items:center;background:transparent;color:var(--label-2);cursor:pointer;transition:background-color 150ms ease,color 150ms ease,transform 160ms var(--ease-out)}
+.search:active{transform:scale(.94)}
+@media (hover:hover) and (pointer:fine){.search:hover{background:var(--fill);color:var(--label)}}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:11.5px;font-weight:600;color:var(--label-2);padding:6px 10px 4px}
+.nav a{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border-radius:9px;color:var(--label);font-weight:500;transition:background-color 150ms ease}
+.nav a svg.i{color:var(--label-2)}
+.nav a[aria-current="page"]{background:var(--surface-solid);box-shadow:var(--hl),var(--shadow-1)}
+.nav a[aria-current="page"] svg.i{color:var(--accent)}
+@media (hover:hover) and (pointer:fine){.nav a:not([aria-current="page"]):hover{background:var(--fill)}}
+.nav a .meta{margin-left:auto;font-size:12px;color:var(--label-2)}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.mini-spend{padding:12px;border-radius:12px;background:var(--surface);box-shadow:var(--hl),var(--shadow-1)}
+.mini-spend .row{display:flex;justify-content:space-between;font-size:12px}
+.meter{height:6px;border-radius:999px;background:var(--fill-strong);overflow:hidden;margin-top:8px}
+.meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#30D158,#0A84FF);transform-origin:left;animation:grow 700ms var(--ease-out) both}
+@keyframes grow{from{transform:scaleX(0)}}
+.engine{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--label-2);padding:0 6px}
+.engine .btn{margin-left:auto}
+
+/* ---------- main ---------- */
+main{min-width:0;height:100%;overflow:auto}
+.page{max-width:1120px;margin:0;padding:28px 36px 96px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;margin-bottom:24px}
+.toolbar .titles{flex:1;min-width:0}
+.toolbar .eyebrow{font-size:13px;color:var(--label-2);font-weight:500;margin-bottom:4px}
+.route{display:none}
+.route.on{display:block}
+.route.on .rise{animation:rise 200ms var(--ease-out) both;animation-delay:var(--d,0ms)}
+.route.seen .meter i{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(4px)}}
+
+.banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r);margin-bottom:18px;font-weight:500}
+.banner.bad{background:var(--red-tint);color:var(--red-text)}
+.banner.warn{background:var(--amber-tint);color:var(--amber-text)}
+.banner .btn{margin-left:auto}
+.banner code{font-family:var(--mono);font-size:12.5px;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:40px 24px}
+.empty .art{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--accent-tint);color:var(--accent-text)}
+.empty .art svg.i{width:26px;height:26px}
+.empty p{max-width:340px}
+
+.sk{background:linear-gradient(90deg,var(--fill) 0%,var(--fill-strong) 50%,var(--fill) 100%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:8px}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+
+/* ---------- home ---------- */
+.home-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-head h2{flex:1}
+.tasks{list-style:none;margin:0;padding:6px}
+.task{display:flex;align-items:center;gap:12px;min-height:48px;padding:6px 12px;border-radius:10px}
+.task + .task{box-shadow:inset 0 1px 0 var(--sep)}
+.task .t{flex:1;min-width:0}
+.task .t b{display:block;width:fit-content;max-width:100%;font-weight:500;transition:color 200ms ease,background-size 300ms var(--ease-out);
+  background:linear-gradient(var(--label-3),var(--label-3)) no-repeat 0 55%/0% 1.5px}
+.task .t span{font-size:12px;color:var(--label-2);display:flex;align-items:center;gap:6px}
+.task.done .t b{color:var(--label-2);background-size:100% 1.5px}
+.task .due{transition:color 200ms ease}
+.task.done .due{color:var(--green-text)}
+/* completion celebration */
+.today-bar{height:4px;border-radius:999px;background:var(--fill-strong);overflow:hidden;margin:-4px 0 12px}
+.today-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#30D158,#0A84FF);transform-origin:left;transition:transform 420ms var(--ease-out)}
+.spark{position:fixed;z-index:70;width:6px;height:6px;border-radius:50%;pointer-events:none;will-change:transform,opacity}
+.spark.bar{width:3px;height:9px;border-radius:2px}
+.all-done{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:12px;border-radius:var(--r);background:var(--green-tint);color:var(--green-text);font-weight:600;
+  transform-origin:top center;transition:opacity 260ms var(--ease-out),transform 260ms var(--ease-out)}
+.all-done .badge{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#fff;flex:none;box-shadow:0 4px 12px -4px color-mix(in srgb,var(--green) 70%,transparent)}
+.all-done .badge svg.i{stroke-width:3}
+.all-done small{display:block;font-weight:500;font-size:12px;opacity:.85}
+.all-done[hidden]{display:flex!important;opacity:0;transform:scale(.96) translateY(-4px);pointer-events:none;position:absolute;visibility:hidden}
+.check{width:22px;height:22px;border-radius:50%;border:1.75px solid var(--label-3);background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;flex:none;color:#fff;transition:background-color 180ms var(--ease-out),border-color 180ms var(--ease-out),transform 160ms var(--ease-out)}
+.check:active{transform:scale(.9)}
+.check svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset 220ms var(--ease-out)}
+.task.done .check{background:var(--green);border-color:var(--green)}
+.task.done .check svg{stroke-dashoffset:0}
+.due{font-size:12px;font-weight:600;color:var(--label-2)}
+.due.today{color:var(--accent-text)}
+.due.late{color:var(--red-text)}
+
+.filters{display:flex;gap:6px}
+.fchip{height:28px;padding:0 12px;border-radius:999px;border:0;background:var(--fill);color:var(--label-2);font:600 12.5px var(--font);cursor:pointer;transition:background-color 150ms ease,color 150ms ease}
+.fchip[aria-pressed="true"]{background:var(--label);color:var(--bg)}
+.projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.proj{display:flex;flex-direction:column;gap:12px;padding:16px;cursor:pointer;transition:transform 200ms var(--ease-out),box-shadow 200ms var(--ease-out)}
+.proj:active{transform:scale(.98)}
+@media (hover:hover) and (pointer:fine){.proj:hover{transform:translateY(-1px);box-shadow:var(--hl),var(--shadow-2)}}
+.proj .top{display:flex;align-items:center;gap:10px}
+.proj .top b{display:block;font-weight:600}
+.proj .top span{font-size:12px;color:var(--label-2)}
+.proj .bar{height:4px;border-radius:999px;background:var(--fill-strong);overflow:hidden}
+.proj .bar i{display:block;height:100%;border-radius:inherit}
+.proj.rob .bar i{background:var(--robotics)}.proj.app .bar i{background:var(--appdev)}
+.proj .foot{display:flex;justify-content:space-between;font-size:12px;color:var(--label-2)}
+
+/* sidebar spend: segmented meter + hover/focus breakdown */
+.sidebar{z-index:20}
+.mini-spend{position:relative;cursor:default;outline-offset:3px}
+.seg-meter{display:flex;gap:1.5px;background:var(--fill-strong)}
+.seg-meter i{flex:none;min-width:3px;border-radius:0;animation:none}
+.seg-meter i:first-child{border-radius:999px 0 0 999px}
+.spend-pop{position:absolute;left:calc(100% + 14px);bottom:-6px;width:290px;padding:16px 18px;border-radius:var(--r-l);z-index:30;
+  background:var(--surface-solid);box-shadow:var(--hl),var(--shadow-2);
+  transform-origin:left bottom;opacity:0;transform:scale(.96) translateX(-4px);pointer-events:none;
+  transition:opacity 100ms var(--ease-out),transform 100ms var(--ease-out)}
+.mini-spend:focus-visible .spend-pop{opacity:1;transform:none;transition-duration:160ms}
+@media (hover:hover) and (pointer:fine){
+  .mini-spend:hover .spend-pop{opacity:1;transform:none;pointer-events:auto;transition-duration:160ms;transition-delay:90ms}
+  .mini-spend:hover{box-shadow:var(--hl),var(--shadow-2)}
+}
+.spend-pop .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.spend-pop .big{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.spend-pop .big small{font-size:13px;font-weight:600;color:var(--label-2);letter-spacing:0}
+.spend-pop .meter{height:8px;margin:12px 0 6px}
+.spend-pop dl{margin:14px 0 0;display:grid;grid-template-columns:1fr auto auto;gap:8px 12px;font-size:13px}
+.spend-pop dt{display:flex;align-items:center;gap:8px;color:var(--label)}
+.spend-pop dd{margin:0;color:var(--label-2);text-align:right}
+.spend-pop dd.rm{color:var(--label);font-weight:600}
+.spend-pop .note{margin-top:12px;padding-top:10px;box-shadow:inset 0 1px 0 var(--sep);font-size:12px;color:var(--label-2);display:flex;gap:8px;align-items:center}
+
+/* ---------- new ---------- */
+/* new project: one page — name, type toggle, tick tiles, checks, create */
+.np-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start}
+.np-top .field{max-width:none}
+.input.lg{height:46px;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.np-top .path{padding:2px 0 0}
+.lbl{font-size:12.5px;font-weight:600;color:var(--label-2)}
+.kind{position:relative;display:inline-flex;padding:4px;border-radius:12px;background:var(--fill)}
+.kind button{position:relative;z-index:1;display:inline-flex;align-items:center;gap:10px;width:200px;height:46px;padding:0 12px;border:0;background:none;border-radius:9px;font:600 14px var(--font);color:var(--label-2);cursor:pointer;transition:color 200ms ease}
+.kind button[aria-checked="true"]{color:var(--label)}
+.kind button[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.kind .kpill{position:absolute;top:4px;left:0;height:46px;border-radius:9px;background:var(--surface-solid);box-shadow:var(--hl),0 1px 3px rgba(0,0,0,.12);transition:transform 260ms var(--ease-drawer)}
+.kind.kb .kpill{transition:none}
+.tile.sm{width:28px;height:28px;border-radius:8px}
+.tile.sm svg.i{width:16px;height:16px}
+body[data-state="error"] .kind [data-kind="app"]{opacity:.45}
+.kind-err{font-size:12px;font-weight:500;color:var(--red-text);margin-top:6px}
+.presets{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:22px}
+.kgroup{margin-top:24px}
+.kgroup .gh{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.kgroup .gh span{font-size:12px;color:var(--label-2)}
+.ktiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.kt{position:relative;display:flex;align-items:center;gap:12px;padding:12px 34px 12px 12px;border:0;border-radius:12px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-1);
+  transition:box-shadow 180ms var(--ease-out),background-color 180ms ease,transform 160ms var(--ease-out),opacity 180ms ease}
+.kt:active{transform:scale(.98)}
+.kt[aria-checked="true"]{background:color-mix(in srgb,var(--accent) 7%,var(--surface-solid));box-shadow:var(--hl),0 0 0 2px var(--accent),var(--shadow-1)}
+.kt[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.kt .g{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;font:700 12px var(--font);color:#fff;letter-spacing:.02em;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px -2px rgba(0,0,0,.25)}
+.kt .tx{min-width:0}
+.kt b{display:block;font-weight:600;font-size:13.5px}
+.kt .s{display:block;font-size:12px;color:var(--label-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt .ck{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--label-3);display:grid;place-items:center;color:#fff;transition:background-color 160ms var(--ease-out),border-color 160ms var(--ease-out)}
+.kt .ck svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset 200ms var(--ease-out)}
+.kt[aria-checked="true"] .ck{background:var(--accent);border-color:var(--accent)}
+.kt[aria-checked="true"] .ck svg{stroke-dashoffset:0}
+#pickArea.swap{animation:rise 220ms var(--ease-out) both}
+.np-checks{margin-top:24px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.parts-full{display:grid;gap:16px}
+.cost-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.cost-row .lbl{display:flex;align-items:center;gap:6px}
+.cost-row b{display:block;font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
+.cost-bar{display:flex;gap:2px;height:8px;margin-top:14px;border-radius:999px;overflow:hidden;background:var(--fill-strong)}
+.cost-bar i{display:block;flex:0 0 0;min-width:0;flex-basis:0}
+.cost-bar .have{background:var(--green)}.cost-bar .ord{background:var(--amber)}.cost-bar .need{background:var(--red)}
+.st-btn{border:0;cursor:pointer;font-family:var(--font)}
+.st-btn:active{transform:scale(.96)}
+tr.row-flash td{animation:flash 1100ms var(--ease-out)}
+.addparts{margin-top:8px}
+.addparts>.gh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ap-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start;margin-top:4px}
+#catArea .kgroup:first-child{margin-top:12px}
+.kt .inp{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;color:var(--green-text)}
+.sel-win{position:sticky;top:16px;margin-top:12px;padding:14px;border-radius:var(--r-l);background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);display:grid;gap:10px}
+.sw-head{display:flex;align-items:center;justify-content:space-between}
+.sw-list{display:grid;gap:2px;max-height:300px;overflow:auto}
+.sw-empty{padding:8px 2px 4px;line-height:1.5}
+.sw-item{display:flex;align-items:center;gap:8px;padding:6px 0}
+.sw-item + .sw-item{box-shadow:inset 0 1px 0 var(--sep)}
+.sw-item .g{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;color:#fff;font:700 10px var(--font)}
+.sw-item .nm{flex:1;min-width:0}
+.sw-item .nm b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw-item .nm span{font-size:12px;color:var(--label-2);font-variant-numeric:tabular-nums}
+.sel-win .checks{display:grid;gap:6px}
+.sw-foot{display:flex;align-items:center;gap:12px;padding-top:10px;box-shadow:inset 0 1px 0 var(--sep)}
+.sw-foot>div{flex:1}
+.sw-foot b{display:block;font-size:18px;letter-spacing:-.01em}
+@media (max-width:1180px){.ap-grid{grid-template-columns:minmax(0,1fr)}.sel-win{position:sticky;bottom:16px;top:auto}}
+@media (max-width:760px){.cost-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.np-checks .checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.np-bar{position:sticky;bottom:16px;z-index:5;margin-top:24px;display:flex;align-items:center;gap:16px;padding:10px 10px 10px 18px;border-radius:16px;
+  background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2)}
+.np-bar .sum{flex:1;min-width:0}
+.np-bar .sum b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-bar .sum .why{color:var(--red-text);font-weight:500}
+#tip{position:fixed;z-index:80;width:290px;padding:12px 14px;border-radius:12px;background:var(--surface-solid);box-shadow:var(--hl),var(--shadow-2);pointer-events:none;
+  opacity:0;transform:scale(.97) translateY(3px);transition:opacity 140ms var(--ease-out),transform 140ms var(--ease-out);font-size:12.5px;line-height:1.45}
+#tip.on{opacity:1;transform:none}
+#tip.instant{transition:none}
+#tip .h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
+#tip .h b{font-size:13.5px}
+#tip .h span{color:var(--label-2);font-weight:600;font-variant-numeric:tabular-nums}
+#tip p{margin:4px 0 0;color:var(--label)}
+#tip .k{display:block;font-size:11px;font-weight:700;color:var(--green-text)}
+#tip .w .k{color:var(--amber-text)}
+@media (max-width:760px){.np-top{grid-template-columns:minmax(0,1fr)}.kind{display:flex}.kind button{width:auto;flex:1}}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;max-width:380px}
+.field label{font-size:12.5px;font-weight:600;color:var(--label-2)}
+.input{height:38px;padding:0 12px;border-radius:10px;border:0;background:var(--surface-solid);color:var(--label);font:14px var(--font);box-shadow:inset 0 0 0 1px var(--sep),var(--shadow-1)}
+.input:focus{outline:none;box-shadow:inset 0 0 0 1px var(--accent),0 0 0 3px var(--accent-tint)}
+.path{font-family:var(--mono);font-size:12.5px;color:var(--label-2);padding-bottom:10px}
+
+/* ---------- handbook ---------- */
+.hb{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start}
+.toc{position:sticky;top:0;padding:10px}
+.toc .input{height:32px;width:100%;font-size:13px;margin-bottom:8px}
+.toc h4{margin:14px 0 4px;padding:14px 8px 0;border-top:1px solid var(--sep);font-size:11.5px;font-weight:600;color:var(--label-2)}
+.toc .input + h4{margin-top:6px;padding-top:6px;border-top:0}
+.toc a{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:6px;font-size:13px}
+.toc a.on{background:var(--accent-tint);color:var(--accent-text);font-weight:600}
+@media (hover:hover) and (pointer:fine){.toc a:not(.on):hover{background:var(--fill)}}
+.chapter{padding:28px 32px 36px}
+.ch-grid{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:36px;align-items:start}
+.ch-main{min-width:0}
+.ch-main h2{margin:30px 0 10px}
+.tbl-wrap{overflow-x:auto}
+.timing{margin:14px 0 4px;padding:14px 16px;border-radius:12px;background:var(--fill)}
+.timing svg{width:100%;height:auto;display:block}
+.timing .t-lbl{font:600 12px var(--mono);fill:var(--label)}
+.timing .t-note{font:500 11px var(--font);fill:var(--label-2)}
+.timing .t-low{fill:none;stroke:var(--accent);stroke-width:2}
+.timing .t-sig{fill:none;stroke:var(--robotics);stroke-width:2}
+.timing .t-burst path{fill:none;stroke:var(--label-3);stroke-width:1.2}
+.timing .t-dim{fill:none;stroke:var(--label-3);stroke-width:1}
+.wsteps{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.wsteps li{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:var(--fill);line-height:1.5}
+.wsteps .n{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--robotics);color:#fff;font:700 12px var(--font)}
+.code-card{margin-top:16px;border-radius:12px;background:var(--surface-solid);box-shadow:inset 0 0 0 1px var(--sep);overflow:hidden}
+.code-card .code-head{gap:6px}
+.code-card .code-head b{font-weight:600}
+.faq{display:grid;gap:8px}
+.faq div{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;padding:12px 14px;border-radius:10px;background:var(--fill)}
+.faq b{font-weight:600}
+.faq span{color:var(--label-2);line-height:1.5}
+.ch-rail{position:sticky;top:20px;display:grid;gap:12px}
+.rbox{padding:14px 16px;border-radius:12px;background:var(--fill)}
+.rbox h3{font-size:12px;font-weight:600;color:var(--label-2);margin-bottom:10px}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;margin:0;font-size:13px}
+.spec dt{color:var(--label-2)}
+.spec dd{margin:0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.used{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px}
+.used .muted{margin-left:auto;font-weight:500}
+.doc{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;font-size:13px;font-weight:500;color:var(--accent-text)}
+.doc + .doc{box-shadow:inset 0 1px 0 var(--sep)}
+.doc svg.i{width:13px;height:13px;flex:none}
+.rel{display:flex;align-items:center;gap:10px;padding:6px 0}
+.rel + .rel{box-shadow:inset 0 1px 0 var(--sep)}
+.rel .g{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:#fff;font:700 10px var(--font)}
+.rel b{display:block;font-size:13px;font-weight:600}
+.rel small{display:block;font-size:12px;color:var(--label-2)}
+@media (max-width:1180px){.ch-grid{grid-template-columns:minmax(0,1fr)}.ch-rail{position:static;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}}
+@media (max-width:640px){.faq div{grid-template-columns:minmax(0,1fr);gap:4px}}
+.crumb{font-size:12.5px;color:var(--label-2);display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.crumb svg.i{width:12px;height:12px}
+.chapter .lead{font-size:16px;color:var(--label-2);margin:10px 0 16px;max-width:560px}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.callout{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--amber-tint);color:var(--amber-text);font-weight:500;margin-bottom:22px}
+.callout svg.i{margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--label-2);padding:8px 10px;box-shadow:inset 0 -1px 0 var(--sep)}
+td{padding:10px;box-shadow:inset 0 -1px 0 var(--sep);vertical-align:middle}
+tr:last-child td{box-shadow:none}
+.chapter h2{margin:24px 0 8px}
+.chapter p.body{max-width:680px;color:var(--label);line-height:1.6}
+.chapter .acts{display:flex;gap:8px;margin-top:24px}
+
+.cart{position:sticky;top:0;display:flex;flex-direction:column;max-height:calc(100vh - 140px);background:var(--surface);box-shadow:var(--hl),var(--shadow-2)}
+.cart-head{padding:16px 18px 12px;box-shadow:inset 0 -1px 0 var(--sep)}
+.cart-head .row{display:flex;align-items:center;gap:8px}
+.cart-head .row h2{flex:1}
+.select{display:flex;align-items:center;gap:8px;margin-top:10px;height:32px;padding:0 10px;border-radius:9px;background:var(--fill);font-size:13px;font-weight:500;cursor:pointer;border:0;color:var(--label);width:100%;font-family:var(--font)}
+.select span{flex:1;text-align:left}
+.cart-body{overflow:auto;padding:6px 18px 12px;flex:1}
+.slot-label{font-size:11.5px;font-weight:600;color:var(--label-2);margin:14px 0 6px}
+.item{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 8px;margin:0 -8px;border-radius:10px}
+.item + .item{box-shadow:inset 0 1px 0 var(--sep)}
+.item .nm{flex:1;min-width:0}
+.item .nm b{display:block;font-weight:500;font-size:13.5px}
+.item .nm span{font-size:12px;color:var(--label-2)}
+.qty{display:inline-flex;align-items:center;border-radius:8px;background:var(--fill)}
+.qty button{width:26px;height:26px;border:0;background:none;color:var(--label);font:600 14px var(--font);cursor:pointer;border-radius:8px}
+.qty button:active{background:var(--fill-strong)}
+.qty output{min-width:16px;text-align:center;font-size:13px;font-weight:600}
+.item.flash{animation:flash 900ms var(--ease-out)}
+@keyframes flash{from{background:var(--accent-tint)}to{background:transparent}}
+.checks{display:flex;flex-direction:column;gap:6px}
+.chk{display:flex;gap:8px;align-items:flex-start;padding:9px 10px;border-radius:10px;font-size:12.5px;line-height:1.4;transition:background-color 240ms ease,color 240ms ease}
+.chk svg.i{margin-top:1px;width:15px;height:15px}
+.chk.bad{background:var(--red-tint);color:var(--red-text)}
+.chk.warn{background:var(--amber-tint);color:var(--amber-text)}
+.chk.ok{background:var(--green-tint);color:var(--green-text)}
+.chk .btn{margin-left:auto;flex:none}
+.chk b{font-weight:600}
+.cart-foot{padding:14px 18px;box-shadow:inset 0 1px 0 var(--sep);display:flex;align-items:center;gap:12px}
+.cart-foot .tot{flex:1}
+.cart-foot .tot b{display:block;font-size:17px;letter-spacing:-.01em}
+.cart-foot .hint{display:block;font-size:12px;font-weight:500;color:var(--red-text)}
+
+/* ---------- project ---------- */
+.p-head{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:20px}
+.p-head .titles{flex:1;min-width:0}
+.p-head .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.seg{position:relative;display:inline-flex;padding:3px;border-radius:10px;background:var(--fill);margin-bottom:18px}
+.seg button{position:relative;z-index:1;height:30px;width:92px;padding:0;border:0;background:none;font:600 13px var(--font);color:var(--label-2);cursor:pointer;border-radius:8px;transition:color 200ms ease}
+.seg button[aria-selected="true"]{color:var(--label)}
+.seg .pill{position:absolute;top:3px;left:0;width:92px;height:30px;border-radius:7px;background:var(--surface-solid);box-shadow:var(--hl),0 1px 3px rgba(0,0,0,.12);transition:transform 260ms var(--ease-drawer)}
+.seg.kb .pill{transition:none}
+.tab{display:none}.tab.on{display:block}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.col{padding:8px}
+.col-head{display:flex;align-items:center;gap:8px;padding:8px 8px 10px}
+.col-head h3{flex:1}
+.col-head .count{font-size:12px;font-weight:600;color:var(--label-2);background:var(--fill);border-radius:999px;padding:1px 8px}
+.kcard{background:var(--surface-solid);border-radius:8px;padding:10px 12px;box-shadow:var(--hl),0 0 0 .5px var(--sep),0 1px 2px rgba(0,0,0,.05);margin-bottom:8px;display:flex;flex-direction:column;gap:6px;cursor:grab;transition:transform 160ms var(--ease-out)}
+.kcard:active{transform:scale(.98)}
+.kcard b{font-weight:500;font-size:13.5px}
+.kcard .r{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--label-2)}
+.kcard.done b{color:var(--label-2)}
+.wiring{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.diagram{padding:10px}
+.stage-wrap{position:relative;width:100%;max-width:880px;margin:0;aspect-ratio:640/340;border-radius:10px;overflow:hidden;
+  background:radial-gradient(circle,var(--mat-dot) 1px,transparent 1.4px) 0 0/14px 14px,var(--mat)}
+.stage{position:absolute;left:0;top:0;width:640px;height:340px;transform-origin:0 0}
+.stage>*{position:absolute}
+.stage svg.wires{left:0;top:0;width:640px;height:340px;overflow:visible;pointer-events:none}
+.wire{fill:none;stroke-width:2.6;stroke-linecap:round;transition:opacity 200ms ease}
+.wire-sh{fill:none;stroke:rgba(0,0,0,.28);stroke-width:4.4;stroke-linecap:round;transition:opacity 200ms ease}
+.wire.dash{stroke-dasharray:6 5}
+.wire-end{stroke:rgba(0,0,0,.35);stroke-width:1}
+.diagram.focus .wire,.diagram.focus .wire-sh,.diagram.focus .wire-end{opacity:.15}
+.diagram.focus .hot{opacity:1!important}
+.diag-note{position:absolute;inset:auto 12px 12px 12px;font-size:12px;color:var(--label-2)}
+.pin-row{cursor:pointer;transition:background-color 150ms ease}
+.pin-row.hot{background:var(--accent-tint)}
+.pin-sel{appearance:none;-webkit-appearance:none;min-width:150px;height:30px;padding:0 26px 0 10px;border:0;border-radius:8px;font:600 13px var(--font);font-variant-numeric:tabular-nums;color:var(--label);cursor:pointer;
+  background:var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238E8E95' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 9px center}
+.pin-sel:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.pin-sel{text-align:left}
+.pin-sel[aria-expanded="true"]{box-shadow:inset 0 0 0 1.5px var(--accent)!important}
+#pinPop{position:fixed;z-index:85;width:292px;padding:12px;border-radius:14px;background:var(--surface-solid);box-shadow:var(--hl),var(--shadow-2);
+  opacity:0;transform:scale(.96);pointer-events:none;transition:opacity 100ms var(--ease-out),transform 100ms var(--ease-out)}
+#pinPop.open{opacity:1;transform:none;pointer-events:auto;transition-duration:150ms}
+#pinPop.instant{transition:none}
+#pinPop .pp-title{font-size:12.5px;color:var(--label-2);padding:0 2px 2px}
+#pinPop .pp-title b{color:var(--label);font-family:var(--mono);font-weight:600}
+#pinPop .pp-h{font-size:11.5px;font-weight:600;color:var(--label-2);margin:10px 2px 6px}
+#pinPop .pp-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.pp-opt{position:relative;height:34px;border:0;border-radius:8px;background:var(--fill);color:var(--label);font:600 13px var(--font);font-variant-numeric:tabular-nums;cursor:pointer;
+  transition:background-color 120ms ease,color 120ms ease}
+.pp-opt:active{transform:scale(.96)}
+.pp-opt:focus{outline:none}
+.pp-opt:focus-visible,.pp-opt:hover{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.pp-opt[aria-selected="true"]{background:var(--accent);color:#fff}
+.pp-opt .d{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%}
+.pp-opt.warn .d{background:var(--amber)}
+.pp-opt.bad .d,.pp-opt.used .d{background:var(--red)}
+.pp-opt.used{color:var(--label-3)}
+.pp-foot{margin-top:12px;padding:10px 2px 0;box-shadow:inset 0 1px 0 var(--sep);font-size:12px;line-height:1.4;color:var(--label-2);min-height:44px}
+.pp-foot b{color:var(--label);font-variant-numeric:tabular-nums}
+.pin-row.bad .pin-sel{box-shadow:inset 0 0 0 1.5px var(--red)}
+.pin-row.warn .pin-sel{box-shadow:inset 0 0 0 1.5px var(--amber)}
+.pin-msg{display:flex;align-items:flex-start;gap:7px;font-size:12px;line-height:1.35;font-weight:500}
+.pin-msg .bang{width:18px;height:18px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font:800 12px/1 var(--font)}
+.pin-msg.bad{color:var(--red-text)}.pin-msg.bad .bang{background:var(--red)}
+.pin-msg.warn{color:var(--amber-text)}.pin-msg.warn .bang{background:var(--amber)}
+.pin-msg.ok{color:var(--green-text)}
+pre .ln{display:block;margin:0 -14px;padding:0 14px}
+pre .ln.flash{animation:lnflash 1100ms var(--ease-out)}
+@keyframes lnflash{from{background:var(--accent-tint)}to{background:transparent}}
+pre .warn-c{color:var(--red-text)}
+@media (hover:hover) and (pointer:fine){.pin-row:hover{background:var(--fill)}}
+.code{margin-top:16px}
+.code-head{display:flex;align-items:center;gap:8px;padding:10px 14px;box-shadow:inset 0 -1px 0 var(--sep)}
+.code-head b{flex:1;font-family:var(--mono);font-size:12.5px}
+pre{margin:0;padding:14px;font:12.5px/1.6 var(--mono);color:var(--label);overflow:auto}
+pre .c{color:var(--label-2)}pre .k{color:var(--appdev-text)}pre .n{color:var(--robotics-text)}
+
+/* ---------- menus / overlays ---------- */
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 6px);min-width:230px;padding:6px;z-index:30;background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:12px;box-shadow:var(--hl),var(--shadow-2);transform-origin:top right;opacity:0;transform:scale(.95);pointer-events:none;transition:opacity 100ms var(--ease-out),transform 100ms var(--ease-out)}
+.menu.open{opacity:1;transform:scale(1);pointer-events:auto;transition-duration:160ms}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;height:34px;padding:0 10px;border:0;border-radius:6px;background:none;color:var(--label);font:500 13.5px var(--font);cursor:pointer;text-align:left}
+.menu button span{margin-left:auto}
+@media (hover:hover) and (pointer:fine){.menu button:hover{background:var(--accent);color:#fff}.menu button:hover kbd{color:#fff;background:rgba(255,255,255,.2)}}
+
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.18);display:grid;place-items:start center;padding-top:14vh;opacity:0;pointer-events:none}
+.scrim.open{opacity:1;pointer-events:auto}
+/* command bar: keyboard-first, so it opens instantly (no animation) */
+.cmdk{width:min(560px,calc(100vw - 32px));border-radius:16px;background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);overflow:hidden}
+.cmdk input{width:100%;height:52px;border:0;background:none;padding:0 18px;font:16px var(--font);color:var(--label);box-shadow:inset 0 -1px 0 var(--sep)}
+.cmdk input:focus{outline:none}
+.cmdk ul{list-style:none;margin:0;padding:6px;max-height:320px;overflow:auto}
+.cmdk li{display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;border-radius:9px;cursor:pointer;font-weight:500}
+.cmdk li>span:last-child{margin-left:auto;font-size:12px;color:var(--label-2);font-weight:400}
+.cmdk li .dot{margin:0 4px 0 4px}
+.cmdk li.sel{background:var(--accent);color:#fff}
+.cmdk li.sel>span:last-child,.cmdk li.sel svg.i{color:#fff}
+.cmdk .grp{font-size:11.5px;color:var(--label-2);font-weight:600;padding:8px 12px 4px}
+
+.toasts{position:fixed;bottom:64px;left:calc(50% + 120px);transform:translateX(-50%);z-index:50;display:flex;flex-direction:column-reverse;gap:8px;align-items:center}
+.toast{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;font-weight:500;font-size:13px;background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out)}
+.toast svg.i{color:var(--green)}
+@starting-style{.toast{opacity:0;transform:translateY(8px) scale(.97)}}
+.toast.out{opacity:0;transform:translateY(6px);transition-duration:150ms}
+
+@media (max-width:1180px){
+  .hb{grid-template-columns:190px minmax(0,1fr)}
+}
+@media (max-width:980px){
+  body{grid-template-columns:72px minmax(0,1fr)}
+  .sidebar .brand b,.nav a span,.nav a .meta,.nav-label,.mini-spend,.engine span{display:none}
+  .nav a{justify-content:center;padding:0}
+  .brand{flex-direction:column;gap:12px;padding:2px 0}
+  .search{margin-left:0}
+  .home-grid,.wiring,.hb{grid-template-columns:minmax(0,1fr)}
+  .toc{display:none}
+  .board{grid-template-columns:minmax(0,1fr)}
+  .cart{position:static;max-height:none}
+  .page{padding:24px 20px 96px}
+  .toasts{left:calc(50% + 36px)}
+  .chapter{padding:22px 18px}
+  table{display:block;overflow-x:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  /* gentler, not zero: keep fades and colour, drop movement */
+  @keyframes rise{from{opacity:0}}
+  .meter i,.sk{animation:none}
+  .seg .pill{transition:none}
+  .btn:active,.proj:active,.type:active,.kcard:active,.check:active{transform:none}
+  .proj:hover{transform:none!important}
+  .menu{transform:none}
+  #pinPop{transform:none}
+  .btn.glow::before,.btn.glow::after{animation:none}
+  .btn.glow:hover{transform:none!important}
+  @starting-style{.toast{transform:none}}
+  .toast.out{transform:none}
+}
+@media (prefers-reduced-transparency:reduce){
+  .card,.sidebar,.menu,.cmdk,.toast,.cart{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--surface-solid)}
+}
+</style>
+<!-- icon sprite (Lucide-style strokes) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-x-c" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.8 9.8 0 0 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.8 9.8 0 0 1-6.7-2.7L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 10.5l-6.1 1.7L12 18l-1.9-5.8L4 10.5l6.1-1.7z"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-6-6-6M12 19h8"/></symbol>
+  <symbol id="i-package" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></symbol>
+  <symbol id="i-git" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="9" r="3"/><path d="M6 9v6M18 12a6 6 0 0 1-6 6H9"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+</svg>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" data-s="sidebar" aria-label="Main">
+  <div class="brand" data-s="brand"><div class="brand-mark" aria-hidden="true"></div><b>Workflow Hub</b><button class="search" data-s="search" data-cmdk aria-label="Search or jump to (Ctrl K)" title="Search · Ctrl K"><svg class="i"><use href="#i-search"/></svg></button></div>
+  <nav class="nav" data-s="nav">
+    <a href="#home" data-s="nav-home"><svg class="i"><use href="#i-home"/></svg><span>Home</span></a>
+    <a href="#project" data-s="nav-projects"><svg class="i"><use href="#i-folder"/></svg><span>Projects</span><span class="meta" data-when="full">5</span></a>
+    <a href="#handbook" data-s="nav-handbook"><svg class="i"><use href="#i-book"/></svg><span>Handbook</span></a>
+    <a href="#library" data-s="nav-library" data-soon="Snippet library arrives in session 3"><svg class="i"><use href="#i-layers"/></svg><span>Library</span></a>
+  </nav>
+  <nav class="nav" data-s="nav-recent" data-when="full" aria-label="Recent projects">
+    <div class="nav-label">Recent</div>
+    <a href="#project" data-s="nav-rover" data-pid="rover"><span class="dot rob"></span><span>Rover-01</span></a>
+    <a href="#project" data-s="nav-kedai" data-pid="kedai"><span class="dot app"></span><span>Kedai</span></a>
+    <a href="#project" data-s="nav-plant" data-pid="plant"><span class="dot rob"></span><span>Plant monitor</span></a>
+  </nav>
+  <div class="side-foot">
+    <div class="mini-spend" data-s="mini-spend" tabindex="0" aria-describedby="spendPop">
+      <div class="row"><span class="muted">Haiku · Nov</span><b class="num"><span data-when="full loading error">RM1.71</span><span data-when="empty">RM0.00</span> / 10</b></div>
+      <div class="meter seg-meter" data-when="full loading error" aria-hidden="true"><i style="width:13.5%;background:#0A84FF"></i><i style="width:3.2%;background:#30D158"></i><i style="width:.2%;background:#FF9F0A"></i><i style="width:.2%;background:#BF5AF2"></i></div>
+      <div class="meter" data-when="empty"><i style="width:0%"></i></div>
+      <div class="spend-pop" id="spendPop" role="tooltip" data-s="spend-pop">
+        <div class="head"><h3>Haiku spend</h3><span class="chip">November</span></div>
+        <div data-when="full loading error">
+          <div class="big num" data-s="spend-total"><span id="spendNum">RM1.71</span> <small>of RM10</small></div>
+          <div class="meter seg-meter" aria-hidden="true"><i style="width:13.5%;background:#0A84FF"></i><i style="width:3.2%;background:#30D158"></i><i style="width:.2%;background:#FF9F0A"></i><i style="width:.2%;background:#BF5AF2"></i></div>
+          <div class="small muted">RM8.29 left · resets 1 Dec · warns at RM7</div>
+          <dl data-s="spend-breakdown">
+            <dt><i class="dot" style="background:#0A84FF"></i>Docs answers</dt><dd class="num">612</dd><dd class="rm num">RM1.35</dd>
+            <dt><i class="dot" style="background:#30D158"></i>Commit messages</dt><dd class="num">241</dd><dd class="rm num">RM0.32</dd>
+            <dt><i class="dot" style="background:#FF9F0A"></i>Parts suggestions</dt><dd class="num">9</dd><dd class="rm num">RM0.02</dd>
+            <dt><i class="dot" style="background:#BF5AF2"></i>Weekly review</dt><dd class="num">2</dd><dd class="rm num">RM0.02</dd>
+          </dl>
+          <div class="note"><svg class="i" style="color:var(--green)"><use href="#i-check-c"/></svg>Cache answered 188 questions for free.</div>
+        </div>
+        <p class="small muted" data-when="empty">No Haiku calls yet this month. Docs answers and commit messages show up here.</p>
+      </div>
+    </div>
+    <div class="engine" data-s="engine">
+      <span class="dot ok on-ok"></span><span class="on-ok">Engine · :8765</span>
+      <span class="dot bad off"></span><span class="off" style="color:var(--red-text)">Engine offline</span>
+      <button class="btn ghost sm" data-s="theme-btn" id="themeBtn" aria-label="Toggle dark mode"><svg class="i"><use href="#i-moon"/></svg></button>
+    </div>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ================= HOME ================= -->
+<section class="route page" id="home" data-route="#home" data-s="home" aria-label="Home">
+  <header class="toolbar rise" data-s="home-toolbar">
+    <div class="titles">
+      <div class="eyebrow" data-s="home-date">Saturday, 14 November</div>
+      <h1 data-s="home-title">Today</h1>
+    </div>
+    <a class="btn primary glow" href="#new" data-s="home-new"><svg class="i"><use href="#i-plus"/></svg>New project</a>
+  </header>
+
+  <div class="banner bad rise" data-when="error" data-s="home-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span>Can't reach the engine on localhost:8765. Start it with <code>python -m engine</code>, then retry.</span>
+    <button class="btn sm" data-toast="Engine is back. Everything is synced." data-s="home-retry"><svg class="i"><use href="#i-refresh"/></svg>Retry</button>
+  </div>
+
+  <!-- empty: first launch -->
+  <div class="card rise" data-when="empty" data-s="home-empty">
+    <div class="empty">
+      <div class="art"><svg class="i"><use href="#i-folder"/></svg></div>
+      <h2>Start your first project</h2>
+      <p class="muted">Pick Robotics or App development. The hub sets up the folder, files and git in under five minutes.</p>
+      <a class="btn primary" href="#new" data-s="home-empty-cta"><svg class="i"><use href="#i-plus"/></svg>New project</a>
+    </div>
+  </div>
+
+  <div class="home-grid" data-when="full loading error">
+    <div style="display:flex;flex-direction:column;gap:24px;min-width:0">
+      <!-- today -->
+      <section class="rise" style="--d:40ms" data-s="today">
+        <div class="sec-head"><h2>Today's tasks</h2><span class="muted small num" data-s="today-count" data-when="full">1 of 5 done</span></div>
+        <div class="today-bar" data-when="full" data-s="today-bar" role="progressbar" aria-label="Today's progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="1"><i id="todayBar" style="transform:scaleX(.2)"></i></div>
+        <div class="all-done" id="allDone" data-when="full" data-s="all-done" hidden aria-live="polite">
+          <span class="badge"><svg class="i"><use href="#i-check"/></svg></span>
+          <span>All 5 done for today. Nice work.<small>Rover-01 and Kedai both moved forward.</small></span>
+        </div>
+        <div class="card" data-when="loading">
+          <div style="padding:14px 18px;display:flex;flex-direction:column;gap:16px">
+            <div class="sk" style="height:14px;width:62%"></div><div class="sk" style="height:14px;width:48%"></div><div class="sk" style="height:14px;width:70%"></div>
+          </div>
+        </div>
+        <div class="card" data-when="error"><p class="muted" style="padding:18px 20px">Tasks will show once the engine is running.</p></div>
+        <ul class="card tasks" data-when="full" data-s="today-list">
+          <li class="task" data-s="task-1" data-p="rover"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Add 1k/2k divider on ECHO</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-2" data-p="rover"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Calibrate HC-SR04 distance offset</b><span><i class="dot rob"></i>Rover-01</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-3" data-p="kedai"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Wire Supabase auth into the login screen</b><span><i class="dot app"></i>Kedai</span></div><span class="due today">Today</span></li>
+          <li class="task" data-s="task-4" data-p="kedai"><button class="check" aria-label="Mark done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Fix splash screen flicker on Android</b><span><i class="dot app"></i>Kedai</span></div><span class="due late">Overdue · Thu</span></li>
+          <li class="task done" data-s="task-5" data-p="plant"><button class="check" aria-label="Mark not done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button><div class="t"><b>Log water-level sensor drift</b><span><i class="dot rob"></i>Plant monitor</span></div><span class="due">Done</span></li>
+        </ul>
+      </section>
+
+      <!-- recent projects -->
+      <section class="rise" style="--d:90ms" data-s="recent">
+        <div class="sec-head">
+          <h2>Recent projects</h2>
+          <div class="filters" role="group" aria-label="Filter by type" data-s="filters" data-when="full">
+            <button class="fchip" aria-pressed="true" data-f="all">All</button>
+            <button class="fchip" aria-pressed="false" data-f="rob">Robotics</button>
+            <button class="fchip" aria-pressed="false" data-f="app">Apps</button>
+          </div>
+        </div>
+        <div class="projects" data-when="loading">
+          <div class="card pad"><div class="sk" style="height:36px;width:36px;border-radius:10px"></div><div class="sk" style="height:12px;width:70%;margin-top:14px"></div><div class="sk" style="height:4px;margin-top:18px"></div></div>
+          <div class="card pad"><div class="sk" style="height:36px;width:36px;border-radius:10px"></div><div class="sk" style="height:12px;width:55%;margin-top:14px"></div><div class="sk" style="height:4px;margin-top:18px"></div></div>
+          <div class="card pad"><div class="sk" style="height:36px;width:36px;border-radius:10px"></div><div class="sk" style="height:12px;width:62%;margin-top:14px"></div><div class="sk" style="height:4px;margin-top:18px"></div></div>
+        </div>
+        <div class="projects" data-when="full error" data-s="project-grid">
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-rover" data-pid="rover">
+            <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Rover-01</b><span>ESP32 DevKit · 2WD</span></div></div>
+            <div class="bar"><i style="width:43%"></i></div>
+            <div class="foot"><span class="num">6 / 14 tasks</span><span>12 min ago</span></div>
+          </a>
+          <a href="#project" class="card proj app" data-m="app" data-s="proj-kedai" data-pid="kedai">
+            <div class="top"><div class="tile app"><svg class="i"><use href="#i-phone"/></svg></div><div><b>Kedai</b><span>Expo + Supabase</span></div></div>
+            <div class="bar"><i style="width:41%"></i></div>
+            <div class="foot"><span class="num">9 / 22 tasks</span><span>2 h ago</span></div>
+          </a>
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-plant" data-pid="plant">
+            <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Plant monitor</b><span>ESP32-C3 · sensors</span></div></div>
+            <div class="bar"><i style="width:37%"></i></div>
+            <div class="foot"><span class="num">3 / 8 tasks</span><span>Yesterday</span></div>
+          </a>
+          <a href="#project" class="card proj app" data-m="app" data-s="proj-habit" data-pid="habit">
+            <div class="top"><div class="tile app"><svg class="i"><use href="#i-phone"/></svg></div><div><b>Habit streaks</b><span>Expo</span></div></div>
+            <div class="bar"><i style="width:92%"></i></div>
+            <div class="foot"><span class="num">11 / 12 tasks</span><span>3 days ago</span></div>
+          </a>
+          <a href="#project" class="card proj rob" data-m="rob" data-s="proj-line" data-pid="line">
+            <div class="top"><div class="tile rob"><svg class="i"><use href="#i-cpu"/></svg></div><div><b>Line follower</b><span>Arduino Nano</span></div></div>
+            <div class="bar"><i style="width:100%"></i></div>
+            <div class="foot"><span class="num">7 / 7 · shipped</span><span>Last week</span></div>
+          </a>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= NEW PROJECT ================= -->
+<section class="route page" data-route="#new" data-s="new" aria-label="New project">
+  <header class="toolbar rise" data-s="new-toolbar">
+    <div class="titles">
+      <a class="eyebrow" href="#home" data-s="new-back" style="display:inline-flex;align-items:center;gap:2px"><svg class="i" style="width:14px;height:14px"><use href="#i-left"/></svg>Home</a>
+      <h1>New project</h1>
+    </div>
+  </header>
+
+  <div class="banner bad rise" data-when="error" data-s="new-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span><code>modules/app-dev/module.yaml</code> line 4: <b>color</b> is missing. Add it, then reload.</span>
+    <button class="btn sm" data-toast="Reloaded modules/ — 2 types found." data-s="new-reload"><svg class="i"><use href="#i-refresh"/></svg>Reload</button>
+  </div>
+
+  <div class="card rise" data-when="empty" data-s="new-empty">
+    <div class="empty">
+      <div class="art"><svg class="i"><use href="#i-package"/></svg></div>
+      <h2>No project types yet</h2>
+      <p class="muted">Add a folder with a <span class="mono">module.yaml</span> inside <span class="mono">modules/</span>, then reload.</p>
+      <button class="btn" data-toast="Reloaded modules/ — still empty." data-s="new-empty-reload"><svg class="i"><use href="#i-refresh"/></svg>Reload</button>
+    </div>
+  </div>
+
+  <div data-when="loading">
+    <div class="np-top"><div><div class="sk" style="height:12px;width:90px"></div><div class="sk" style="height:46px;margin-top:8px;border-radius:10px"></div></div><div><div class="sk" style="height:12px;width:40px"></div><div class="sk" style="height:54px;width:408px;max-width:100%;margin-top:8px;border-radius:12px"></div></div></div>
+    <div class="sk" style="height:14px;width:80px;margin-top:30px"></div>
+    <div class="ktiles" style="margin-top:12px"><div class="sk" style="height:60px;border-radius:12px"></div><div class="sk" style="height:60px;border-radius:12px"></div><div class="sk" style="height:60px;border-radius:12px"></div><div class="sk" style="height:60px;border-radius:12px"></div></div>
+    <p class="muted small" style="margin-top:12px">Reading modules/…</p>
+  </div>
+
+  <div data-when="full error">
+    <div class="np-top rise" style="--d:30ms">
+      <div class="field" data-s="name-field">
+        <label for="pname">Project name</label>
+        <input class="input lg" id="pname" value="Rover-02" placeholder="e.g. Rover-02" autocomplete="off" data-s="name-input">
+        <div class="path" data-s="name-path"><span style="font-family:var(--font)">Saved to </span>~/projects/<span id="slug">rover-02</span></div>
+      </div>
+      <div class="field" style="flex:none">
+        <span class="lbl" id="kindLbl">Type</span>
+        <div class="kind" role="radiogroup" aria-labelledby="kindLbl" data-s="kind">
+          <span class="kpill" aria-hidden="true"></span>
+          <button role="radio" aria-checked="false" data-kind="app" data-s="kind-app"><span class="tile app sm"><svg class="i"><use href="#i-phone"/></svg></span>App development</button>
+          <button role="radio" aria-checked="true" data-kind="rob" data-s="kind-rob"><span class="tile rob sm"><svg class="i"><use href="#i-cpu"/></svg></span>Robotics</button>
+        </div>
+        <span class="kind-err" data-when="error">App development can't load until module.yaml is fixed.</span>
+      </div>
+    </div>
+
+    <div class="presets rise" style="--d:60ms" role="group" aria-label="Presets" data-s="presets"></div>
+    <div id="pickArea" class="rise" style="--d:90ms" data-s="pick-area"></div>
+
+    <section class="np-checks" aria-label="Checks" data-s="np-checks">
+      <div class="gh"><h3>Checks</h3></div>
+      <div class="checks" id="npChecks" style="margin-top:10px"></div>
+    </section>
+
+    <div class="np-bar" data-s="np-bar">
+      <div class="sum"><b id="npSum">ESP32 DevKit V1 + 4 parts</b><span class="muted small" id="npMeta">RM40 estimated</span></div>
+      <button class="btn primary" id="npCreate" data-s="np-create">Create project</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HANDBOOK ================= -->
+<section class="route page" data-route="#handbook" data-s="handbook" aria-label="Handbook" style="max-width:1320px">
+  <header class="toolbar rise" data-s="hb-toolbar">
+    <div class="titles">
+      <div class="eyebrow">Parts, boards and stacks</div>
+      <h1>Handbook</h1>
+    </div>
+  </header>
+
+  <div class="banner bad rise" data-when="error" data-s="hb-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span><code>handbook/parts/hc-sr04.md</code> line 6: <b>pins</b> must be a list. Fix the YAML block, then reload.</span>
+    <button class="btn sm" data-toast="Chapter reloaded." data-s="hb-reload"><svg class="i"><use href="#i-refresh"/></svg>Reload</button>
+  </div>
+
+  <div class="hb">
+    <!-- toc -->
+    <nav class="card toc rise" aria-label="Chapters" data-s="toc">
+      <input class="input" placeholder="Search handbook" aria-label="Search handbook" data-s="toc-search">
+      <h4>App stacks</h4>
+      <a href="#handbook">Expo + Supabase</a><a href="#handbook">Next.js</a><a href="#handbook">Tauri</a>
+      <h4>Electronics parts</h4>
+      <a href="#handbook">ESP32 DevKit V1</a><a href="#handbook">L298N driver</a>
+      <a href="#handbook" class="on" data-s="toc-active" aria-current="page">HC-SR04 ultrasonic</a>
+      <a href="#handbook">SG90 servo</a><a href="#handbook">TT gear motor</a>
+      <h4>My notes</h4>
+      <a href="#handbook">ESP32 boot loops</a><a href="#handbook">Expo env vars</a>
+    </nav>
+
+    <!-- chapter -->
+    <article class="card chapter rise" style="--d:50ms" data-s="chapter">
+      <div data-when="loading">
+        <div class="sk" style="height:12px;width:30%"></div><div class="sk" style="height:26px;width:60%;margin-top:14px"></div>
+        <div class="sk" style="height:14px;width:85%;margin-top:18px"></div><div class="sk" style="height:14px;width:70%;margin-top:10px"></div>
+        <div class="sk" style="height:120px;margin-top:26px;border-radius:12px"></div>
+      </div>
+      <div data-when="error" class="empty"><p class="muted">This chapter can't be shown until its YAML block is fixed.</p></div>
+      <div data-when="full empty" class="ch-grid">
+        <div class="ch-main">
+          <div class="crumb">Electronics parts <svg class="i"><use href="#i-chev"/></svg> Sensors</div>
+          <h1 data-s="ch-title">HC-SR04 ultrasonic sensor</h1>
+          <p class="lead" data-s="ch-lead">Measures 2–400 cm with a sound ping. Cheap and reliable indoors; blind under 2 cm and on soft surfaces.</p>
+          <div class="facts" data-s="ch-facts"><span class="chip">Sensor</span><span class="chip">5V · 15 mA</span><span class="chip">No library</span><span class="chip ok">RM5–10</span></div>
+          <div class="callout" data-s="ch-warn"><svg class="i"><use href="#i-alert"/></svg><span>ECHO outputs 5V. On ESP32, put a 1k/2k voltage divider between ECHO and the GPIO.</span></div>
+          <div class="acts" style="margin:0 0 6px">
+            <button class="btn tinted" id="addBtn" data-s="ch-add"><svg class="i"><use href="#i-plus"/></svg>Add to Rover-01</button>
+            <button class="btn ghost" data-toast="Comparison opens in session 5." data-s="ch-compare">Compare sensors</button>
+          </div>
+
+          <h2 data-s="ch-how-h">How it works</h2>
+          <p class="body">A 10 µs pulse on TRIG fires eight 40 kHz pings. ECHO then goes HIGH until the sound bounces back, so the HIGH time is the round trip. Divide the microseconds by 58 to get centimetres.</p>
+          <figure class="timing" data-s="ch-timing" aria-label="Timing: TRIG pulses for 10 microseconds, then ECHO stays high for the echo time">
+            <svg viewBox="0 0 560 140" role="img">
+              <text x="0" y="34" class="t-lbl">TRIG</text><text x="0" y="94" class="t-lbl">ECHO</text>
+              <path class="t-low" d="M56 40 H96 V18 H124 V40 H540"/>
+              <path class="t-sig" d="M56 100 H200 V78 H420 V100 H540"/>
+              <g class="t-burst"><path d="M140 40 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8 l4 -8 l4 8"/></g>
+              <text x="110" y="12" text-anchor="middle" class="t-note">10 µs</text>
+              <text x="160" y="56" class="t-note">8 × 40 kHz pings</text>
+              <path class="t-dim" d="M200 114 H420 M200 109 V119 M420 109 V119"/>
+              <text x="310" y="134" text-anchor="middle" class="t-note">echo time (µs) ÷ 58 = cm</text>
+            </svg>
+          </figure>
+
+          <h2>Pins</h2>
+          <div class="tbl-wrap">
+          <table data-s="ch-pins">
+            <thead><tr><th>Pin</th><th>Mode</th><th>Voltage</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">VCC</td><td>Power</td><td>5V</td><td class="muted">From VIN, not 3V3</td></tr>
+              <tr><td class="mono">TRIG</td><td>Output</td><td>3.3V ok</td><td class="muted">10 µs pulse starts a ping</td></tr>
+              <tr><td class="mono">ECHO</td><td>Input</td><td><span class="chip warn">5V</span></td><td class="muted">Needs divider on 3.3V boards</td></tr>
+              <tr><td class="mono">GND</td><td>Ground</td><td>—</td><td class="muted">Share ground with the board</td></tr>
+            </tbody>
+          </table>
+          </div>
+
+          <h2>Wiring on ESP32</h2>
+          <ol class="wsteps" data-s="ch-wiring">
+            <li><span class="n">1</span><span><b>VCC → VIN</b> (5V from USB) and <b>GND → GND</b>.</span></li>
+            <li><span class="n">2</span><span><b>TRIG → GPIO 19</b>. 3.3V is enough to trigger it.</span></li>
+            <li><span class="n">3</span><span><b>ECHO → 1 kΩ → GPIO 18</b>, then <b>GPIO 18 → 2 kΩ → GND</b>. That turns 5V into a safe 3.3V.</span></li>
+          </ol>
+
+          <div class="code-card" data-s="ch-code">
+            <div class="code-head"><svg class="i" style="color:var(--label-2)"><use href="#i-code"/></svg><b>snippets/sensors/hc-sr04-read</b><button class="btn ghost sm" data-toast="Snippet copied."><svg class="i"><use href="#i-copy"/></svg>Copy</button><button class="btn sm" data-toast="Inserted at the cursor in VS Code (extension arrives in session 12).">Insert in VS Code</button></div>
+<pre><span class="k">#include</span> <span class="n">"pins.h"</span>
+
+<span class="k">const unsigned long</span> PING_EVERY_MS = <span class="n">60</span>;
+<span class="k">unsigned long</span> lastPing = <span class="n">0</span>;
+<span class="k">float</span> distanceCm = <span class="n">-1</span>;            <span class="c">// -1 = no echo yet</span>
+
+<span class="k">void</span> setupSonar() {
+  pinMode(SONAR_TRIG, OUTPUT);
+  pinMode(SONAR_ECHO, INPUT);         <span class="c">// through the 1k/2k divider</span>
+}
+
+<span class="k">void</span> updateSonar() {                <span class="c">// call every loop(), never blocks long</span>
+  <span class="k">if</span> (millis() - lastPing &lt; PING_EVERY_MS) <span class="k">return</span>;
+  lastPing = millis();
+  digitalWrite(SONAR_TRIG, HIGH);
+  delayMicroseconds(<span class="n">10</span>);
+  digitalWrite(SONAR_TRIG, LOW);
+  <span class="k">unsigned long</span> us = pulseIn(SONAR_ECHO, HIGH, <span class="n">25000</span>);  <span class="c">// 25 ms timeout</span>
+  distanceCm = us ? us / <span class="n">58.0</span> : <span class="n">-1</span>;
+}</pre>
+          </div>
+
+          <h2>Common problems</h2>
+          <div class="faq" data-s="ch-faq">
+            <div><b>Always reads -1 or 0</b><span>ECHO isn't reaching the pin. Check the divider and that GND is shared, then raise the timeout to 30 ms.</span></div>
+            <div><b>Numbers jump around</b><span>Take three readings and use the middle one. Keep it 5 cm or more from the chassis edge.</span></div>
+            <div><b>Misses soft or angled objects</b><span>Sound gets absorbed or bounces away. Aim it straight, or add an IR sensor for close range.</span></div>
+          </div>
+        </div>
+
+        <aside class="ch-rail" data-s="ch-rail" aria-label="At a glance">
+          <div class="rbox">
+            <h3>At a glance</h3>
+            <dl class="spec">
+              <dt>Range</dt><dd>2–400 cm</dd>
+              <dt>Accuracy</dt><dd>±3 mm</dd>
+              <dt>Beam angle</dt><dd>15°</dd>
+              <dt>Frequency</dt><dd>40 kHz</dd>
+              <dt>Supply</dt><dd>5V · 15 mA</dd>
+              <dt>Max rate</dt><dd>~16 reads/s</dd>
+              <dt>Price</dt><dd>RM5–10</dd>
+            </dl>
+          </div>
+          <div class="rbox">
+            <h3>Used in</h3>
+            <a class="used" href="#project"><span class="dot rob"></span>Rover-01<span class="muted small">ECHO on GPIO 18</span></a>
+          </div>
+          <div class="rbox">
+            <h3>Docs</h3>
+            <a class="doc" href="https://www.arduino.cc/reference/en/language/functions/advanced-io/pulsein/" target="_blank" rel="noopener">Arduino · pulseIn()<svg class="i"><use href="#i-chev"/></svg></a>
+            <a class="doc" href="https://randomnerdtutorials.com/esp32-hc-sr04-ultrasonic-arduino/" target="_blank" rel="noopener">Random Nerd Tutorials · ESP32 + HC-SR04<svg class="i"><use href="#i-chev"/></svg></a>
+            <a class="doc" href="https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf" target="_blank" rel="noopener">Datasheet (PDF)<svg class="i"><use href="#i-chev"/></svg></a>
+          </div>
+          <div class="rbox">
+            <h3>Related parts</h3>
+            <div class="rel"><span class="g" style="background:#1F6F8B">ToF</span><span><b>VL53L0X</b><small>Laser, 3.3V, 2 m · RM15</small></span></div>
+            <div class="rel"><span class="g" style="background:#0E7490">WP</span><span><b>JSN-SR04T</b><small>Waterproof ultrasonic · RM22</small></span></div>
+            <div class="rel"><span class="g" style="background:#7C3AED">IR</span><span><b>Sharp GP2Y0A21</b><small>IR, 10–80 cm · RM18</small></span></div>
+          </div>
+        </aside>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= PROJECT ================= -->
+<section class="route page" data-route="#project" data-s="project" aria-label="Project">
+  <header class="p-head rise" data-s="p-head">
+    <div class="tile rob lg"><svg class="i"><use href="#i-cpu"/></svg></div>
+    <div class="titles">
+      <h1 data-s="p-title">Rover-01</h1>
+      <div class="meta" data-s="p-meta"><span class="chip rob">Robotics</span><span class="chip">ESP32 DevKit V1</span><span class="chip mono" style="font-weight:500">~/projects/rover-01</span><span class="chip" data-when="full empty"><svg class="i" style="width:12px;height:12px"><use href="#i-git"/></svg>main · 2 changes</span></div>
+    </div>
+    <div class="menu-wrap" data-s="p-more">
+      <button class="btn ghost" id="moreBtn" aria-haspopup="menu" aria-expanded="false" aria-label="More launch options"><svg class="i"><use href="#i-more"/></svg></button>
+      <div class="menu" id="moreMenu" role="menu">
+        <button role="menuitem" data-toast="Opening Arduino IDE…"><svg class="i"><use href="#i-cpu"/></svg>Open in Arduino IDE</button>
+        <button role="menuitem" data-toast="Terminal opened in ~/projects/rover-01"><svg class="i"><use href="#i-terminal"/></svg>Open terminal</button>
+        <button role="menuitem" data-toast="Claude Code started in ~/projects/rover-01"><svg class="i"><use href="#i-terminal"/></svg>Open Claude Code here</button>
+      </div>
+    </div>
+    <button class="btn primary" data-toast="Opening Rover-01 in VS Code…" data-s="p-vscode" data-when="full empty loading"><svg class="i"><use href="#i-code"/></svg>Open in VS Code</button>
+  </header>
+
+  <div class="banner bad rise" data-when="error" data-s="p-error">
+    <svg class="i"><use href="#i-x-c"/></svg>
+    <span>Folder <code>~/projects/rover-01</code> not found. It was moved or renamed. Point the hub to its new place.</span>
+    <button class="btn sm" data-toast="Folder picker opens on desktop." data-s="p-locate">Locate folder</button>
+  </div>
+
+  <div class="seg rise" style="--d:40ms" role="tablist" aria-label="Project sections" data-s="tabs" data-when="full empty loading">
+    <span class="pill" aria-hidden="true"></span>
+    <button role="tab" aria-selected="true" data-tab="tasks" data-s="tab-tasks">Tasks</button>
+    <button role="tab" aria-selected="false" data-tab="wiring" data-s="tab-wiring">Wiring</button>
+    <button role="tab" aria-selected="false" data-tab="parts" data-s="tab-parts">Parts</button>
+  </div>
+
+  <!-- TASKS -->
+  <div class="tab on rise" style="--d:80ms" data-tab-panel="tasks" data-when="full empty loading">
+    <div class="board" data-when="loading">
+      <div class="card col"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:54px;margin-top:14px"></div><div class="sk" style="height:54px;margin-top:8px"></div></div>
+      <div class="card col"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:54px;margin-top:14px"></div></div>
+      <div class="card col"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:54px;margin-top:14px"></div></div>
+    </div>
+    <div class="card" data-when="empty" data-s="tasks-empty">
+      <div class="empty">
+        <div class="art"><svg class="i"><use href="#i-check-c"/></svg></div>
+        <h2>No tasks yet</h2>
+        <p class="muted">The setup checklist lands here after the wizard runs. Add your own any time.</p>
+        <button class="btn" data-toast="New task added to To do." data-s="tasks-empty-add"><svg class="i"><use href="#i-plus"/></svg>Add task</button>
+      </div>
+    </div>
+    <div class="board" data-when="full" data-s="kanban">
+      <div class="card col" data-s="col-todo">
+        <div class="col-head"><h3>To do</h3><span class="count">3</span></div>
+        <div class="kcard" data-s="k-divider"><b>Add 1k/2k divider on ECHO</b><div class="r"><span class="due today">Today</span>· from check</div></div>
+        <div class="kcard" data-s="k-servo"><b>Move servo to GPIO 13</b><div class="r"><span class="due today">Today</span>· from check</div></div>
+        <div class="kcard" data-s="k-order"><b>Order 18650 2S holder + BMS</b><div class="r"><span class="due">Mon 16 Nov</span>· RM14</div></div>
+        <button class="btn ghost sm" style="width:100%" data-toast="New task added to To do." data-s="todo-add"><svg class="i"><use href="#i-plus"/></svg>Add task</button>
+      </div>
+      <div class="card col" data-s="col-doing">
+        <div class="col-head"><h3>Doing</h3><span class="count">2</span></div>
+        <div class="kcard" data-s="k-calib"><b>Calibrate HC-SR04 distance offset</b><div class="r"><span class="due today">Today</span></div></div>
+        <div class="kcard" data-s="k-pwm"><b>Tune left/right PWM so it drives straight</b><div class="r"><span class="due">Tue 17 Nov</span></div></div>
+      </div>
+      <div class="card col" data-s="col-done">
+        <div class="col-head"><h3>Done</h3><span class="count">6</span></div>
+        <div class="kcard done" data-s="k-pins"><b>Generate pins.h from wiring</b><div class="r"><svg class="i" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg>Thu</div></div>
+        <div class="kcard done" data-s="k-mount"><b>Mount L298N on the chassis</b><div class="r"><svg class="i" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg>Wed</div></div>
+        <div class="kcard done" data-s="k-blink"><b>Flash blink test over CP210x</b><div class="r"><svg class="i" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg>Tue</div></div>
+        <button class="btn ghost sm" style="width:100%" data-toast="Showing all 6 done tasks." data-s="done-more">Show 3 more</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIRING -->
+  <div class="tab" data-tab-panel="wiring" data-when="full empty loading">
+    <div class="card" data-when="loading" style="padding:20px"><div class="sk" style="height:260px;border-radius:12px"></div></div>
+    <div class="card" data-when="empty" data-s="wiring-empty">
+      <div class="empty">
+        <div class="art"><svg class="i"><use href="#i-cpu"/></svg></div>
+        <h2>No wires yet</h2>
+        <p class="muted">Add parts in the cart, then drag from a part pin to a board pin. pins.h updates as you go.</p>
+        <a class="btn" href="#handbook" data-s="wiring-empty-cart"><svg class="i"><use href="#i-bag"/></svg>Open cart</a>
+      </div>
+    </div>
+    <div data-when="full">
+      <div class="wiring">
+        <div class="card diagram" id="diagram" data-s="diagram">
+          <div class="stage-wrap" id="stageWrap" role="img" aria-label="Wiring diagram: ESP32 DevKit V1 wired to an L298N motor driver, HC-SR04 sensor and SG90 servo">
+            <div class="stage" id="stage">
+              <svg class="l298n" style="left:14px;top:96px" width="160" height="150" viewBox="0 0 160 150" aria-hidden="true">
+                <rect x="1" y="1" width="150" height="148" rx="6" fill="#B71C1C" stroke="#7F1212"/>
+                <rect x="34" y="8" width="70" height="54" rx="3" fill="#1F2933"/>
+                <g fill="#2E3A46"><rect x="38" y="12" width="5" height="46"/><rect x="47" y="12" width="5" height="46"/><rect x="56" y="12" width="5" height="46"/><rect x="65" y="12" width="5" height="46"/><rect x="74" y="12" width="5" height="46"/><rect x="83" y="12" width="5" height="46"/><rect x="92" y="12" width="5" height="46"/></g>
+                <rect x="8" y="16" width="18" height="34" rx="2" fill="#1565C0"/><rect x="8" y="98" width="18" height="34" rx="2" fill="#1565C0"/><rect x="40" y="118" width="46" height="22" rx="2" fill="#1565C0"/>
+                <g fill="#90A4AE"><circle cx="17" cy="25" r="4"/><circle cx="17" cy="41" r="4"/><circle cx="17" cy="107" r="4"/><circle cx="17" cy="123" r="4"/><circle cx="51" cy="129" r="4"/><circle cx="63" cy="129" r="4"/><circle cx="75" cy="129" r="4"/></g>
+                <rect x="40" y="72" width="16" height="10" rx="1" fill="#111"/><rect x="62" y="72" width="22" height="22" rx="2" fill="#263238"/>
+                <text x="70" y="104" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="11" font-weight="700">L298N</text>
+                <rect x="140" y="20" width="12" height="114" rx="2" fill="#111"/>
+                <g fill="#D4AF37"><rect x="143" y="27" width="6" height="6"/><rect x="143" y="47" width="6" height="6"/><rect x="143" y="67" width="6" height="6"/><rect x="143" y="87" width="6" height="6"/><rect x="143" y="107" width="6" height="6"/><rect x="143" y="127" width="6" height="6" transform="translate(0,-4)"/></g>
+                <g fill="#FFE0E0" font-family="ui-monospace,monospace" font-size="8" text-anchor="end"><text x="136" y="33">ENA</text><text x="136" y="53">IN1</text><text x="136" y="73">IN2</text><text x="136" y="93">IN3</text><text x="136" y="113">IN4</text><text x="136" y="129">ENB</text></g>
+              </svg>
+              <wokwi-esp32-devkit-v1 style="left:260px;top:24px;transform:scale(1.4);transform-origin:0 0"></wokwi-esp32-devkit-v1>
+              <wokwi-hc-sr04 style="left:450px;top:20px"></wokwi-hc-sr04>
+              <wokwi-servo style="left:462px;top:196px" angle="90"></wokwi-servo>
+              <svg class="wires" id="wires" viewBox="0 0 640 340" aria-hidden="true"></svg>
+            </div>
+            <p class="diag-note" id="diagNote" hidden>Couldn’t load the part drawings. The pin table and pins.h still update.</p>
+          </div>
+          <p class="small muted" style="padding:8px 6px 2px">Dashed wires need attention. Click a row to trace its wire. Parts drawn with Wokwi Elements (MIT).</p>
+        </div>
+        <div class="card" style="overflow:hidden" data-s="pin-table">
+          <table>
+            <thead><tr><th>Signal</th><th>Part pin</th><th>GPIO</th><th>Check</th></tr></thead>
+            <tbody id="pinRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card code" data-s="pins-h">
+        <div class="code-head"><svg class="i" style="color:var(--label-2)"><use href="#i-code"/></svg><b>include/pins.h</b><span class="chip" id="pinsStamp">AUTO-GENERATED · 2 min ago</span><button class="btn ghost sm" data-toast="pins.h copied." aria-label="Copy pins.h"><svg class="i"><use href="#i-copy"/></svg></button></div>
+<pre id="pinsH"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTS -->
+  <div class="tab" data-tab-panel="parts" data-when="full empty loading">
+    <div class="card" data-when="loading" style="padding:20px"><div class="sk" style="height:14px;width:40%"></div><div class="sk" style="height:14px;margin-top:16px"></div><div class="sk" style="height:14px;margin-top:12px"></div><div class="sk" style="height:14px;margin-top:12px"></div></div>
+    <div class="card" data-when="empty" data-s="parts-empty">
+      <div class="empty">
+        <div class="art"><svg class="i"><use href="#i-bag"/></svg></div>
+        <h2>No parts listed</h2>
+        <p class="muted">Pick a board and parts in the cart. They show here with prices and order status.</p>
+        <a class="btn" href="#handbook" data-s="parts-empty-cart"><svg class="i"><use href="#i-bag"/></svg>Open cart</a>
+      </div>
+    </div>
+    <div data-when="full" class="parts-full">
+      <div class="card pad cost" data-s="cost">
+        <div class="cost-row">
+          <div><span class="lbl">Estimated total</span><b class="num" id="costTotal">RM74</b></div>
+          <div><span class="lbl"><i class="dot ok"></i>In hand</span><b class="num" id="costHave">RM58</b></div>
+          <div><span class="lbl"><i class="dot" style="background:var(--amber)"></i>Ordered</span><b class="num" id="costOrd">RM7</b></div>
+          <div><span class="lbl"><i class="dot bad"></i>Still to buy</span><b class="num" id="costNeed">RM15</b></div>
+        </div>
+        <div class="cost-bar" aria-hidden="true"><i class="have"></i><i class="ord"></i><i class="need"></i></div>
+      </div>
+      <div class="card" style="overflow:hidden" data-s="parts-table">
+        <table>
+          <thead><tr><th>Part</th><th>Qty</th><th>Status</th><th style="text-align:right">Price</th><th><span class="sr-only">Remove</span></th></tr></thead>
+          <tbody id="partsBody"></tbody>
+        </table>
+      </div>
+      <section class="addparts" data-s="add-parts">
+        <div class="gh"><h2>Add components</h2><span class="muted small">Tick what you need, then add them to Rover-01. Hover a tile for what it’s good for.</span></div>
+        <div class="ap-grid">
+          <div id="catArea"></div>
+          <aside class="sel-win" data-s="selection" aria-label="Selected components">
+            <div class="sw-head"><h3>Selected</h3><span class="chip num" id="selCount">0</span></div>
+            <div id="selList" class="sw-list"></div>
+            <div id="selChecks" class="checks"></div>
+            <div class="sw-foot"><div><span class="muted small">Adds to the total</span><b class="num" id="selTotal">RM0</b></div><button class="btn primary" id="selAdd" disabled data-s="sel-add">Add to project</button></div>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIBRARY stub ================= -->
+<section class="route page" data-route="#library" aria-label="Library">
+  <div class="card rise"><div class="empty"><div class="art"><svg class="i"><use href="#i-layers"/></svg></div><h2>Snippet library</h2><p class="muted">Arrives in session 3: tags, search and quick capture.</p><a class="btn" href="#home">Back home</a></div></div>
+</section>
+</main>
+
+<!-- command bar -->
+<div class="scrim" id="scrim" aria-hidden="true">
+  <div class="cmdk" role="dialog" aria-modal="true" aria-label="Command bar" data-s="cmdk">
+    <input id="cmdkInput" placeholder="Jump to a project, chapter or action…" aria-label="Command">
+    <ul id="cmdkList">
+      <li class="grp">Projects</li>
+      <li data-go="#project"><span class="dot rob"></span>Rover-01<span>Robotics</span></li>
+      <li data-go="#project"><span class="dot app"></span>Kedai<span>App</span></li>
+      <li class="grp">Handbook</li>
+      <li data-go="#handbook"><svg class="i"><use href="#i-book"/></svg>HC-SR04 ultrasonic<span>Parts</span></li>
+      <li data-go="#handbook"><svg class="i"><use href="#i-book"/></svg>Expo + Supabase<span>Stacks</span></li>
+      <li class="grp">Actions</li>
+      <li data-go="#new"><svg class="i"><use href="#i-plus"/></svg>New project<span>Ctrl N</span></li>
+      <li data-go="#home"><svg class="i"><use href="#i-home"/></svg>Go home<span></span></li>
+    </ul>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* toasts */
+const toast=msg=>{const t=document.createElement('div');t.className='toast';t.innerHTML='<svg class="i"><use href="#i-check-c"/></svg>';t.append(msg);$('#toasts').append(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),160)},2400)};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-toast]');if(b){toast(b.dataset.toast);closeMenu()}});
+
+/* theme */
+const themeBtn=$('#themeBtn');
+const syncTheme=()=>{const d=document.documentElement.dataset.theme==='dark';themeBtn.innerHTML=`<svg class="i"><use href="#i-${d?'sun':'moon'}"/></svg>`;themeBtn.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode')};
+themeBtn.onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('wh-theme',r.dataset.theme)}catch(e){};syncTheme()};
+syncTheme();
+
+/* router */
+const route=()=>{const h=location.hash||'#home';
+  $$('.route').forEach(s=>{const on=s.dataset.route===h;if(on&&!s.classList.contains('on')){s.classList.add('on');if(!s.dataset.v){s.dataset.v=1;stagger(s)}else s.classList.add('seen')}else if(!on)s.classList.remove('on')});
+  if(!$$('.route').some(s=>s.dataset.route===h)){location.hash='#home';return}
+  $$('.nav a').forEach(a=>a.toggleAttribute('aria-current',false));
+  const cur=$(`.nav a[href="${h}"]`);if(cur)cur.setAttribute('aria-current','page');
+  $('#main').scrollTop=0;closeMenu();if(h==='#project')requestAnimationFrame(movePill);if(h==='#new')requestAnimationFrame(moveKpill);};
+
+/* count-up for the spend figure, first time the breakdown opens (skipped under reduced motion) */
+const ms=document.querySelector('.mini-spend');['mouseenter','focus'].forEach(ev=>ms.addEventListener(ev,()=>{if(!countUp.done){countUp.done=1;setTimeout(countUp,90)}}));
+const countUp=()=>{const el=$('#spendNum'),end=1.71;if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent='RM'+end.toFixed(2);return}
+  const t0=performance.now(),dur=650;const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent='RM'+(end*e).toFixed(2);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)};
+addEventListener('hashchange',route);
+
+/* non-uniform stagger for list items inside the page entrance */
+const stagger=sec=>{$$('.task,.proj,.kcard,.kt',sec).forEach((el,i)=>{el.style.animation='none';void el.offsetWidth;
+  el.style.animation=`rise 220ms var(--ease-out) both ${Math.round(50+30*Math.pow(i,.8))}ms`;el.addEventListener('animationend',()=>el.style.animation='',{once:true})})};
+
+/* library stub keeps toast */
+$$('[data-soon]').forEach(a=>a.addEventListener('click',()=>toast(a.dataset.soon)));
+
+/* today tasks */
+const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SPARK=['#30D158','#0A84FF','#FF9F0A','#FF375F','#BF5AF2','#FFD60A'];
+/* burst of sparks from an element's centre: transform + opacity only, removed when done */
+const burst=(el,n=10,dist=30)=>{if(calm())return;const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(let i=0;i<n;i++){const s=document.createElement('i');s.className='spark'+(i%2?' bar':'');s.style.background=SPARK[i%SPARK.length];
+    s.style.left=cx-3+'px';s.style.top=cy-3+'px';document.body.append(s);
+    const a=(i/n)*Math.PI*2+Math.random()*.5,d=dist*(.7+Math.random()*.6),x=Math.cos(a)*d,y=Math.sin(a)*d,rot=Math.random()*240-120;
+    s.animate([{transform:'translate(0,0) scale(.6) rotate(0deg)',opacity:1},{transform:`translate(${x}px,${y}px) scale(1) rotate(${rot}deg)`,opacity:1,offset:.55},
+      {transform:`translate(${x*1.15}px,${y*1.15+8}px) scale(.4) rotate(${rot*1.4}deg)`,opacity:0}],{duration:560+Math.random()*120,easing:'cubic-bezier(.23,1,.32,1)'}).onfinish=()=>s.remove()}};
+let wasAll=false;
+const countDone=()=>{const all=$$('#home .task'),d=all.filter(t=>t.classList.contains('done')).length;
+  $('[data-s="today-count"]').textContent=`${d} of ${all.length} done`;
+  $('#todayBar').style.transform=`scaleX(${d/all.length})`;$('[data-s="today-bar"]').setAttribute('aria-valuenow',d);
+  const isAll=d===all.length,box=$('#allDone');box.hidden=!isAll;
+  if(isAll&&!wasAll)setTimeout(()=>burst(box.querySelector('.badge'),18,56),120);wasAll=isAll;if(typeof updateBadges==='function')updateBadges()};
+$$('#home .task .due').forEach(d=>d.dataset.orig=d.textContent);
+$$('#home .task .check').forEach(c=>c.onclick=()=>{const t=c.closest('.task'),done=t.classList.toggle('done'),due=$('.due',t);
+  due.textContent=done?'Done':(due.dataset.orig==='Done'?'Today':due.dataset.orig);
+  c.setAttribute('aria-label',done?'Mark not done':'Mark done');
+  c.getAnimations().forEach(a=>a.cancel());t.getAnimations().forEach(a=>a.cancel());
+  if(done&&!calm()){
+    c.animate([{transform:'scale(.82)'},{transform:'scale(1.14)',offset:.45},{transform:'scale(1)'}],{duration:320,easing:'cubic-bezier(.23,1,.32,1)'});
+    t.animate([{backgroundColor:'var(--green-tint)'},{backgroundColor:'transparent'}],{duration:700,easing:'ease-out'});
+    burst(c)}
+  countDone()});
+
+/* badges: count each project's open tasks due today; red if any is overdue */
+const prevCount={};
+const updateBadges=()=>{const open={},late={};
+  $$('#home .task').forEach(t=>{if(t.classList.contains('done'))return;const p=t.dataset.p;open[p]=(open[p]||0)+1;if($('.due.late',t))late[p]=1});
+  $$('.proj[data-pid]').forEach(card=>{const p=card.dataset.pid,n=open[p]||0,tile=$('.tile',card);
+    let b=$('.pbadge',tile);if(!b){b=document.createElement('span');b.className='pbadge off';b.setAttribute('role','img');tile.append(b)}
+    let line=$('.due-line',card);if(!line){line=document.createElement('span');line.className='due-line';$('.top div:last-child',card).append(line)}
+    const label=n?`${n} task${n>1?'s':''} due${late[p]?', 1 overdue':' today'}`:'';
+    b.classList.toggle('late',!!late[p]);b.setAttribute('aria-label',label);if(n)b.textContent=n;b.classList.toggle('off',!n);
+    line.textContent=n?(late[p]?'Overdue task':`${n} due today`):'';line.classList.toggle('late',!!late[p]);line.hidden=!n;
+    if(prevCount[p]!==undefined&&n&&n<prevCount[p]&&!calm())b.animate([{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(.23,1,.32,1)'});
+    prevCount[p]=n});
+  $$('.nav a[data-pid]').forEach(a=>{const p=a.dataset.pid,n=open[p]||0;let c=$('.cnt',a);
+    if(!c){c=document.createElement('span');c.className='cnt';a.append(c)}c.textContent=n;c.hidden=!n;c.classList.toggle('late',!!late[p]);
+    c.setAttribute('aria-label',n?`${n} open`:'')})};
+updateBadges();
+
+/* filters */
+$$('.fchip').forEach(f=>f.onclick=()=>{$$('.fchip').forEach(x=>x.setAttribute('aria-pressed',x===f));
+  $$('.proj').forEach(p=>p.hidden=f.dataset.f!=='all'&&p.dataset.m!==f.dataset.f)});
+
+/* ---------- new project: kits, tiles, tooltip, checks ---------- */
+const KITS={
+ app:{groups:[
+  {id:'fw',title:'Framework',hint:'Pick one',one:true,items:[
+   {id:'expo',name:'Expo',sub:'React Native · Android + iOS',g:'EX',c:'#4F46E5',good:'Phone apps for Android and iOS from one codebase. Test instantly on your phone with Expo Go.',watch:'Custom native modules need a dev build.',meta:'Free'},
+   {id:'next',name:'Next.js',sub:'React · web apps and sites',g:'NX',c:'#1D1D1F',good:'Websites and web apps that need fast pages and SEO: dashboards, stores, landing pages.',watch:'Not for offline phone apps.',meta:'Free'},
+   {id:'tauri',name:'Tauri',sub:'Rust + web UI · desktop',g:'TA',c:'#E8A33D',good:'Small, fast desktop apps for Windows, macOS and Linux, with a web UI and a Rust core.',watch:'Needs the Rust toolchain installed.',meta:'Free'}]},
+  {id:'be',title:'Backend',hint:'Pick one, or none',one:true,optional:true,items:[
+   {id:'supabase',name:'Supabase',sub:'Postgres · auth · storage',g:'SB',c:'#249361',good:'Sign-in, a real Postgres database and file storage on a free tier. Realtime updates built in.',watch:'Needs internet; keys live in .env.',meta:'Free tier'},
+   {id:'firebase',name:'Firebase',sub:'Realtime sync · push',g:'FB',c:'#F57C00',good:'Quick auth, realtime sync between phones and push notifications.',watch:'NoSQL data is harder to query; Google lock-in.',meta:'Free tier'},
+   {id:'sqlite',name:'Local SQLite',sub:'On-device · offline',g:'SQ',c:'#0F80CC',good:'Offline-first apps with no account or server. Data stays on the device.',watch:'No sync between devices.',meta:'Free'}]},
+  {id:'ex',title:'Extras',hint:'Tick any',items:[
+   {id:'router',name:'Expo Router',sub:'File-based navigation',g:'ER',c:'#6366F1',only:'expo',good:'Screens from files in app/, with deep links and typed routes for free.',watch:'Expo only.',meta:'Free'},
+   {id:'nativewind',name:'NativeWind',sub:'Tailwind for React Native',g:'NW',c:'#0EA5E9',only:'expo',good:'Style with Tailwind classes; your design tokens map straight in.',watch:'Expo only. Some web-only classes do nothing.',meta:'Free'},
+   {id:'zustand',name:'Zustand',sub:'Tiny state store',g:'ZU',c:'#8B5A2B',good:'Shared app state in a few lines, without Redux boilerplate.',watch:'Not a data-fetching cache.',meta:'Free'},
+   {id:'eas',name:'EAS Build',sub:'Cloud APK / IPA builds',g:'EA',c:'#334155',only:'expo',good:'Build store-ready APKs and iOS apps in the cloud, no Mac needed.',watch:'Expo only. Free plan has a build queue.',meta:'Free plan'}]}],
+  presets:[{name:'Expo + Supabase app',ids:['expo','supabase','router','nativewind']},{name:'Desktop tool',ids:['tauri','sqlite','zustand']}]},
+ rob:{groups:[
+  {id:'board',title:'Board',hint:'Pick one',one:true,items:[
+   {id:'esp32',name:'ESP32 DevKit V1',sub:'Wi-Fi + BLE · 3.3V',g:'E32',c:'#1F3A5F',price:25,good:'The best all-rounder: Wi-Fi, Bluetooth, lots of PWM pins and plenty of speed for robots.',watch:'3.3V logic. GPIO 0, 2, 12 and 15 are strapping pins.'},
+   {id:'nano',name:'Arduino Nano',sub:'5V · breadboard size',g:'NA',c:'#00878A',price:18,good:'Small 5V board that plugs into a breadboard. Simple and beginner-friendly.',watch:'No wireless and only 2 KB of RAM.'},
+   {id:'uno',name:'Arduino Uno',sub:'5V · shields',g:'UNO',c:'#0E7C86',price:35,good:'Learning and prototyping with shields and 5V sensors.',watch:'Large, and no wireless.'},
+   {id:'c3',name:'ESP32-C3 Super Mini',sub:'Tiny · Wi-Fi + BLE',g:'C3',c:'#334155',price:15,good:'Tiny, cheap wireless sensor nodes that sip power.',watch:'Fewer pins than the DevKit.'}]}],
+  presets:[]}};
+/* parts catalog for the project Parts tab (price is per unit) */
+const CAT=[
+ {id:'motion',title:'Motors and drivers',items:[
+  {id:'l298n',name:'L298N driver',sub:'2 DC motors · 2 A',g:'DRV',c:'#B91C1C',price:9,good:'Driving two DC motors forward and back with speed control.',watch:'Drops about 2V and runs warm.'},
+  {id:'tt',name:'TT gear motor',sub:'With wheel · 3–6V',g:'TT',c:'#CA8A04',price:6,good:'Cheap wheels for small 2WD robots.',watch:'Stall current up to 1.5 A each. Needs a driver.'},
+  {id:'sg90',name:'SG90 servo',sub:'180° · 9 g',g:'SV',c:'#1D4ED8',price:7,good:'Turning a sensor head or a small arm to an exact angle.',watch:'Jitters on weak power. Avoid strapping pins.'},
+  {id:'mg996r',name:'MG996R servo',sub:'Metal gear · 10 kg·cm',g:'MG',c:'#1E3A8A',price:22,good:'Arms and grippers that need real torque.',watch:'Pulls up to 2.5 A; give it its own 5–6V supply.'},
+  {id:'stepper',name:'28BYJ-48 + ULN2003',sub:'Stepper with driver',g:'ST',c:'#475569',price:9,good:'Slow, exact positioning like dials, blinds or turntables.',watch:'Slow and weak; not for driving wheels.'}]},
+ {id:'sense',title:'Sensors',items:[
+  {id:'hcsr04',name:'HC-SR04',sub:'Ultrasonic distance',g:'US',c:'#0E7490',price:6,good:'Measuring distance to obstacles in front of the robot.',watch:'ECHO is 5V. Use a divider on 3.3V boards.'},
+  {id:'ir',name:'IR line sensor',sub:'Line following',g:'IR',c:'#7C3AED',price:4,good:'Following a black line on the floor.',watch:'Strong sunlight confuses it.'},
+  {id:'mpu',name:'MPU6050',sub:'Gyro + accel · I2C',g:'IMU',c:'#DB2777',price:10,good:'Knowing tilt and heading so the robot drives straight.',watch:'Drifts over time; calibrate at start.'},
+  {id:'vl53',name:'VL53L0X',sub:'Laser distance · I2C',g:'ToF',c:'#1F6F8B',price:15,good:'Precise distance up to 2 m, works on soft surfaces.',watch:'Narrow beam; misses thin objects to the side.'},
+  {id:'dht22',name:'DHT22',sub:'Temp + humidity',g:'DHT',c:'#0F766E',price:12,good:'Room or greenhouse climate readings.',watch:'Read at most once every 2 s.'}]},
+ {id:'power',title:'Power',items:[
+  {id:'batt',name:'18650 2S pack + BMS',sub:'7.4V rechargeable',g:'BAT',c:'#15803D',price:14,good:'Separate power for motors so the board doesn’t brown out.',watch:'Never short it. Always use the BMS.'},
+  {id:'buck',name:'LM2596 buck converter',sub:'Adjustable 1.2–35V',g:'BCK',c:'#1E40AF',price:6,good:'Stepping the battery down to a clean 5V for servos and the board.',watch:'Set the voltage with a meter before connecting.'}]},
+ {id:'io',title:'Display and controls',items:[
+  {id:'oled',name:'SSD1306 OLED',sub:'0.96" · I2C',g:'OL',c:'#111827',price:12,good:'Showing distance, battery or status right on the robot.',watch:'Shares the I2C pins with other sensors.'},
+  {id:'buzzer',name:'Active buzzer',sub:'5V beeper',g:'BZ',c:'#3F3F46',price:2,good:'Beeps for alarms, start-up and warnings.',watch:'Loud at 5V; add a resistor for quieter beeps.'},
+  {id:'btn',name:'Push buttons ×5',sub:'Tactile 6 mm',g:'BTN',c:'#52525B',price:2,good:'Start, stop and mode buttons.',watch:'Use INPUT_PULLUP and debounce in code.'}]},
+ {id:'passive',title:'Wiring and passives',items:[
+  {id:'res',name:'Resistor kit (1k + 2k)',sub:'For the ECHO divider',g:'Ω',c:'#92400E',price:1,good:'Voltage dividers and LED current limiting.',watch:'Check colour bands; 1k is brown-black-red.'},
+  {id:'jumpers',name:'Jumper wires ×40',sub:'M-M, M-F, F-F',g:'JW',c:'#BE185D',price:5,good:'Breadboard and header connections.',watch:'Cheap ones break inside; test if a signal vanishes.'},
+  {id:'bb',name:'Half breadboard',sub:'400 points',g:'BB',c:'#A1A1AA',price:5,good:'Trying circuits before soldering.',watch:'Loose contacts cause random faults; press parts in firmly.'}]}];
+const ITEM={};Object.values(KITS).forEach(k=>k.groups.forEach(g=>g.items.forEach(it=>{it.group=g;ITEM[it.id]=it})));
+CAT.forEach(g=>g.items.forEach(it=>{it.group=g;ITEM[it.id]=it}));
+const npSel={app:new Set(['expo','supabase']),rob:new Set(['esp32'])};
+let npKind='rob';
+const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fw=()=>[...npSel.app].find(id=>ITEM[id].group.id==='fw');
+const blocked=it=>it.only&&fw()!==it.only;
+
+function renderPresets(){const box=$('.presets');box.hidden=!KITS[npKind].presets.length;box.innerHTML='<span class="muted small">Start from</span>';
+  KITS[npKind].presets.forEach(pr=>{const b=document.createElement('button');b.className='fchip';b.textContent=pr.name;
+    const on=pr.ids.length===npSel[npKind].size&&pr.ids.every(i=>npSel[npKind].has(i));b.setAttribute('aria-pressed',on);
+    b.onclick=()=>{npSel[npKind]=new Set(pr.ids);renderTiles(false);npUpdate()};box.append(b)})}
+function renderTiles(animate){const area=$('#pickArea');area.innerHTML='';
+  KITS[npKind].groups.forEach(g=>{const sec=document.createElement('section');sec.className='kgroup';sec.dataset.s='group-'+g.id;sec.id='s-group-'+g.id;
+    sec.innerHTML=`<div class="gh"><h3>${g.title}</h3><span>${g.hint}</span></div>`;const grid=document.createElement('div');grid.className='ktiles';
+    grid.setAttribute('role',g.one?'radiogroup':'group');grid.setAttribute('aria-label',g.title);
+    g.items.forEach(it=>{const b=document.createElement('button');b.className='kt';b.dataset.id=it.id;b.dataset.s='tile-'+it.id;b.id='s-tile-'+it.id;
+      b.setAttribute('role',g.one?'radio':'checkbox');b.setAttribute('aria-describedby','tip');
+      b.innerHTML=`<span class="g" style="background:${it.c}">${it.g}</span><span class="tx"><b>${esc(it.name)}</b><span class="s">${esc(it.sub)}${it.price?' · RM'+it.price:''}</span></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>`;
+      b.onclick=()=>{if(b.getAttribute('aria-disabled')==='true'){toast(`${it.name} works with Expo only.`);return}
+        const set=npSel[npKind];
+        if(g.one){const was=set.has(it.id);g.items.forEach(x=>set.delete(x.id));if(!was||!g.optional)set.add(it.id)}
+        else set.has(it.id)?set.delete(it.id):set.add(it.id);
+        if(npKind==='app')[...set].forEach(id=>{if(blocked(ITEM[id]))set.delete(id)});
+        npUpdate()};
+      grid.append(b)});
+    sec.append(grid);area.append(sec)});
+  if(animate){area.classList.remove('swap');void area.offsetWidth;area.classList.add('swap')}
+  bindTips();npUpdate()}
+function npChecks(){const S=npSel[npKind],has=id=>S.has(id),out=[];
+  if(npKind==='rob'){const board=['esp32','nano','uno','c3'].find(has);
+    if(!board)out.push(['bad','<b>Board</b> missing. Pick one to continue.']);
+    else out.push(['ok','<b>Parts</b> come next: add motors, sensors and power in the project\u2019s Parts tab.'])}
+  else{const f=fw();
+    if(!f)out.push(['bad','<b>Framework</b> missing. Pick one to continue.']);
+    if(f==='tauri')out.push(['warn','<b>Tauri</b> needs Rust. Setup installs rustup if it’s missing.']);
+    if(f==='next'&&has('sqlite'))out.push(['warn','<b>SQLite</b> in Next.js runs on the server only, not in the browser.']);
+    if(f==='expo'&&has('supabase'))out.push(['ok','<b>Supabase</b> works in Expo. Keys go in .env, never in code.']);
+    if(f==='expo'&&!has('eas'))out.push(['ok','<b>Builds</b> run locally. Tick EAS Build for cloud APKs.'])}
+  if(npKind==='app'&&!out.some(c=>c[0]!=='ok'))out.unshift(['ok','<b>Everything fits together.</b>']);return out}
+function npUpdate(){const S=npSel[npKind],name=$('#pname').value.trim();
+  $$('#pickArea .kt').forEach(b=>{const it=ITEM[b.dataset.id];b.setAttribute('aria-checked',S.has(it.id));b.setAttribute('aria-disabled',npKind==='app'&&!!blocked(it))});
+  const checks=npChecks(),ic={bad:'x-c',warn:'alert',ok:'check-c'};
+  $('#npChecks').innerHTML=checks.map(([l,h])=>`<div class="chk ${l}"><svg class="i"><use href="#i-${ic[l]}"/></svg><span>${h}</span></div>`).join('');
+  const picked=KITS[npKind].groups.flatMap(g=>g.items).filter(i=>S.has(i.id));let sum,meta;
+  if(npKind==='rob'){const b=picked[0];sum=b?b.name:'No board';meta=b?`RM${b.price} board · add parts after creating`:''}
+  else{sum=picked.length?picked.map(i=>i.name).join(' + '):'No stack yet';meta=`${picked.length} package${picked.length===1?'':'s'} · free tiers`}
+  const bad=checks.find(c=>c[0]==='bad'),why=!name?'Add a project name.':bad?bad[1].replace(/<[^>]+>/g,''):'';
+  $('#npSum').textContent=sum;$('#npMeta').innerHTML=why?`<span class="why">${esc(why)}</span>`:esc(meta);
+  $('#npCreate').disabled=!!why;renderPresetsState()}
+function renderPresetsState(){$$('.presets .fchip').forEach((b,i)=>{const pr=KITS[npKind].presets[i];b.setAttribute('aria-pressed',pr.ids.length===npSel[npKind].size&&pr.ids.every(x=>npSel[npKind].has(x)))})}
+/* type toggle */
+const kpill=$('.kind .kpill');
+function moveKpill(){const a=$('.kind [aria-checked="true"]');if(!a||!a.offsetWidth)return;kpill.style.width=a.offsetWidth+'px';kpill.style.transform=`translateX(${a.offsetLeft}px)`}
+function setKind(k,animate=true){if(k==='app'&&document.body.dataset.state==='error'){toast('Fix modules/app-dev/module.yaml to use App development.');return}
+  npKind=k;$$('.kind [role="radio"]').forEach(b=>b.setAttribute('aria-checked',b.dataset.kind===k));moveKpill();renderPresets();renderTiles(animate);hideTip(true)}
+$$('.kind [role="radio"]').forEach(b=>b.onclick=()=>setKind(b.dataset.kind));
+$('.kind').addEventListener('keydown',e=>{if(!/Arrow(Left|Right)/.test(e.key))return;e.preventDefault();const k=$('.kind');k.classList.add('kb');
+  setKind(npKind==='rob'?'app':'rob',false);$(`.kind [data-kind="${npKind}"]`).focus();requestAnimationFrame(()=>requestAnimationFrame(()=>k.classList.remove('kb')))});
+addEventListener('resize',moveKpill);
+$('#pname').addEventListener('input',e=>{$('#slug').textContent=(e.target.value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'untitled';npUpdate()});
+$('#npCreate').onclick=()=>{const n=$('#pname').value.trim();
+  toast(npKind==='rob'?`Creating ${n}: pio project init, platformio.ini, pins.h, main.cpp, git init…`:`Creating ${n}: scaffold, theme file, .env.example, git init…`);
+  setTimeout(()=>{location.hash='#project';if(npKind==='rob')setTimeout(()=>$('[data-tab="parts"]').click(),60)},900)};
+/* tooltip: first one waits 350 ms, neighbours open instantly (no animation) */
+const tip=document.createElement('div');tip.id='tip';tip.setAttribute('role','tooltip');document.body.append(tip);
+let tipT=0,tipLast=0;
+function showTip(el,instant){const it=ITEM[el.dataset.id];if(!it)return;
+  tip.innerHTML=`<div class="h"><b>${esc(it.name)}</b><span>${it.price?'RM'+it.price:esc(it.meta||'')}</span></div><p><span class="k">Good for</span>${esc(it.good)}</p><p class="w"><span class="k">Watch out</span>${esc(it.watch)}</p>`;
+  tip.classList.toggle('instant',instant);const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+  let x=Math.max(8,Math.min(r.left+r.width/2-w/2,innerWidth-w-8)),y=r.top-h-10,below=y<8;if(below)y=r.bottom+10;
+  tip.style.left=x+'px';tip.style.top=y+'px';tip.style.transformOrigin=`${r.left+r.width/2-x}px ${below?'0':'100%'}`;tip.classList.add('on')}
+function hideTip(now){clearTimeout(tipT);if(tip.classList.contains('on'))tipLast=Date.now();tip.classList.toggle('instant',!!now);tip.classList.remove('on')}
+function bindTips(){}
+document.addEventListener('pointerover',e=>{const b=e.target.closest('.kt[data-id]');if(!b||e.pointerType!=='mouse'||b.contains(e.relatedTarget))return;
+  clearTimeout(tipT);const warm=tip.classList.contains('on')||Date.now()-tipLast<500;if(warm)showTip(b,true);else tipT=setTimeout(()=>showTip(b,calm()),350)});
+document.addEventListener('pointerout',e=>{const b=e.target.closest('.kt[data-id]');if(!b||b.contains(e.relatedTarget))return;hideTip()});
+document.addEventListener('focusin',e=>{const b=e.target.closest('.kt[data-id]');if(b&&b.matches(':focus-visible'))showTip(b,true)});
+document.addEventListener('focusout',e=>{if(e.target.closest('.kt[data-id]'))hideTip(true)});
+addEventListener('keydown',e=>{if(e.key==='Escape')hideTip(true)});
+document.getElementById('main').addEventListener('scroll',()=>hideTip(true),{passive:true});
+setKind('rob',false);
+
+/* handbook: Add to project bumps the part in Rover-01 -> Parts */
+$('#addBtn').onclick=()=>{addToProject({hcsr04:1});toast(`HC-SR04 added to Rover-01 → Parts (now ${projectParts.find(p=>p.id==='hcsr04').qty}).`)};
+
+/* project tabs */
+const pill=$('.seg .pill');
+function movePill(){const a=$('.seg [aria-selected="true"]');if(!a||!a.offsetWidth)return;pill.style.width=a.offsetWidth+'px';pill.style.transform=`translateX(${a.offsetLeft}px)`}
+$$('.seg [role="tab"]').forEach(b=>b.onclick=()=>{$$('.seg [role="tab"]').forEach(x=>x.setAttribute('aria-selected',x===b));
+  $$('[data-tab-panel]').forEach(p=>p.classList.toggle('on',p.dataset.tabPanel===b.dataset.tab));movePill();requestAnimationFrame(fitStage)});
+$('.seg').addEventListener('keydown',e=>{if(!/Arrow(Left|Right)/.test(e.key))return;const tabs=$$('.seg [role="tab"]'),i=tabs.findIndex(t=>t.getAttribute('aria-selected')==='true');
+  const seg=$('.seg');seg.classList.add('kb');const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.click();n.focus();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>seg.classList.remove('kb')))});
+addEventListener('resize',movePill);
+
+/* ---------- wiring: signals, ESP32 pin rules, diagram + pins.h ---------- */
+const ESP_PINS=[13,4,14,16,17,18,19,21,22,23,25,26,27,32,33,0,2,5,12,15,34,35,36,39];
+const PIN_NAME={36:'VP',39:'VN',16:'RX2',17:'TX2'};
+const pinName=g=>PIN_NAME[g]||('D'+g);
+const SIGS=[
+ {id:'leftMotorPWM',mac:'LEFT_MOTOR_PWM',part:'L298N',pp:'ENA',at:[164,126],need:'pwm',col:'#F56300',gpio:25},
+ {id:'leftMotorIN1',mac:'LEFT_MOTOR_IN1',part:'L298N',pp:'IN1',at:[164,146],need:'out',col:'#FF9F0A',gpio:26},
+ {id:'leftMotorIN2',mac:'LEFT_MOTOR_IN2',part:'L298N',pp:'IN2',at:[164,166],need:'out',col:'#FFD60A',gpio:27},
+ {id:'rightMotorIN3',mac:'RIGHT_MOTOR_IN3',part:'L298N',pp:'IN3',at:[164,186],need:'out',col:'#64D2FF',gpio:32},
+ {id:'rightMotorIN4',mac:'RIGHT_MOTOR_IN4',part:'L298N',pp:'IN4',at:[164,206],need:'out',col:'#BF5AF2',gpio:33},
+ {id:'rightMotorPWM',mac:'RIGHT_MOTOR_PWM',part:'L298N',pp:'ENB',at:[164,222],need:'pwm',col:'#30D158',gpio:14},
+ {id:'sonarTrig',mac:'SONAR_TRIG',part:'HC-SR04',pp:'TRIG',at:[531.3,114.5],need:'out',col:'#5E5CE6',gpio:19},
+ {id:'sonarEcho',mac:'SONAR_ECHO',part:'HC-SR04',pp:'ECHO',at:[541.3,114.5],need:'in',col:'#FF375F',gpio:18,five:true},
+ {id:'servoSignal',mac:'SERVO_SIGNAL',part:'SG90',pp:'signal',at:[462,265],need:'pwm',col:'#FF453A',gpio:12}];
+/* ESP32 header geometry from the Wokwi element (pinInfo), scaled 1.4 at (260,24) */
+const ESP_GEO={EN:24,VP:34,VN:44,D34:53.1,D35:62.9,D32:72.2,D33:81.7,D25:91.3,D26:101,D27:110.8,D14:120,D12:130.4,D13:139.5,
+  D23:24,D22:34,D21:62.9,D19:72.2,D18:81.7,D5:91.3,TX2:101,RX2:110.8,D4:120,D2:130.4,D15:139.5};
+const RIGHT=new Set(['D23','D22','D21','D19','D18','D5','TX2','RX2','D4','D2','D15']);
+const pinXY=g=>{const n=pinName(g),y=24+ESP_GEO[n]*1.4,right=RIGHT.has(n);return{x:260+(right?101.3:5)*1.4,y,right}};
+/* one-line verdict for a signal on a GPIO: [level, text] */
+function pinCheck(sig,g){const other=SIGS.find(o=>o!==sig&&o.gpio===g);
+  if(other)return['bad',`GPIO ${g} is already used by ${other.id}.`];
+  if(sig.need!=='in'&&[34,35,36,39].includes(g))return['bad',`GPIO ${g} is input-only, so it can't drive ${sig.pp}.`];
+  if(g===12)return['bad','GPIO 12 is a strapping pin; a load here can stop boot.'];
+  if(g===0)return['bad','GPIO 0 is the BOOT button pin; it can stop the board from starting.'];
+  if(g===2)return['warn','GPIO 2 drives the onboard LED and must be low at boot.'];
+  if(g===5||g===15)return['warn',`GPIO ${g} pulses at boot, so ${sig.part} may twitch on power-up.`];
+  if(sig.five)return['warn','ECHO is 5V. Keep the 1k/2k divider before this pin.'];
+  return['ok','Good pin for this signal.']}
+function freeGood(sig){return ESP_PINS.find(g=>!SIGS.some(o=>o!==sig&&o.gpio===g)&&pinCheck(sig,g)[0]==='ok')}
+function renderPins(changed){
+  const body=$('#pinRows');body.innerHTML='';
+  SIGS.forEach(sig=>{const [lvl,txt]=pinCheck(sig,sig.gpio),tr=document.createElement('tr');tr.className='pin-row '+lvl;tr.dataset.w=sig.id;tr.dataset.s='pin-'+sig.id;tr.id='s-pin-'+sig.id;
+    const fix=lvl==='bad'?freeGood(sig):null;
+    tr.innerHTML=`<td class="mono">${sig.id}</td><td>${sig.part} ${sig.pp}</td>
+      <td><button class="pin-sel" aria-haspopup="listbox" aria-expanded="false" aria-label="GPIO for ${sig.id}: ${sig.gpio}">GPIO ${sig.gpio}</button></td>
+      <td><span class="pin-msg ${lvl}">${lvl==='ok'?'<svg class="i" style="width:15px;height:15px"><use href="#i-check-c"/></svg>':'<span class="bang" aria-hidden="true">!</span>'}<span>${lvl==='ok'?'OK':txt+(fix?` Try GPIO ${fix}.`:'')}</span></span></td>`;
+    const btn=$('.pin-sel',tr);
+    btn.addEventListener('click',e=>{e.stopPropagation();popSig===sig?closePinPicker(true):openPinPicker(sig,btn,e.detail===0)});
+    tr.onclick=()=>trace(sig.id);body.append(tr)});
+  renderWires();renderPinsH(changed);if(traced)trace(traced,true)}
+function renderWires(){const svg=$('#wires');let h='';
+  SIGS.forEach(sig=>{const [sx,sy]=sig.at,p=pinXY(sig.gpio),lvl=pinCheck(sig,sig.gpio)[0];let d;
+    const leftPart=sig.part==='L298N';
+    if(leftPart&&!p.right){const mx=(sx+p.x)/2;d=`M${sx} ${sy} C${mx} ${sy} ${mx} ${p.y} ${p.x} ${p.y}`}
+    else if(!leftPart&&p.right){d=sig.part==='HC-SR04'?`M${sx} ${sy} C${sx} ${sy+40} ${p.x+50} ${p.y} ${p.x} ${p.y}`:`M${sx} ${sy} C${sx-34} ${sy} ${p.x+40} ${p.y} ${p.x} ${p.y}`}
+    else{const ox=p.right?p.x+22:p.x-22;d=`M${sx} ${sy} C${sx} 336 ${ox} 336 ${ox} ${p.y} L${p.x} ${p.y}`}
+    h+=`<g data-w="${sig.id}"><path class="wire-sh" d="${d}"/><path class="wire${lvl!=='ok'&&!(sig.five&&lvl==='warn')?' dash':''}" d="${d}" stroke="${sig.col}"/><circle class="wire-end" cx="${p.x}" cy="${p.y}" r="3.2" fill="${sig.col}"/><circle class="wire-end" cx="${sx}" cy="${sy}" r="3.2" fill="${sig.col}"/></g>`});
+  svg.innerHTML=h}
+function renderPinsH(changed){const pad=s=>s.padEnd(17,' ');
+  const lines=['<span class="ln"><span class="c">// AUTO-GENERATED by Workflow Hub from wiring.json. Do not edit.</span></span>','<span class="ln"><span class="k">#pragma once</span></span>'];
+  SIGS.forEach(sig=>{const [l,t]=pinCheck(sig,sig.gpio);let tail='';
+    if(sig.five)tail='  <span class="c">// via 1k/2k divider</span>';
+    if(l==='bad')tail=`  <span class="warn-c">// ! ${t}</span>`;
+    lines.push(`<span class="ln${changed===sig.id?' flash':''}"><span class="k">#define</span> ${pad(sig.mac)}<span class="n">${sig.gpio}</span>${tail}</span>`)});
+  $('#pinsH').innerHTML=lines.join('');if(changed)$('#pinsStamp').textContent='AUTO-GENERATED · just now'}
+let traced=null;
+function trace(id,keep){const on=keep||traced!==id;traced=on?id:null;
+  $$('.pin-row').forEach(r=>r.classList.toggle('hot',on&&r.dataset.w===id));
+  $$('#wires g').forEach(g=>g.querySelectorAll('*').forEach(el=>el.classList.toggle('hot',on&&g.dataset.w===id)));
+  $('#diagram').classList.toggle('focus',on)}
+/* ---------- pin picker: grouped grid popover ---------- */
+const pinLevel=(sig,g)=>{const [l,t]=pinCheck(sig,g);return sig.five&&l==='warn'&&t.startsWith('ECHO')?'ok':l};
+const NOTE={34:'input only',35:'input only',36:'input only',39:'input only',12:'can stop boot',0:'BOOT button',2:'onboard LED',5:'pulses at boot',15:'pulses at boot'};
+const pop=document.createElement('div');pop.id='pinPop';pop.setAttribute('role','listbox');document.body.append(pop);
+let popSig=null,popBtn=null;
+function popFoot(sig,g){const used=SIGS.find(o=>o!==sig&&o.gpio===g),[l,t]=pinCheck(sig,g),lv=used?'bad':pinLevel(sig,g);
+  $('.pp-foot',pop).innerHTML=`<b>GPIO ${g}</b> · `+(used?`Used by ${used.id}. Picking it causes a conflict.`:lv==='ok'?(sig.five?'Good pin. Keep the 1k/2k divider on ECHO.':`Good pin for ${sig.pp}.`):t)}
+function openPinPicker(sig,btn,viaKey){closePinPicker();popSig=sig;popBtn=btn;
+  const G={rec:[],risk:[],used:[]};
+  [...ESP_PINS].sort((a,b)=>a-b).forEach(g=>{const used=SIGS.find(o=>o!==sig&&o.gpio===g),l=pinLevel(sig,g);
+    (used?G.used:l==='ok'?G.rec:G.risk).push(`<button class="pp-opt ${used?'used':l}" role="option" aria-selected="${g===sig.gpio}" data-g="${g}" title="${used?'used by '+used.id:NOTE[g]||'recommended'}">${g}${l!=='ok'||used?'<span class="d"></span>':''}</button>`)});
+  const sec=(h,arr)=>arr.length?`<div class="pp-h">${h}</div><div class="pp-grid">${arr.join('')}</div>`:'';
+  pop.innerHTML=`<div class="pp-title">GPIO for <b>${sig.id}</b></div>`+sec(`Recommended for ${sig.pp}`,G.rec)+sec('Might not work',G.risk)+sec('In use',G.used)+'<div class="pp-foot"></div>';
+  pop.setAttribute('aria-label',`GPIO for ${sig.id}`);popFoot(sig,sig.gpio);
+  const r=btn.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight,x=Math.max(8,Math.min(r.left,innerWidth-w-8));
+  let y=r.bottom+6,up=y+h>innerHeight-8;if(up)y=Math.max(8,r.top-h-6);
+  pop.style.left=x+'px';pop.style.top=y+'px';pop.style.transformOrigin=`${r.left+r.width/2-x}px ${up?'100%':'0'}`;
+  pop.classList.toggle('instant',!!viaKey||calm());pop.classList.add('open');btn.setAttribute('aria-expanded','true');
+  ($('.pp-opt[aria-selected="true"]',pop)||$('.pp-opt',pop)).focus({preventScroll:true})}
+function closePinPicker(focusBack){if(!popSig)return;pop.classList.remove('open');popBtn&&popBtn.setAttribute('aria-expanded','false');
+  if(focusBack&&popBtn)popBtn.focus();popSig=null;popBtn=null}
+pop.addEventListener('click',e=>{const o=e.target.closest('.pp-opt');if(!o||!popSig)return;const sig=popSig,g=+o.dataset.g;closePinPicker();
+  if(g!==sig.gpio){sig.gpio=g;renderPins(sig.id);const l=pinCheck(sig,g)[0];
+    toast(l==='bad'?`${sig.id} on GPIO ${g} might not work. Check the warning.`:`${sig.id} moved to GPIO ${g}. pins.h updated.`)}
+  $(`[data-s="pin-${sig.id}"] .pin-sel`).focus()});
+pop.addEventListener('mouseover',e=>{const o=e.target.closest('.pp-opt');if(o&&popSig)popFoot(popSig,+o.dataset.g)});
+pop.addEventListener('focusin',e=>{const o=e.target.closest('.pp-opt');if(o&&popSig)popFoot(popSig,+o.dataset.g)});
+pop.addEventListener('keydown',e=>{const opts=$$('.pp-opt',pop),i=opts.indexOf(document.activeElement);
+  const mv={ArrowRight:1,ArrowLeft:-1,ArrowDown:5,ArrowUp:-5}[e.key];
+  if(mv!==undefined){e.preventDefault();opts[Math.max(0,Math.min(opts.length-1,i+mv))].focus()}
+  else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closePinPicker(true)}
+  else if(e.key==='Tab')closePinPicker()});
+document.addEventListener('click',e=>{if(popSig&&!e.target.closest('#pinPop'))closePinPicker()});
+document.getElementById('main').addEventListener('scroll',()=>closePinPicker(),{passive:true});
+addEventListener('resize',()=>closePinPicker());
+/* scale the fixed 640x340 stage to the card */
+const fitStage=()=>{const w=$('#stageWrap').clientWidth;if(w)$('#stage').style.transform=`scale(${w/640})`};
+new ResizeObserver(fitStage).observe($('#stageWrap'));
+/* if the Wokwi parts never load, say so (wires and table still work) */
+Promise.race([customElements.whenDefined('wokwi-esp32-devkit-v1'),new Promise((_,r)=>setTimeout(r,8000))]).catch(()=>{$('#diagNote').hidden=false});
+renderPins();
+
+/* ---------- Parts tab: cost tracker, parts list, catalog + selection window ---------- */
+const projectParts=[{id:'esp32',qty:1,st:'have'},{id:'l298n',qty:1,st:'have'},{id:'tt',qty:2,st:'have'},{id:'hcsr04',qty:1,st:'have'},
+  {id:'sg90',qty:1,st:'ordered'},{id:'batt',qty:1,st:'need'},{id:'res',qty:1,st:'need'}];
+const ST={have:['ok','In hand'],ordered:['warn','Ordered'],need:['bad','Need']},NEXT={need:'ordered',ordered:'have',have:'need'};
+const selection=new Map();
+const rm=n=>'RM'+n;
+function renderParts(flashIds=[]){const body=$('#partsBody');
+  body.innerHTML=projectParts.map(p=>{const it=ITEM[p.id],[cls,lbl]=ST[p.st],board=it.group.id==='board';
+    return `<tr data-id="${p.id}" class="${flashIds.includes(p.id)?'row-flash':''}"><td><b style="font-weight:500">${esc(it.name)}</b><span class="muted small" style="display:block">${esc(it.sub)}</span></td>
+      <td>${board?'1':`<span class="qty"><button aria-label="Fewer ${esc(it.name)}" data-q="-1">−</button><output>${p.qty}</output><button aria-label="More ${esc(it.name)}" data-q="1">+</button></span>`}</td>
+      <td><button class="chip ${cls} st-btn" title="Click to change status" aria-label="${esc(it.name)}: ${lbl}. Click to change.">${lbl}</button></td>
+      <td class="num" style="text-align:right">${rm(it.price*p.qty)}</td>
+      <td style="text-align:right">${board?'':`<button class="btn ghost sm rm-btn" aria-label="Remove ${esc(it.name)}">✕</button>`}</td></tr>`}).join('');
+  const sum=st=>projectParts.filter(p=>!st||p.st===st).reduce((t,p)=>t+ITEM[p.id].price*p.qty,0),T=sum(),H=sum('have'),O=sum('ordered'),N=sum('need');
+  $('#costTotal').textContent=rm(T);$('#costHave').textContent=rm(H);$('#costOrd').textContent=rm(O);$('#costNeed').textContent=rm(N);
+  const bar=$('.cost-bar');bar.children[0].style.flexGrow=H;bar.children[1].style.flexGrow=O;bar.children[2].style.flexGrow=N;
+  renderCatalog()}
+$('#partsBody').addEventListener('click',e=>{const tr=e.target.closest('tr');if(!tr)return;const p=projectParts.find(x=>x.id===tr.dataset.id);
+  if(e.target.closest('.st-btn')){p.st=NEXT[p.st];renderParts();return}
+  const q=e.target.closest('[data-q]');if(q){p.qty=Math.max(1,p.qty+ +q.dataset.q);renderParts();return}
+  if(e.target.closest('.rm-btn')){projectParts.splice(projectParts.indexOf(p),1);renderParts();toast(`${ITEM[p.id].name} removed from Rover-01.`)}});
+function renderCatalog(){const area=$('#catArea');
+  area.innerHTML=CAT.map(g=>`<section class="kgroup" data-s="cat-${g.id}" id="s-cat-${g.id}"><div class="gh"><h3>${g.title}</h3></div><div class="ktiles" role="group" aria-label="${g.title}">`+
+    g.items.map(it=>{const inP=projectParts.find(p=>p.id===it.id),on=selection.has(it.id);
+      return `<button class="kt" role="checkbox" aria-checked="${on}" data-id="${it.id}" data-s="cat-${it.id}" id="s-cat-${it.id}" aria-describedby="tip"><span class="g" style="background:${it.c}">${it.g}</span><span class="tx"><b>${esc(it.name)}</b><span class="s">${esc(it.sub)} · RM${it.price}</span>${inP?`<span class="inp">In project ×${inP.qty}</span>`:''}</span><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span></button>`}).join('')+'</div></section>').join('');
+  renderSelection()}
+$('#catArea').addEventListener('click',e=>{const b=e.target.closest('.kt');if(!b)return;const id=b.dataset.id;
+  selection.has(id)?selection.delete(id):selection.set(id,1);b.setAttribute('aria-checked',selection.has(id));renderSelection()});
+function partChecks(){const all=new Set([...projectParts.map(p=>p.id),...selection.keys()]),has=id=>all.has(id),newly=id=>selection.has(id),out=[];
+  if(has('tt')&&!has('l298n'))out.push(['bad','<b>TT motors</b> need a driver. Add the L298N.']);
+  if((newly('tt')||newly('l298n')||newly('mg996r'))&&!has('batt'))out.push(['warn','<b>Motors</b> need their own power. Add the 18650 pack.']);
+  if(newly('mg996r')&&!has('buck'))out.push(['warn','<b>MG996R</b> wants a steady 5–6V. Add the buck converter.']);
+  if((newly('hcsr04'))&&!has('res'))out.push(['warn','<b>HC-SR04</b> ECHO is 5V. Add the resistor kit for the divider.']);
+  if([...selection.keys()].filter(id=>['mpu','vl53','oled'].includes(id)).length&&[...all].filter(id=>['mpu','vl53','oled'].includes(id)).length>1)out.push(['ok','<b>I2C</b> parts share SDA 21 / SCL 22. No extra pins needed.']);
+  return out}
+function renderSelection(){const list=$('#selList'),ids=[...selection.keys()];
+  $('#selCount').textContent=ids.length;
+  list.innerHTML=ids.length?ids.map(id=>{const it=ITEM[id],q=selection.get(id);return `<div class="sw-item" data-id="${id}"><span class="g" style="background:${it.c}">${it.g}</span><span class="nm"><b>${esc(it.name)}</b><span>${rm(it.price*q)}</span></span><span class="qty"><button aria-label="Fewer" data-sq="-1">−</button><output>${q}</output><button aria-label="More" data-sq="1">+</button></span><button class="btn ghost sm" data-sx aria-label="Remove ${esc(it.name)} from selection">✕</button></div>`}).join('')
+    :'<p class="muted small sw-empty">Nothing selected yet. Tick components on the left and they collect here.</p>';
+  const ic={bad:'x-c',warn:'alert',ok:'check-c'};
+  $('#selChecks').innerHTML=partChecks().map(([l,h])=>`<div class="chk ${l}"><svg class="i"><use href="#i-${ic[l]}"/></svg><span>${h}</span></div>`).join('');
+  $('#selTotal').textContent=rm(ids.reduce((t,id)=>t+ITEM[id].price*selection.get(id),0));$('#selAdd').disabled=!ids.length}
+$('#selList').addEventListener('click',e=>{const row=e.target.closest('.sw-item');if(!row)return;const id=row.dataset.id;
+  const q=e.target.closest('[data-sq]');if(q){selection.set(id,Math.max(1,selection.get(id)+ +q.dataset.sq));renderSelection();return}
+  if(e.target.closest('[data-sx]')){selection.delete(id);const t=$(`#catArea .kt[data-id="${id}"]`);t&&t.setAttribute('aria-checked','false');renderSelection()}});
+function addToProject(map){const ids=[];Object.entries(map).forEach(([id,q])=>{const p=projectParts.find(x=>x.id===id);if(p)p.qty+=q;else projectParts.push({id,qty:q,st:'need'});ids.push(id)});renderParts(ids)}
+$('#selAdd').onclick=()=>{const n=selection.size,cost=[...selection].reduce((t,[id,q])=>t+ITEM[id].price*q,0);addToProject(Object.fromEntries(selection));selection.clear();renderCatalog();
+  toast(`Added ${n} component${n>1?'s':''} to Rover-01. ${rm(cost)} more to buy.`);if(!calm())$('[data-s="parts-table"]').scrollIntoView({block:'nearest',behavior:'smooth'})};
+renderParts();
+
+/* more menu */
+const menu=$('#moreMenu'),moreBtn=$('#moreBtn');
+function closeMenu(){menu.classList.remove('open');moreBtn.setAttribute('aria-expanded','false')}
+moreBtn.onclick=e=>{e.stopPropagation();const o=!menu.classList.contains('open');menu.classList.toggle('open',o);moreBtn.setAttribute('aria-expanded',o)};
+document.addEventListener('click',e=>{if(!e.target.closest('.menu-wrap'))closeMenu()});
+
+/* command bar */
+const scrim=$('#scrim'),inp=$('#cmdkInput');let sel=0;
+const items=()=>$$('#cmdkList li[data-go]').filter(li=>!li.hidden);
+const paint=()=>{const it=items();it.forEach((li,i)=>li.classList.toggle('sel',i===sel))};
+const openK=()=>{scrim.classList.add('open');scrim.setAttribute('aria-hidden','false');inp.value='';$$('#cmdkList li').forEach(l=>l.hidden=false);sel=0;paint();setTimeout(()=>inp.focus(),10)};
+const closeK=()=>{scrim.classList.remove('open');scrim.setAttribute('aria-hidden','true')};
+$$('[data-cmdk]').forEach(b=>b.onclick=openK);
+scrim.onclick=e=>{if(e.target===scrim)closeK()};
+$('#cmdkList').onclick=e=>{const li=e.target.closest('li[data-go]');if(li){location.hash=li.dataset.go;closeK()}};
+inp.oninput=()=>{const q=inp.value.toLowerCase();$$('#cmdkList li[data-go]').forEach(li=>li.hidden=!li.textContent.toLowerCase().includes(q));sel=0;paint()};
+addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();scrim.classList.contains('open')?closeK():openK();return}
+  if(!scrim.classList.contains('open')){if(e.key==='Escape')closeMenu();return}
+  const it=items();
+  if(e.key==='Escape')closeK();
+  else if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(sel+1,it.length-1);paint()}
+  else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(sel-1,0);paint()}
+  else if(e.key==='Enter'&&it[sel]){location.hash=it[sel].dataset.go;closeK()}
+});
+
+route();
+})();
+</script>
+<script>
+/* Artifact review dock: state switcher + "Pick to change".
+   Uses the comments capability's customAnchors so the page owns comment mode:
+   pick an element -> claude.ai composer opens there (labelled with the element's data-s id);
+   after the comment is sent or closed, comment mode ends and you are back to browsing. */
+(()=>{
+const STATES=window.SCRATCH_STATES||['empty','loading','error','full'];
+const ss={get:k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}}};
+const mk=(t,p={},...c)=>{const e=document.createElement(t);Object.assign(e,p);c.forEach(x=>e.append(x));return e};
+const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+document.head.append(mk('style',{textContent:STATES.map(s=>`body[data-state="${s}"] [data-when]:not([data-when~="${s}"]){display:none!important}`).join('')+`
+#rv{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:6px;padding:5px;border-radius:999px;
+ background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--hl),var(--shadow-2);font:600 12px var(--font);max-width:calc(100vw - 32px)}
+#rv .grp{display:flex;gap:2px;padding:2px;border-radius:999px;background:var(--fill)}
+#rv button{border:0;background:none;color:var(--label-2);font:600 11.5px var(--font);height:28px;padding:0 10px;border-radius:999px;cursor:pointer;transition:background-color 150ms ease,color 150ms ease,transform 160ms var(--ease-out)}
+#rv button:active{transform:scale(.97)}
+#rv .grp button[aria-pressed="true"]{background:var(--surface-solid);color:var(--label);box-shadow:var(--hl),0 1px 2px rgba(0,0,0,.12)}
+#rv .pick{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--on-accent);padding:0 14px}
+#rv .pick[aria-pressed="true"]{background:var(--label);color:var(--bg)}
+#rv .msg{color:var(--label-2);font-weight:500;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rv-hl{outline:2px solid var(--accent)!important;outline-offset:3px!important;border-radius:6px}
+#rv-tag{position:fixed;z-index:61;pointer-events:none;padding:2px 7px;border-radius:6px;background:var(--accent);color:var(--on-accent);font:600 11px var(--mono);white-space:nowrap}
+.np-bar{bottom:68px!important}
+body.rv-picking *{cursor:crosshair!important}
+body.rv-picking #rv,body.rv-picking #rv *{cursor:pointer!important}
+@media (max-width:640px){#rv .msg{display:none}#rv .grp button{padding:0 7px}}
+`}));
+
+/* stable ids so anchors name the element */
+document.querySelectorAll('[data-s]').forEach(el=>{if(!el.id)el.id='s-'+el.dataset.s});
+
+/* dock */
+const dock=mk('div',{id:'rv'});dock.setAttribute('data-uncommentable','');dock.setAttribute('role','toolbar');dock.setAttribute('aria-label','Review tools');
+const grp=mk('div',{className:'grp'});grp.setAttribute('role','group');grp.setAttribute('aria-label','Screen state');
+const setState=s=>{document.body.dataset.state=s;ss.set('rv-state',s);[...grp.children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===s));schedulePins()};
+STATES.forEach(s=>{const b=mk('button',{textContent:s[0].toUpperCase()+s.slice(1)});b.dataset.v=s;b.onclick=()=>setState(s);grp.append(b)});
+const pick=mk('button',{className:'pick',innerHTML:'<svg class="i" style="width:14px;height:14px"><use href="#i-search"/></svg><span>Pick to change</span>'});
+pick.setAttribute('aria-pressed','false');
+const msg=mk('span',{className:'msg'});
+dock.append(grp,pick,msg);document.body.append(dock);
+let sayT;const say=(t,ms=5000)=>{msg.textContent=t;clearTimeout(sayT);if(ms)sayT=setTimeout(()=>msg.textContent='',ms)};
+
+/* comments + custom anchors */
+let comments=null,ca=null,shellMode=false,composing=false,threads=[];
+const resolve=a=>{try{return document.querySelector(a)}catch(e){return null}};
+const visible=el=>el&&el.getClientRects().length>0;
+let pinRaf=0;
+function schedulePins(){if(!ca||pinRaf)return;pinRaf=requestAnimationFrame(()=>{pinRaf=0;const map={};
+  threads.forEach(t=>{const el=resolve(t.anchor);if(visible(el)){const r=el.getBoundingClientRect();map[t.id]={x:Math.min(r.right,innerWidth-12)-10+scrollX,y:r.top+10+scrollY}}});
+  try{ca.placed(map)}catch(e){}})}
+['resize','hashchange'].forEach(ev=>addEventListener(ev,schedulePins));
+document.getElementById('main')?.addEventListener('scroll',schedulePins,{passive:true});
+
+(async()=>{
+  try{comments=await window.claude?.use?.('comments')}catch(e){}
+  if(!comments){say('Comments are off here. Use the comment button in the artifact toolbar.');return}
+  try{ca=await comments.customAnchors({
+      mode:on=>{shellMode=on;if(!on){threads=[];if(picking)setPick(false)}sync()},
+      threads:list=>{threads=list||[];schedulePins()},
+      reveal:id=>{const t=threads.find(x=>x.id===id),el=t&&resolve(t.anchor);if(visible(el))el.scrollIntoView({block:'center',behavior:calm()?'auto':'smooth'})},
+      composing:open=>{const was=composing;composing=open;
+        /* composer closed (sent or dismissed): leave comment mode so clicks browse again */
+        if(was&&!open){setTimeout(()=>{if(!composing){try{ca.exitMode()}catch(e){}setPick(false);say('Sent. Back to browsing.',3000)}},250)}}
+    });schedulePins()}
+  catch(e){ca=null}
+})();
+
+/* pick mode */
+let picking=false,hl=null;const tag=mk('div',{id:'rv-tag'});tag.hidden=true;document.body.append(tag);
+const intercepting=()=>picking||shellMode;
+const target=e=>e.closest('[data-s]')||e;
+const clearHl=()=>{if(hl)hl.classList.remove('rv-hl');hl=null;tag.hidden=true};
+function sync(){const on=intercepting();pick.setAttribute('aria-pressed',on);pick.querySelector('span').textContent=on?'Done':'Pick to change';
+  document.body.classList.toggle('rv-picking',on);if(!on)clearHl()}
+function setPick(v){picking=v;if(!v&&shellMode&&ca){try{ca.exitMode()}catch(e){}}sync();
+  if(v)say('Click the part you want changed. Done or Esc to go back.',0);else if(msg.textContent.startsWith('Click'))say('')}
+pick.onclick=()=>setPick(!intercepting());
+addEventListener('keydown',e=>{if(e.key==='Escape'&&intercepting()&&!composing)setPick(false)});
+document.addEventListener('mouseover',e=>{if(!intercepting()||e.target.closest('#rv'))return;const t=target(e.target);if(t===hl)return;clearHl();hl=t;t.classList.add('rv-hl');
+  const r=t.getBoundingClientRect();tag.textContent=(t.dataset.s||t.tagName.toLowerCase())+' · '+(location.hash||'#home')+' · '+document.body.dataset.state;
+  tag.hidden=false;tag.style.left=Math.max(8,Math.min(r.left,innerWidth-tag.offsetWidth-8))+'px';tag.style.top=Math.max(8,r.top-26)+'px'},true);
+document.addEventListener('click',async e=>{if(!intercepting()||e.target.closest('#rv'))return;e.preventDefault();e.stopPropagation();
+  const t=target(e.target);clearHl();
+  const label=`${t.dataset.s||t.tagName.toLowerCase()} · ${location.hash||'#home'} · ${document.body.dataset.state}`;
+  try{
+    if(ca){const [anchor,at]=ca.domAnchor(t,e);const r=await ca.compose(anchor,at,{label,detail:(t.innerText||'').replace(/\s+/g,' ').slice(0,300)});
+      if(r&&r.opened){picking=false;say('Type your change, then press Send to Claude.')}else say('Close the open comment first, then pick again.')}
+    else if(comments){setPick(false);const r=await comments.openComposer({element:t});
+      say(r&&r.opened?'Type your change, then press Send to Claude. Press Esc in the comment bar to stop commenting.':'Close the open comment first, then pick again.')}
+    else{setPick(false);say('Comments are off here. Use the comment button in the artifact toolbar.')}
+  }catch(err){say(err&&err.code==='rate_limited'?'Too many picks at once. Wait a moment.':'Couldn’t open a comment here. Use the comment button in the artifact toolbar.')}
+  sync()},true);
+setState(STATES.includes(ss.get('rv-state'))?ss.get('rv-state'):'full');
+})();
+</script>

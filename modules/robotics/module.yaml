@@ -1,0 +1,10 @@
+id: robotics
+name: Robotics
+tagline: ESP32 and Arduino with PlatformIO. Wiring view writes pins.h for you.
+icon: cpu
+color: categorical-2
+cart_slots: [board, parts]
+project_tabs: [wiring, parts]
+launch: [vscode, arduino-ide]
+run: [build, upload, serial]
+handbook_part: Electronics parts

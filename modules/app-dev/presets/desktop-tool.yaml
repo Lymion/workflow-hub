@@ -1,0 +1,3 @@
+preset: desktop-tool
+name: Desktop tool
+stack: [tauri, sqlite, zustand]

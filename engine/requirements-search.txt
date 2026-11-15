@@ -1,0 +1,3 @@
+# Optional: local meaning search (bge-small). Without it, search is keyword-only.
+-r requirements.txt
+sentence-transformers>=3.0

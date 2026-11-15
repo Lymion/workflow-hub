@@ -1,0 +1,38 @@
+# Docs the hub downloads for the docs guide. Only these pages are fetched (no crawling).
+docs:
+  - { id: expo-env, title: "Expo · Environment variables", url: "https://docs.expo.dev/guides/environment-variables/" }
+  - { id: expo-router, title: "Expo Router · Introduction", url: "https://docs.expo.dev/router/introduction/" }
+  - { id: eas-build, title: "EAS Build · Setup", url: "https://docs.expo.dev/build/setup/" }
+  - { id: rn-pressable, title: "React Native · Pressable", url: "https://reactnative.dev/docs/pressable" }
+  - { id: supabase-auth, title: "Supabase JS · signInWithPassword", url: "https://supabase.com/docs/reference/javascript/auth-signinwithpassword" }
+  - { id: nextjs-routing, title: "Next.js · App Router", url: "https://nextjs.org/docs/app/building-your-application/routing" }
+  - { id: tauri-start, title: "Tauri · Create a project", url: "https://v2.tauri.app/start/create-project/" }
+
+# Official doc sites. Read online inside the hub (nothing downloaded); the online Ask
+# searches their page lists (search.url: tried in order, first that works).
+sites:
+  - id: expo
+    title: Expo
+    about: Expo SDK, Expo Router, EAS Build
+    home: https://docs.expo.dev/
+    search: { type: sitemap, url: https://docs.expo.dev/sitemap.xml, prefix: "https://docs.expo.dev/" }
+  - id: react-native
+    title: React Native
+    about: Core components and APIs
+    home: https://reactnative.dev/docs/getting-started
+    search: { type: sitemap, url: https://reactnative.dev/sitemap.xml, prefix: "https://reactnative.dev/docs/" }
+  - id: supabase
+    title: Supabase
+    about: Database, auth, storage, JavaScript client
+    home: https://supabase.com/docs
+    search: { type: sitemap, url: [https://supabase.com/docs/sitemap.xml, https://supabase.com/sitemap.xml], prefix: "https://supabase.com/docs/" }
+  - id: nextjs
+    title: Next.js
+    about: App Router, data fetching, API routes
+    home: https://nextjs.org/docs
+    search: { type: sitemap, url: https://nextjs.org/sitemap.xml, prefix: "https://nextjs.org/docs" }
+  - id: tauri
+    title: Tauri
+    about: Desktop apps with a web UI and a Rust core
+    home: https://v2.tauri.app/start/
+    search: { type: sitemap, url: [https://v2.tauri.app/sitemap-index.xml, https://v2.tauri.app/sitemap.xml], prefix: "https://v2.tauri.app/" }

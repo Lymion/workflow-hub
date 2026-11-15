@@ -1,0 +1,247 @@
+board: esp32-devkit
+order: 1
+name: ESP32 DevKit V1
+pio_board: esp32dev
+platform: espressif32
+framework: arduino
+monitor_speed: 115200
+logic_voltage: 3.3
+max_pin_ma: 40
+glyph: E32
+color: '#1F3A5F'
+price_rm: 25
+wireless:
+- wifi
+- ble
+i2c:
+  sda: '21'
+  scl: '22'
+spi:
+  mosi: '23'
+  miso: '19'
+  sck: '18'
+  ss: '5'
+led: '2'
+header:
+  left:
+  - '36'
+  - '39'
+  - '34'
+  - '35'
+  - '32'
+  - '33'
+  - '25'
+  - '26'
+  - '27'
+  - '14'
+  - '12'
+  - '13'
+  right:
+  - '23'
+  - '22'
+  - '1'
+  - '3'
+  - '21'
+  - '19'
+  - '18'
+  - '5'
+  - '17'
+  - '16'
+  - '4'
+  - '2'
+  - '15'
+pins:
+- id: '1'
+  label: GPIO 1 (TX0)
+  caps:
+  - digital
+  - output
+  - pwm
+  reserved: USB serial
+  note: USB serial TX. Using it breaks Serial.print and uploads.
+- id: '2'
+  label: GPIO 2
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - touch
+  strapping: warn
+  note: Onboard LED; must be low or floating at boot.
+- id: '3'
+  label: GPIO 3 (RX0)
+  caps:
+  - digital
+  - output
+  - pwm
+  reserved: USB serial
+  note: USB serial RX. Using it breaks Serial.print and uploads.
+- id: '4'
+  label: GPIO 4
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - touch
+- id: '5'
+  label: GPIO 5
+  caps:
+  - digital
+  - output
+  - pwm
+  strapping: warn
+  note: Outputs a PWM pulse at boot.
+- id: '12'
+  label: GPIO 12
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - touch
+  strapping: bad
+  note: Sets flash voltage at boot. A load here can stop the board starting.
+- id: '13'
+  label: GPIO 13
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - touch
+- id: '14'
+  label: GPIO 14
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - touch
+- id: '15'
+  label: GPIO 15
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - touch
+  strapping: warn
+  note: Outputs a pulse at boot; silences boot log when low.
+- id: '16'
+  label: GPIO 16 (RX2)
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '17'
+  label: GPIO 17 (TX2)
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '18'
+  label: GPIO 18
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '19'
+  label: GPIO 19
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '21'
+  label: GPIO 21
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '22'
+  label: GPIO 22
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '23'
+  label: GPIO 23
+  caps:
+  - digital
+  - output
+  - pwm
+- id: '25'
+  label: GPIO 25
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - dac
+- id: '26'
+  label: GPIO 26
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - dac
+- id: '27'
+  label: GPIO 27
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc2
+  - touch
+- id: '32'
+  label: GPIO 32
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc1
+  - touch
+- id: '33'
+  label: GPIO 33
+  caps:
+  - digital
+  - output
+  - pwm
+  - adc1
+  - touch
+- id: '34'
+  label: GPIO 34
+  caps:
+  - digital
+  - adc1
+  input_only: true
+  note: Input only, no pull-ups.
+- id: '35'
+  label: GPIO 35
+  caps:
+  - digital
+  - adc1
+  input_only: true
+  note: Input only, no pull-ups.
+- id: '36'
+  label: GPIO 36 (VP)
+  caps:
+  - digital
+  - adc1
+  input_only: true
+  note: Input only, no pull-ups.
+- id: '39'
+  label: GPIO 39 (VN)
+  caps:
+  - digital
+  - adc1
+  input_only: true
+  note: Input only, no pull-ups.
+good_for: 'The best all-rounder: Wi-Fi, Bluetooth, lots of PWM pins and plenty of speed for robots.'
+watch_out: "3.3V logic. GPIO 0, 2, 5, 12 and 15 are strapping pins; 34\u201339 are input-only."
+wokwi:
+  element: wokwi-esp32-devkit-v1
+  prefix: D
+  pins: {'36': VP, '39': VN, '1': TX0, '3': RX0, '16': RX2, '17': TX2}

@@ -1,0 +1,36 @@
+title: Pick a stack for your app
+questions:
+  - id: platform
+    q: Where will people use it?
+    options:
+      - { label: "On their phone", boost: { expo: 4, expo-router: 2 } }
+      - { label: "In a web browser", boost: { nextjs: 4 } }
+      - { label: "As a desktop app", boost: { tauri: 4 } }
+  - id: offline
+    q: Must it work without internet?
+    options:
+      - { label: "Yes, offline first", boost: { sqlite: 3 } }
+      - { label: "No, it's always online", boost: { supabase: 1, firebase: 1 } }
+  - id: accounts
+    q: Do people sign in and share data?
+    options:
+      - { label: "Yes, with accounts and sync", boost: { supabase: 3, firebase: 2 } }
+      - { label: "Live updates between users", boost: { firebase: 3, supabase: 2 } }
+      - { label: "No, it's just for one person", boost: { sqlite: 2, zustand: 1 } }
+  - id: state
+    q: Does a lot of the app share the same data?
+    options:
+      - { label: "Yes, many screens use it", boost: { zustand: 3 } }
+      - { label: "Not really", boost: {} }
+  - id: style
+    q: How do you like to style?
+    options:
+      - { label: "Tailwind classes", boost: { nativewind: 3 } }
+      - { label: "Plain styles and theme tokens", boost: {} }
+  - id: ship
+    q: How will you share it?
+    multi: true
+    options:
+      - { label: "An APK for Android friends", boost: { eas: 3, expo: 1 } }
+      - { label: "A website link", boost: { nextjs: 2 } }
+      - { label: "An installer file", boost: { tauri: 2 } }
