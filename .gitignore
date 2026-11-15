@@ -8,6 +8,7 @@ __pycache__/
 .pytest_cache/
 # scratch prototype notes
 scratch/notes.txt
+scratch/shots/
 # app
 node_modules/
 app/dist/

@@ -36,6 +36,19 @@ docs:
   url: https://docs.arduino.cc/language-reference/en/functions/advanced-io/pulseIn/
 - title: "Arduino · digitalWrite()"
   url: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/
+model:
+  tag: 16
+  shapes:
+  - {w: 45, d: 20, h: 1.6, color: '#2257c2', top: '#2a64d4'}
+  - {kind: cyl, x: -13, r: 7.6, z: 1.6, h: 12, color: '#c5cbd3', top: '#d9dee5', inner: '#3a404c'}
+  - {kind: cyl, x: 13, r: 7.6, z: 1.6, h: 12, color: '#c5cbd3', top: '#d9dee5', inner: '#3a404c'}
+  - {y: -5, w: 6, d: 3, z: 1.6, h: 1.6, color: '#d8dbe0'}
+  - {y: 8.5, w: 10.2, d: 2.5, z: 1.6, h: 2.6, color: '#14171d'}
+  pins:
+    VCC: [-3.81, 8.5, 4.6]
+    TRIG: [-1.27, 8.5, 4.6]
+    ECHO: [1.27, 8.5, 4.6]
+    GND: [3.81, 8.5, 4.6]
 ---
 # HC-SR04 ultrasonic sensor
 

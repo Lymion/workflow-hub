@@ -32,6 +32,19 @@ docs:
   url: https://www.airspayce.com/mikem/arduino/AccelStepper/
 - title: "Arduino · Stepper library"
   url: https://docs.arduino.cc/libraries/stepper/
+model:
+  tag: 24
+  shapes:
+  - {kind: cyl, r: 14, h: 19, color: '#c5cbd3', top: '#d9dee5'}
+  - {kind: cyl, x: 0, y: -8, r: 4.5, z: 19, h: 1.5, color: '#c5cbd3'}
+  - {x: 32, w: 21, d: 35, h: 1.6, color: '#2b6de0', top: '#3b7cf0'}
+  - {x: 32, w: 6, d: 18, z: 1.6, h: 4, color: '#1d1f24'}
+  - {x: 40, w: 2.5, d: 10.2, z: 1.6, h: 2.6, color: '#14171d'}
+  pins:
+    IN1: [40, -3.81, 4.6]
+    IN2: [40, -1.27, 4.6]
+    IN3: [40, 1.27, 4.6]
+    IN4: [40, 3.81, 4.6]
 ---
 # 28BYJ-48 stepper + ULN2003
 

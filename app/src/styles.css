@@ -28,6 +28,10 @@
   --blur: blur(24px) saturate(180%);
   --ease-out: cubic-bezier(.23,1,.32,1);
   --ease-drawer: cubic-bezier(.32,.72,0,1);
+  /* wiring bench: drawing-board paper, ink outlines, callout cards */
+  --paper: #F6EFE1; --paper-grid: rgba(120,92,52,.10); --paper-grid-2: rgba(120,92,52,.16); --paper-trace: rgba(176,128,64,.20);
+  --ink: #1C2333; --bench-shadow: rgba(60,40,20,.16); --callout: rgba(255,252,246,.94); --callout-line: rgba(28,35,51,.14); --hot: #F56300;
+  --font-label: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
 }
 /* ---------- tokens (dark) ---------- */
 :root[data-theme="dark"] {
@@ -51,6 +55,8 @@
   --hl: inset 0 1px 0 rgba(255,255,255,.07);
   --shadow-1: 0 0 0 .5px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -12px rgba(0,0,0,.6);
   --shadow-2: 0 0 0 .5px rgba(0,0,0,.6), 0 2px 6px rgba(0,0,0,.4), 0 28px 56px -16px rgba(0,0,0,.7);
+  --paper: #111A29; --paper-grid: rgba(120,170,230,.07); --paper-grid-2: rgba(120,170,230,.12); --paper-trace: rgba(90,169,255,.16);
+  --ink: #05080E; --bench-shadow: rgba(0,0,0,.38); --callout: rgba(22,30,46,.94); --callout-line: rgba(160,190,230,.18); --hot: #FF8A3D;
 }
 
 @layer base {

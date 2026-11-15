@@ -33,10 +33,13 @@ def suitable(board: dict, mode: str, pin: dict) -> bool:
 
 
 def suggest(board: dict, mode: str, used: set[str]) -> str | None:
-    """First free pin that suits the mode and has no boot or serial catches."""
-    for p in board.get("pins", []):
-        if p["id"] not in used and suitable(board, mode, p):
-            return p["id"]
+    """First free pin that suits the mode and has no boot or serial catches.
+    Signals that aren't I2C keep off the board's SDA/SCL pins (I2C parts share those) unless nothing else is left."""
+    bus = set() if (mode or "").upper() == "I2C" else {str(v) for v in board.get("i2c", {}).values()}
+    for avoid_bus in (True, False):
+        for p in board.get("pins", []):
+            if p["id"] not in used and suitable(board, mode, p) and not (avoid_bus and p["id"] in bus):
+                return p["id"]
     return None
 
 
@@ -88,11 +91,26 @@ def pin_checks(board: dict, assignments: list[dict]) -> list[dict]:
         volt = str(a.get("voltage") or "")
         if mode.startswith("INPUT") and volt.startswith("5") and logic < 4.5 and not a.get("divider"):
             out.append(_finding("warn", name, f"outputs 5V into {pin['label']} ({logic:g}V)", "Add a 1k/2k voltage divider.", signal=a["signal"], gpio=gpio))
+    role = {str(v): k.upper() for k, v in board.get("i2c", {}).items()}
     for gpio, users in by_pin.items():
-        if len(users) > 1 and not all((u.get("mode") or "").upper() == "I2C" for u in users):
-            names = " and ".join(f"{u.get('part_title') or u['part']} {u['part_pin']}" for u in users)
-            free = suggest(board, users[-1].get("mode", "OUTPUT"), used)
-            out.append(_finding("bad", names, f"share {_label(board, gpio)}", f"Move one of them{f' to {_label(board, free)}' if free else ''}.", gpio=gpio))
+        if len(users) < 2:
+            continue
+        on_bus = [u for u in users if (u.get("mode") or "").upper() == "I2C"]
+        others = [u for u in users if (u.get("mode") or "").upper() != "I2C"]
+        if not others:
+            continue  # I2C parts sharing SDA/SCL is how the bus works
+        if on_bus:
+            # a plain signal sitting on the shared I2C pin: only that signal has to move
+            bus = ", ".join(dict.fromkeys(u.get("part_title") or u["part"] for u in on_bus))
+            for u in others:
+                free = suggest(board, (u.get("mode") or "OUTPUT").upper(), used)
+                what = f"the I2C {role[gpio]} pin" if gpio in role else "an I2C pin"
+                out.append(_finding("bad", f"{u.get('part_title') or u['part']} {u['part_pin']}", f"is on {_label(board, gpio)}, {what} that {bus} share{'s' if len(on_bus) == 1 else ''}",
+                                    f"Move it{f' to {_label(board, free)}' if free else ' to a free pin'}; the I2C parts stay.", signal=u["signal"], gpio=gpio))
+            continue
+        names = " and ".join(f"{u.get('part_title') or u['part']} {u['part_pin']}" for u in others)
+        free = suggest(board, others[-1].get("mode", "OUTPUT"), used)
+        out.append(_finding("bad", names, f"share {_label(board, gpio)}", f"Move one of them{f' to {_label(board, free)}' if free else ''}.", gpio=gpio))
     return out
 
 

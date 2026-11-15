@@ -168,3 +168,29 @@ watch_out: Large, no wireless, only six PWM pins (3, 5, 6, 9, 10, 11).
 wokwi:
   element: wokwi-arduino-uno
   prefix: ''
+# 3D drawing for the Wiring tab: plan mm, origin at the board's centre, z up.
+model:
+  size: [53.3, 68.6, 1.6]
+  color: '#0b6f86'
+  top: '#0f7f99'
+  silk: '#f2f7f8'
+  pitch: 2.54
+  label: UNO
+  label_at: [6, 8]
+  prefix: ''
+  names: {}
+  rows:
+  - {x: -24.1, y: -14, pins: [IOREF, RST, 3V3, 5V, GND, GND, VIN, '', A0, A1, A2, A3, A4, A5]}
+  - {x: 24.1, y: -24, pins: [AREF, GND, '13', '12', '11', '10', '9', '8', '', '7', '6', '5', '4', '3', '2', '1', '0']}
+  shapes:
+  - {x: -9, y: -31, w: 12, d: 16, h: 11, color: '#b4bac4', top: '#cfd4db'}
+  - {x: 14, y: -31.5, w: 9, d: 13.5, h: 11, color: '#202329'}
+  - {x: 6, y: 12, w: 7.6, d: 35, h: 3.6, color: '#24272e', text: ATMEGA328P}
+  - {x: -14, y: 0, w: 5, d: 5, h: 1.1, color: '#24272e'}
+  - {x: -17, y: -22, w: 6, d: 6, h: 2, color: '#d7dbe0'}
+  hotspots:
+  - {x: -9, y: -31, z: 9.5, title: USB port, body: Power and uploads. Big USB-B socket.}
+  - {x: 14, y: -31.5, z: 9.5, title: Power jack, body: 7–12 V from a battery or adapter.}
+  - {x: 6, y: 12, z: 2, title: ATmega328P, body: '16 MHz, 5 V logic. Runs your sketch.'}
+  - {row: 1, title: Digital pins, body: '0–13. PWM on 3, 5, 6, 9, 10, 11.'}
+  - {row: 0, title: Power · analog, body: '5V, 3V3, GND, VIN and A0–A5.'}
