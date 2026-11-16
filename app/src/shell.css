@@ -528,7 +528,7 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .bench-seg { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--callout); border: 1px solid var(--callout-line); box-shadow: var(--hl), var(--shadow-1); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); }
 .bench-seg button { padding: 5px 12px; border: 0; border-radius: 8px; background: none; cursor: pointer; font: 600 12.5px var(--font-label); letter-spacing: .06em; text-transform: uppercase; color: var(--label-2); transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out); }
 .bench-seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
-:root[data-theme="dark"] .bench-seg button[aria-pressed="true"], :root[data-theme="glass"] .bench-seg button[aria-pressed="true"] { background: var(--hot); color: #111; }
+:root[data-theme="dark"] .bench-seg button[aria-pressed="true"] { background: var(--hot); color: #111; }
 .bench-hint { font: 500 12px var(--font-label); letter-spacing: .08em; text-transform: uppercase; color: var(--label-2); padding: 6px 10px; border-radius: 9px; background: var(--callout); border: 1px solid var(--callout-line); }
 .bench-tools { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: max-content; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 13px; background: var(--callout); border: 1px solid var(--callout-line); box-shadow: var(--hl), var(--shadow-2); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); max-width: calc(100% - 20px); flex-wrap: wrap; justify-content: center; }
 .bench-tools button { width: 34px; height: 34px; border: 0; border-radius: 9px; background: none; display: grid; place-items: center; color: var(--label-2); cursor: pointer; transition: background-color 140ms var(--ease-out), color 140ms var(--ease-out), transform 120ms var(--ease-out); }
@@ -685,3 +685,5 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .bench.bench-full > svg { height: 100vh; }
 body.bench-is-full main { overflow: hidden; }
 body.bench-is-full .rise { transform: none !important; animation: none !important; } /* a leftover transform would trap the fixed bench */
+
+:root[data-theme="glass"] .bench-seg button[aria-pressed="true"] { background: rgba(255,255,255,.9); color: #111; }
