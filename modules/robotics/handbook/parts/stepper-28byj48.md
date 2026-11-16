@@ -40,6 +40,12 @@ model:
   - {x: 32, w: 21, d: 35, h: 1.6, color: '#2b6de0', top: '#3b7cf0'}
   - {x: 32, w: 6, d: 18, z: 1.6, h: 4, color: '#1d1f24'}
   - {x: 40, w: 2.5, d: 10.2, z: 1.6, h: 2.6, color: '#14171d'}
+  - {x: 0, y: 0, w: 42, d: 7, z: 17.5, h: 1.2, color: '#c5cbd3', top: '#d9dee5'}
+  - {kind: cyl, x: -17.5, y: 0, r: 2, z: 18.7, h: 0.12, color: '#9aa3ad', inner: '#20242c'}
+  - {kind: cyl, x: 17.5, y: 0, r: 2, z: 18.7, h: 0.12, color: '#9aa3ad', inner: '#20242c'}
+  - {kind: cyl, x: 0, y: -8, r: 1.5, z: 20.5, h: 6, color: '#e9c46a'}
+  - {x: 0, y: 14.5, w: 14, d: 4, z: 3, h: 12, color: '#3a7bd5'}
+  - {x: 32, y: -10, w: 12, d: 6, z: 1.6, h: 0.1, color: '#3b7cf0', text: 'ULN2003'}
   pins:
     IN1: [40, -3.81, 4.6]
     IN2: [40, -1.27, 4.6]

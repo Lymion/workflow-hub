@@ -12,7 +12,7 @@ from pathlib import Path
 
 HOST = "127.0.0.1"
 PORT = 8765
-VERSION = "0.4.1"
+VERSION = "0.5.0"
 
 # The hub only ever calls this model. It is fixed here, in one line, on purpose:
 # there is no setting to pick another model.

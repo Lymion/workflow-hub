@@ -32,6 +32,10 @@ model:
   - {x: -12, w: 6, d: 10, z: 1.6, h: 4, color: '#1d1f24'}
   - {kind: cyl, x: 4, y: -2, r: 3.2, z: 1.6, h: 5, color: '#2f6fe0'}
   - {x: 14, w: 2.5, d: 10.2, z: 1.6, h: 2.6, color: '#14171d'}
+  - {kind: cyl, x: 4, y: -2, r: 1.6, z: 6.6, h: 0.5, color: '#c7ccd3', top: '#e3e6ea', inner: '#6b737e'}
+  - {kind: cyl, x: -5, y: 4, r: 1, z: 1.6, h: 1.2, color: '#ff453a', top: '#ff7b73'}
+  - {kind: cyl, x: -1, y: 4, r: 1, z: 1.6, h: 1.2, color: '#30d158', top: '#7ee29a'}
+  - {x: 3, y: 4.6, w: 8, d: 2.6, z: 1.6, h: 0.1, color: '#2a64d4', text: 'IR'}
   pins:
     DO: [14, 1.27, 4.6]
     AO: [14, 3.81, 4.6]

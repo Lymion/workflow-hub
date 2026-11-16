@@ -33,6 +33,11 @@ model:
   shapes:
   - {w: 12, d: 12, h: 3.5, color: '#2b2e35', top: '#353942'}
   - {kind: cyl, r: 3.5, z: 3.5, h: 2.2, color: '#e5484d', top: '#ff6b70'}
+  - {kind: cyl, r: 4.2, z: 3.5, h: 0.6, color: '#1f2228'}
+  - {x: -4.6, y: -4.6, w: 1.2, d: 1.2, z: 3.5, h: 0.4, color: '#c7ccd3'}
+  - {x: -4.6, y: 4.6, w: 1.2, d: 1.2, z: 3.5, h: 0.4, color: '#c7ccd3'}
+  - {x: 4.6, y: -4.6, w: 1.2, d: 1.2, z: 3.5, h: 0.4, color: '#c7ccd3'}
+  - {x: 4.6, y: 4.6, w: 1.2, d: 1.2, z: 3.5, h: 0.4, color: '#c7ccd3'}
   pins:
     BTN: [6, 4, 2]
 ---

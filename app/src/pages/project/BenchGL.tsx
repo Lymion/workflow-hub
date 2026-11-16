@@ -18,7 +18,7 @@ type GL = {
   renderer: THREE.WebGLRenderer; scene: THREE.Scene; camera: THREE.PerspectiveCamera; controls: OrbitControls;
   content: THREE.Group; groundMat: THREE.MeshBasicMaterial; gridTex: THREE.CanvasTexture; sun: THREE.DirectionalLight;
   ink: THREE.LineBasicMaterial; flowTex: THREE.Texture; dirty: boolean; tween: number; raf: number;
-  parts: Map<string, THREE.Group>; wires: Map<string, { mats: THREE.MeshLambertMaterial[]; flow: THREE.Mesh }>; glow: Map<string, THREE.Mesh[]>;
+  parts: Map<string, THREE.Group>; wires: Map<string, { mats: THREE.MeshToonMaterial[]; hulls: THREE.Object3D[]; flow: THREE.Mesh }>; glow: Map<string, THREE.Mesh[]>;
   pickables: THREE.Object3D[]; board: THREE.Group | null; saved: { pos: THREE.Vector3; target: THREE.Vector3 } | null;
 };
 
@@ -45,7 +45,8 @@ export default function BenchGL(p: BenchProps) {
   // ---------- set up three.js once ----------
   useEffect(() => {
     const el = host.current!;
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -86,7 +87,7 @@ export default function BenchGL(p: BenchProps) {
     scene.add(content);
     const flowTex = stripeTexture();
     const g: GL = {
-      renderer, scene, camera, controls, content, groundMat, gridTex, sun, ink: new THREE.LineBasicMaterial({ color: 0x1c2333, transparent: true, opacity: 0.85 }),
+      renderer, scene, camera, controls, content, groundMat, gridTex, sun, ink: new THREE.LineBasicMaterial({ color: 0x141a26 }),
       flowTex, dirty: true, tween: 0, raf: 0, parts: new Map(), wires: new Map(), glow: new Map(), pickables: [], board: null, saved: null,
     };
     gl.current = g;
@@ -135,9 +136,12 @@ export default function BenchGL(p: BenchProps) {
   useEffect(() => {
     const g = gl.current;
     if (!g) return;
-    const paper = css("--paper", "#F6EFE1");
-    g.scene.background = new THREE.Color(paper);
-    drawGrid(g.gridTex, paper, css("--paper-grid", "rgba(120,92,52,.10)"), css("--paper-grid-2", "rgba(120,92,52,.16)"));
+    const paper = css("--paper", "#F6EFE1"), glass = theme === "glass";
+    // frosted glass: no paper, just the grid, so the frosted bench behind the canvas shows through
+    g.scene.background = glass ? null : new THREE.Color(paper);
+    g.groundMat.transparent = glass;
+    g.groundMat.needsUpdate = true;
+    drawGrid(g.gridTex, glass ? "rgba(0,0,0,0)" : paper, css("--paper-grid", "rgba(120,92,52,.10)"), css("--paper-grid-2", "rgba(120,92,52,.16)"));
     g.ink.color.set(css("--ink", "#1C2333"));
     g.dirty = true;
   }, [theme, ready]);
@@ -150,8 +154,8 @@ export default function BenchGL(p: BenchProps) {
     disposeTree(g.content);
     g.content.clear();
     g.parts.clear(); g.wires.clear(); g.glow.clear(); g.pickables = [];
-    const mats = new Map<string, THREE.MeshLambertMaterial>();
-    const mat = (c: string) => { let m = mats.get(c); if (!m) { m = new THREE.MeshLambertMaterial({ color: c }); mats.set(c, m); } return m; };
+    const mats = new Map<string, THREE.MeshToonMaterial>();
+    const mat = (c: string) => { let m = mats.get(c); if (!m) { m = new THREE.MeshToonMaterial({ color: c, gradientMap: toonRamp() }); mats.set(c, m); } return m; };
 
     // the board: its shapes, silkscreen, antenna trace, chip markings, pin targets
     const b = new THREE.Group();
@@ -189,7 +193,10 @@ export default function BenchGL(p: BenchProps) {
       for (const it of d.insts) {
         const grp = new THREE.Group();
         grp.position.copy(V(it.at[0], it.at[1], 0));
-        it.model.shapes.forEach((sh) => grp.add(shapeMesh(sh, mat, g.ink)));
+        it.model.shapes.forEach((sh) => {
+          grp.add(shapeMesh(sh, mat, g.ink));
+          if (sh.text) { const t = textPlane(sh, labelInk(sh.top ?? sh.color)); t.position.set(sh.x ?? 0, (sh.z ?? 0) + sh.h + 0.03, sh.y ?? 0); grp.add(t); }
+        });
         grp.traverse((o) => { o.userData.part = it.id; });
         g.content.add(grp);
         g.parts.set(it.id, grp);
@@ -200,27 +207,28 @@ export default function BenchGL(p: BenchProps) {
         if (!w.boardPin) continue;
         const route = d.routes.get(wid(w));
         if (!route || route.length < 2) continue;
-        const A = V(...route[0]), B = V(...route[route.length - 1]);
         const curve = new THREE.CatmullRomCurve3(route.map((q) => V(q[0], q[1], q[2])), false, "centripetal");
-        const segs = Math.min(400, route.length * 2);
+        const segs = Math.min(400, route.length * 3);
         const col = p.color[wid(w)] ?? "#ff9f0a";
-        const wm = new THREE.MeshLambertMaterial({ color: col, transparent: true });
+        const wm = new THREE.MeshToonMaterial({ color: col, gradientMap: toonRamp(), transparent: true });
         if (p.bad(w)) { wm.alphaMap = stripeTexture(10); wm.alphaMap.repeat.set(14, 1); wm.alphaTest = 0.5; }
-        const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, 0.45, 8), wm);
+        const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, 0.62, 10), wm);
         tube.castShadow = true;
-        const endM = new THREE.MeshLambertMaterial({ color: col, transparent: true });
-        const e1 = new THREE.Mesh(new THREE.SphereGeometry(0.75, 12, 10), endM), e2 = e1.clone();
-        e1.position.copy(A); e2.position.copy(B);
-        const fl = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, 0.5, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, alphaMap: g.flowTex, transparent: true, depthWrite: false }));
+        const line = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, 0.62 + 0.34, 10), HULL); // heavy ink outline
+        line.userData.hull = true;
+        // plug housings on both pins, in a darker shade of the wire
+        const endM = new THREE.MeshToonMaterial({ color: shade(col, -0.45), gradientMap: toonRamp(), transparent: true });
+        const plugs = [[route[0], route[1]], [route[route.length - 1], route[route.length - 2]]].map(([pin, top]) => plugMesh(V(...pin), V(...top), endM));
+        const fl = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, 0.68, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, alphaMap: g.flowTex, transparent: true, depthWrite: false }));
         fl.visible = false;
         const hit = new THREE.Mesh(new THREE.TubeGeometry(curve, Math.ceil(segs / 2), 1.8, 6), hitWireMat);
         hit.userData = { wire: wid(w) };
-        g.content.add(tube, e1, e2, fl, hit);
+        g.content.add(tube, line, ...plugs, fl, hit);
         g.pickables.push(hit);
-        g.wires.set(wid(w), { mats: [wm, endM], flow: fl });
+        g.wires.set(wid(w), { mats: [wm, endM], flow: fl, hulls: [line, ...plugs.map((x) => x.children[0])] });
       }
     }
-    g.content.traverse((o) => { if ((o as THREE.Mesh).isMesh && !(o as THREE.Mesh).userData.pin && !(o as THREE.Mesh).userData.wire) { o.castShadow = true; } });
+    g.content.traverse((o) => { const u = (o as THREE.Mesh).userData; if ((o as THREE.Mesh).isMesh && !u.pin && !u.wire && !u.hull) { o.castShadow = true; } });
     g.dirty = true;
   }, [ready, d.boardShapes, d.insts, d.routes, wires, showParts, p.color, theme]);
 
@@ -264,6 +272,7 @@ export default function BenchGL(p: BenchProps) {
       if (!e) continue;
       const dim = p.traced ? wid(w) !== p.traced : p.selPart ? `${w.part}#${w.instance}` !== p.selPart : false;
       e.mats.forEach((m) => { m.opacity = dim ? 0.12 : 1; m.depthWrite = !dim; });
+      e.hulls.forEach((h) => { h.visible = !dim; });
       e.flow.visible = flow && !dim;
     }
     // close-up: other parts fade back
@@ -535,30 +544,70 @@ function fly(g: GL, target: THREE.Vector3, pos: THREE.Vector3, ms = 650) {
   g.tween = requestAnimationFrame(step);
 }
 
-function shapeMesh(sh: Shape, mat: (c: string) => THREE.MeshLambertMaterial, ink: THREE.LineBasicMaterial) {
-  const side = mat(sh.color), top = mat(sh.top ?? shade(sh.color, 0.06));
-  let geo: THREE.BufferGeometry, mesh: THREE.Mesh;
+// ---------- stylised look: cel shading with heavy ink outlines ----------
+const HULL = new THREE.MeshBasicMaterial({ color: 0x141a26, side: THREE.BackSide });
+let ramp: THREE.DataTexture | null = null;
+/** Three flat tones (shadow, mid, lit) instead of smooth shading. */
+function toonRamp() {
+  if (!ramp) {
+    ramp = new THREE.DataTexture(new Uint8Array([120, 200, 255]), 3, 1, THREE.RedFormat);
+    ramp.minFilter = ramp.magFilter = THREE.NearestFilter;
+    ramp.needsUpdate = true;
+  }
+  return ramp;
+}
+/** A slightly larger dark copy behind a shape, seen only around its edges: a thick outline at any angle. */
+function outline(geo: THREE.BufferGeometry) {
+  const m = new THREE.Mesh(geo, HULL);
+  m.userData.hull = true;
+  return m;
+}
+/** Dark or light printing, whichever reads on the surface. */
+function labelInk(bg: string) { return new THREE.Color(bg).getHSL({ h: 0, s: 0, l: 0 }).l > 0.6 ? "#2a2f3a" : "rgba(255,255,255,.85)"; }
+/** A jumper's plug housing from the pin towards the wire. */
+function plugMesh(pin: THREE.Vector3, top: THREE.Vector3, m: THREE.Material) {
+  const dir = top.clone().sub(pin), len = dir.length();
+  const box = new THREE.Mesh(new THREE.BoxGeometry(2.5, len, 2.5), m);
+  box.add(outline(new THREE.BoxGeometry(2.5 + 0.6, len + 0.6, 2.5 + 0.6)));
+  box.position.copy(pin).addScaledVector(dir, 0.5);
+  box.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+  box.castShadow = true;
+  return box;
+}
+
+function shapeMesh(sh: Shape, mat: (c: string) => THREE.Material, ink: THREE.LineBasicMaterial) {
+  const side = mat(sh.color), top = mat(sh.top ?? shade(sh.color, 0.08));
+  let geo: THREE.BufferGeometry, mesh: THREE.Mesh, hull: THREE.BufferGeometry | null = null;
   if (sh.kind === "cyl") {
-    geo = new THREE.CylinderGeometry(sh.r ?? 2, sh.r ?? 2, sh.h, 36);
+    const r = sh.r ?? 2, t = Math.min(0.32, r * 0.18);
+    geo = new THREE.CylinderGeometry(r, r, sh.h, 36);
     mesh = new THREE.Mesh(geo, [side, top, side]);
+    if (r > 0.5) hull = new THREE.CylinderGeometry(r + t, r + t, sh.h + t * 2, 36);
     if (sh.inner) {
-      const disc = new THREE.Mesh(new THREE.CircleGeometry((sh.r ?? 2) * 0.68, 32).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: sh.inner }));
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(r * 0.68, 32).rotateX(-Math.PI / 2), new THREE.MeshToonMaterial({ color: sh.inner, gradientMap: toonRamp() }));
       disc.position.y = sh.h / 2 + 0.03;
       mesh.add(disc);
+      const ring = new THREE.Mesh(new THREE.RingGeometry(r * 0.68, r * 0.68 + Math.min(0.3, r * 0.08), 32).rotateX(-Math.PI / 2), HULL.clone());
+      (ring.material as THREE.MeshBasicMaterial).side = THREE.DoubleSide;
+      ring.position.y = sh.h / 2 + 0.04;
+      mesh.add(ring);
     }
   } else {
-    geo = new THREE.BoxGeometry(sh.w ?? 1, sh.h, sh.d ?? 1);
+    const w = sh.w ?? 1, d = sh.d ?? 1, t = Math.min(0.32, Math.min(w, d, sh.h) * 0.18);
+    geo = new THREE.BoxGeometry(w, sh.h, d);
     mesh = new THREE.Mesh(geo, [side, side, top, side, side, side]);
+    if (Math.min(w, d) > 1.2) hull = new THREE.BoxGeometry(w + t * 2, sh.h + t * 2, d + t * 2);
   }
   mesh.position.copy(V(sh.x ?? 0, sh.y ?? 0, (sh.z ?? 0) + sh.h / 2));
-  if ((sh.w ?? 9) > 1.2 || sh.kind === "cyl") mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 30), ink)); // ink outlines (skip the tiny pins)
+  if (hull) mesh.add(outline(hull)); // the heavy silhouette
+  if (((sh.w ?? 9) > 1.2 || sh.kind === "cyl") && sh.h >= 0.3) mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 30), ink)); // inner edges (not on printed plates)
   return mesh;
 }
 
 function fade(grp: THREE.Group, on: boolean) {
   grp.traverse((o) => {
     const m = o as THREE.Mesh;
-    if ((o as THREE.LineSegments).isLineSegments) { o.visible = !on; return; }
+    if ((o as THREE.LineSegments).isLineSegments || o.userData.hull) { o.visible = !on; return; }
     if (!m.isMesh) return;
     if (on && !m.userData.solid) { m.userData.solid = m.material; m.material = (Array.isArray(m.material) ? m.material : [m.material]).map((x) => { const c = (x as THREE.MeshLambertMaterial).clone(); c.transparent = true; c.opacity = 0.16; c.depthWrite = false; return c; }); }
     if (!on && m.userData.solid) { (Array.isArray(m.material) ? m.material : [m.material]).forEach((x) => x.dispose()); m.material = m.userData.solid; delete m.userData.solid; }
@@ -593,6 +642,7 @@ function drawGrid(tex: THREE.CanvasTexture, paper: string, minor: string, major:
   const c = tex.image as HTMLCanvasElement;
   c.width = c.height = 256;
   const x = c.getContext("2d")!;
+  x.clearRect(0, 0, 256, 256);
   x.fillStyle = paper; x.fillRect(0, 0, 256, 256);
   x.lineWidth = 1;
   x.strokeStyle = minor;
@@ -640,7 +690,7 @@ function textPlane(sh: Shape, color: string) {
     const x = c.getContext("2d")!;
     x.clearRect(0, 0, c.width, c.height);
     x.fillStyle = color; x.textAlign = "center"; x.textBaseline = "middle";
-    const size = Math.min(1.9, ((w * 0.9) / Math.max(4, (sh.text ?? "").length)) * 1.7) * ppm;
+    const size = Math.min(sh.h < 0.3 ? dd * 0.62 : 1.9, ((w * 0.9) / Math.max(4, (sh.text ?? "").length)) * 1.7) * ppm; // printed labels fill their plate
     x.font = `600 ${size}px "Barlow Semi Condensed", "Arial Narrow", sans-serif`;
     x.fillText(sh.text ?? "", c.width / 2, c.height / 2);
     tex.needsUpdate = true;

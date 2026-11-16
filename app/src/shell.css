@@ -327,7 +327,7 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 
 /* ---------- wiring: pin table pieces shared with the Wires panel ---------- */
 :root { --mat: #EEF1F5; --mat-dot: rgba(0,0,0,.09); }
-:root[data-theme="dark"] { --mat: #15171C; --mat-dot: rgba(255,255,255,.07); }
+:root[data-theme="dark"], :root[data-theme="glass"] { --mat: #15171C; --mat-dot: rgba(255,255,255,.07); }
 .pin-tbl td { vertical-align: middle; }
 .pin-row { cursor: pointer; transition: background-color 150ms ease; }
 .pin-row.hot { background: var(--accent-tint); }
@@ -424,7 +424,7 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .k-code { background: var(--green-tint); color: var(--green-text); }
 .k-haiku { background: var(--accent-tint); color: var(--accent-text); }
 .k-claude { background: rgba(191,90,242,.14); color: #8E3BD1; }
-:root[data-theme="dark"] .k-claude { color: #D9A0FF; }
+:root[data-theme="dark"] .k-claude, :root[data-theme="glass"] .k-claude { color: #D9A0FF; }
 .switch { position: relative; display: inline-block; width: 42px; height: 26px; flex: none; margin-top: 6px; }
 .switch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; z-index: 1; }
 .switch span { position: absolute; inset: 0; border-radius: 999px; background: var(--fill-strong, rgba(120,120,128,.32)); transition: background-color 200ms var(--ease-out); }
@@ -685,3 +685,5 @@ tr.row-flash td { animation: flash 1100ms var(--ease-out); }
 .bench.bench-full > svg { height: 100vh; }
 body.bench-is-full main { overflow: hidden; }
 body.bench-is-full .rise { transform: none !important; animation: none !important; } /* a leftover transform would trap the fixed bench */
+
+:root[data-theme="glass"] .bench-seg button[aria-pressed="true"] { background: rgba(255,255,255,.9); color: #111; }
