@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { applyWindowGlass } from "../lib/windowGlass";
 import { Icon } from "./Icon";
 import type { EngineState } from "../App";
 
@@ -33,6 +34,7 @@ export function Sidebar({
   const [theme, setTheme] = useState(document.documentElement.dataset.theme || "light");
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    applyWindowGlass(theme);
     try {
       localStorage.setItem("wh-theme", theme);
     } catch {
