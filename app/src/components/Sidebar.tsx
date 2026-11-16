@@ -90,9 +90,16 @@ export function Sidebar({
           <a className="btn btn-ghost btn-sm ml-auto !px-2" href="#settings" aria-label="Settings" title="Settings">
             <Icon name="settings" />
           </a>
-          <button className="btn btn-ghost btn-sm !px-2" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
-            <Icon name={theme === "dark" ? "sun" : "moon"} />
-          </button>
+          {(() => {
+            // light → dark → frosted glass → light
+            const next = theme === "light" ? "dark" : theme === "dark" ? "glass" : "light";
+            const name = { light: "light mode", dark: "dark mode", glass: "frosted glass" } as Record<string, string>;
+            return (
+              <button className="btn btn-ghost btn-sm !px-2" onClick={() => setTheme(next)} aria-label={`Switch to ${name[next]}`} title={`Theme: ${name[theme] ?? theme}. Click for ${name[next]}`}>
+                <Icon name={next === "dark" ? "moon" : next === "glass" ? "glass" : "sun"} />
+              </button>
+            );
+          })()}
         </div>
       </div>
     </aside>

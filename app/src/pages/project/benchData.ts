@@ -91,7 +91,7 @@ export function computeBench(board: BenchBoard, parts: BenchPart[], wires: Bench
       if (!it || !bp || !a) continue;
       const k = lanes.get(it.id) ?? 0; // wires from the same part cruise at slightly different heights
       lanes.set(it.id, k + 1);
-      out.set(wid(w), routeWire([a[0] + it.at[0], a[1] + it.at[1], a[2]], [bp.x, bp.y, pinZ], it.id, boxes, k * 0.9));
+      out.set(wid(w), routeWire([a[0] + it.at[0], a[1] + it.at[1], a[2]], [bp.x, bp.y, pinZ], it.id, boxes, k * 1.6));
     }
     return out;
   })();

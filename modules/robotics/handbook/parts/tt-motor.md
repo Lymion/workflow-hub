@@ -30,6 +30,12 @@ model:
   - {w: 37, d: 22, h: 18.5, color: '#f2b705', top: '#f8c936'}
   - {x: 12, w: 4, d: 26, z: 7.5, h: 4, color: '#f3f3f3'}
   - {x: -14, w: 8, d: 10, z: 4, h: 10, color: '#e8e8ea'}
+  - {x: -1, y: 0, w: 16, d: 9, z: 18.5, h: 0.1, color: '#f8c936', text: 'TT MOTOR'}
+  - {kind: cyl, x: 9, y: -7, r: 1.3, z: 18.5, h: 0.12, color: '#c99a04', inner: '#20242c'}
+  - {kind: cyl, x: 9, y: 7, r: 1.3, z: 18.5, h: 0.12, color: '#c99a04', inner: '#20242c'}
+  - {kind: cyl, x: 12, y: 13.3, r: 2.2, z: 7.5, h: 0.5, color: '#f3f3f3', inner: '#c9c9cc'}
+  - {x: -18.3, y: -2.5, w: 0.6, d: 1.6, z: 7, h: 4, color: '#d6b25a'}
+  - {x: -18.3, y: 2.5, w: 0.6, d: 1.6, z: 7, h: 4, color: '#d6b25a'}
   pins:
     M+: [-18, -2.5, 9]
     M-: [-18, 2.5, 9]

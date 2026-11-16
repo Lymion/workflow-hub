@@ -2,6 +2,12 @@
 
 Each update the Windows installer delivers has a higher version, so it installs over the old one as an upgrade. Your data in `%LOCALAPPDATA%\Workflow Hub` is kept.
 
+## 0.5.0
+
+- **Stylised parts:** cel shading with heavy ink outlines on every part and board, and more detail: printed labels (SG90, MG996R, HC-SR04, L298N, OLED…), servo horn holes and screws, heatsink fins and terminal screws on the L298N, a vented grille on the DHT22, mounting holes, and the buzzer as a small module with its own header.
+- **Jumper wires:** every wire now sits in a plug on each pin (standing up on headers, pointing out of a part's side) and runs in one smooth outlined arch between them, lifted over anything in its way.
+- **Frosted glass theme:** a third theme next to light and dark. Panels become see-through frost over a soft, colourful blurred background, and the 3D bench turns to frosted glass too. Switch it with the theme button at the bottom of the sidebar (light → dark → glass).
+
 ## 0.4.1
 
 - **Fullscreen viewer:** a fullscreen button on the 3D bench and the schematic fills the screen with the view. Esc or the button returns. Switching between Board, Project and Schematic stays fullscreen.

@@ -27,9 +27,13 @@ docs:
 model:
   tag: 14
   shapes:
-  - {kind: cyl, r: 6, h: 9.5, color: '#1d1f24', top: '#2a2d34', inner: '#0b0c0f'}
+  - {w: 24, d: 14, h: 1.6, color: '#1f4fbf', top: '#2a5ed6'}
+  - {kind: cyl, x: 3, r: 6, z: 1.6, h: 9.5, color: '#1d1f24', top: '#2a2d34', inner: '#0b0c0f'}
+  - {x: -9.5, w: 2.5, d: 7.6, z: 1.6, h: 2.6, color: '#14171d'}
+  - {kind: cyl, x: -9.5, y: -5.5, r: 1.0, z: 1.6, h: 0.12, color: '#d9c27a', inner: '#20242c'}
+  - {x: 3, y: -6, w: 8, d: 1.8, z: 1.6, h: 0.1, color: '#2a5ed6', text: 'BUZZER'}
   pins:
-    SIG: [3.2, 5, 1.5]
+    SIG: [-9.5, 0, 4.6]
 ---
 # Active buzzer
 

@@ -44,6 +44,14 @@ model:
   - {kind: cyl, x: 13, r: 7.6, z: 1.6, h: 12, color: '#c5cbd3', top: '#d9dee5', inner: '#3a404c'}
   - {y: -5, w: 6, d: 3, z: 1.6, h: 1.6, color: '#d8dbe0'}
   - {y: 8.5, w: 10.2, d: 2.5, z: 1.6, h: 2.6, color: '#14171d'}
+  - {x: 0, y: -8, w: 14, d: 3, z: 1.6, h: 0.1, color: '#2a64d4', text: 'HC-SR04'}
+  - {kind: cyl, x: -13, r: 7.6, z: 13.6, h: 0.15, color: '#c5cbd3', inner: '#2a2f38'}
+  - {x: -13, y: 0, w: 4, d: 4, z: 13.75, h: 0.1, color: '#3a404c', text: 'T'}
+  - {x: 13, y: 0, w: 4, d: 4, z: 13.75, h: 0.1, color: '#3a404c', text: 'R'}
+  - {kind: cyl, x: -20.5, y: -8, r: 1.1, z: 1.6, h: 0.12, color: '#d9c27a', inner: '#20242c'}
+  - {kind: cyl, x: 20.5, y: -8, r: 1.1, z: 1.6, h: 0.12, color: '#d9c27a', inner: '#20242c'}
+  - {kind: cyl, x: -20.5, y: 8, r: 1.1, z: 1.6, h: 0.12, color: '#d9c27a', inner: '#20242c'}
+  - {kind: cyl, x: 20.5, y: 8, r: 1.1, z: 1.6, h: 0.12, color: '#d9c27a', inner: '#20242c'}
   pins:
     VCC: [-3.81, 8.5, 4.6]
     TRIG: [-1.27, 8.5, 4.6]

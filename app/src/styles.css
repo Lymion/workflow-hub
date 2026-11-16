@@ -59,6 +59,36 @@
   --ink: #05080E; --bench-shadow: rgba(0,0,0,.38); --callout: rgba(22,30,46,.94); --callout-line: rgba(160,190,230,.18); --hot: #FF8A3D;
 }
 
+:root[data-theme="glass"] {
+  /* frosted glass: light text colours over a vivid, blurred wallpaper; every surface is see-through frost */
+  --bg: #e9e4f7;
+  --sidebar: rgba(255,255,255,.30);
+  --surface: rgba(255,255,255,.40);
+  --surface-solid: rgba(255,255,255,.78);
+  --fill: rgba(255,255,255,.38);
+  --fill-strong: rgba(255,255,255,.55);
+  --sep: rgba(40,40,80,.12);
+  --label-2: #4a4a58; --label-3: #6f6f7d;
+  --hl: inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.45);
+  --shadow-1: 0 0 0 .5px rgba(40,30,90,.06), 0 1px 2px rgba(40,30,90,.08), 0 10px 30px -12px rgba(40,30,90,.28);
+  --shadow-2: 0 0 0 .5px rgba(40,30,90,.08), 0 2px 6px rgba(40,30,90,.08), 0 28px 56px -16px rgba(40,30,90,.34);
+  --blur: blur(36px) saturate(190%);
+  --paper: #F1F2FA; --paper-grid: rgba(80,90,170,.09); --paper-grid-2: rgba(80,90,170,.15); --paper-trace: rgba(120,110,230,.18);
+  --callout: rgba(255,255,255,.72); --callout-line: rgba(255,255,255,.9);
+}
+/* the wallpaper the frost blurs: big soft colour fields, fixed behind everything */
+:root[data-theme="glass"] body {
+  background:
+    radial-gradient(42vw 42vw at 8% 12%, rgba(255,128,64,.80), transparent 62%),
+    radial-gradient(46vw 46vw at 92% 6%, rgba(124,92,255,.78), transparent 62%),
+    radial-gradient(52vw 52vw at 78% 96%, rgba(0,196,204,.70), transparent 62%),
+    radial-gradient(40vw 40vw at 14% 92%, rgba(255,72,160,.62), transparent 62%),
+    radial-gradient(30vw 30vw at 50% 50%, rgba(255,214,10,.35), transparent 62%),
+    linear-gradient(135deg, #ffe0c4, #ddd3ff 50%, #c4f1ee);
+  background-attachment: fixed;
+}
+:root[data-theme="glass"] .bench { background: rgba(255,255,255,.35); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); }
+
 @layer base {
   html, body, #root { height: 100%; }
   body {
